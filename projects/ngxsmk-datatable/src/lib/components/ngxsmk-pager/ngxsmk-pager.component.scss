@@ -1,0 +1,403 @@
+// ============================================================================
+// NGXSMK Pager Component Styles
+// Clean, modern pagination with excellent UX
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// SCSS Variables
+// ----------------------------------------------------------------------------
+$pager-primary-color: #3b82f6;
+$pager-primary-hover: #2563eb;
+$pager-primary-active: #1d4ed8;
+
+$pager-bg-white: #ffffff;
+$pager-bg-hover: #f9fafb;
+$pager-bg-active: #f3f4f6;
+$pager-bg-disabled: #f9fafb;
+
+$pager-text-primary: #374151;
+$pager-text-secondary: #6b7280;
+$pager-text-tertiary: #9ca3af;
+$pager-text-disabled: #d1d5db;
+
+$pager-border: #d1d5db;
+$pager-border-hover: #9ca3af;
+$pager-border-disabled: #e5e7eb;
+
+$pager-radius: 6px;
+$pager-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$pager-shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+
+$pager-transition: all 0.2s ease;
+
+// ----------------------------------------------------------------------------
+// Mixins
+// ----------------------------------------------------------------------------
+@mixin button-base {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid $pager-border;
+  border-radius: $pager-radius;
+  background: $pager-bg-white;
+  color: $pager-text-primary;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: $pager-transition;
+  user-select: none;
+}
+
+@mixin button-hover {
+  background: $pager-bg-hover;
+  border-color: $pager-border-hover;
+  color: $pager-text-primary;
+  box-shadow: $pager-shadow-sm;
+}
+
+@mixin button-active {
+  background: $pager-bg-active;
+  transform: translateY(1px);
+}
+
+@mixin button-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: $pager-bg-disabled;
+  border-color: $pager-border-disabled;
+  color: $pager-text-tertiary;
+  box-shadow: none;
+}
+
+// ----------------------------------------------------------------------------
+// Main Component
+// ----------------------------------------------------------------------------
+.ngxsmk-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 12px;
+  background: transparent;
+  font-size: 14px;
+  color: $pager-text-primary;
+  min-height: 50px;
+  gap: 16px;
+  min-width: 100%;
+  width: max-content;
+  box-sizing: border-box;
+
+  // ----------------------------------------------------------------------------
+  // Page Size Selector
+  // ----------------------------------------------------------------------------
+  &__page-size {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    &-label {
+      font-weight: 500;
+      color: $pager-text-secondary;
+      white-space: nowrap;
+    }
+
+    &-select {
+      padding: 6px 10px;
+      border: 1px solid $pager-border;
+      border-radius: $pager-radius;
+      background: $pager-bg-white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: $pager-transition;
+      color: $pager-text-primary;
+      min-width: 70px;
+
+      &:hover {
+        border-color: $pager-border-hover;
+        background: $pager-bg-hover;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $pager-primary-color;
+        box-shadow: 0 0 0 3px rgba($pager-primary-color, 0.1);
+      }
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Range Information
+  // ----------------------------------------------------------------------------
+  &__range {
+    &-text {
+      color: $pager-text-secondary;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Total Items
+  // ----------------------------------------------------------------------------
+  &__total {
+    &-text {
+      color: $pager-text-secondary;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Navigation Controls
+  // ----------------------------------------------------------------------------
+  &__navigation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  // ----------------------------------------------------------------------------
+  // Page Numbers Container
+  // ----------------------------------------------------------------------------
+  &__page-numbers {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  // ----------------------------------------------------------------------------
+  // Ellipsis
+  // ----------------------------------------------------------------------------
+  &__ellipsis {
+    padding: 8px 4px;
+    color: $pager-text-tertiary;
+    font-weight: 600;
+  }
+
+  // ----------------------------------------------------------------------------
+  // Buttons
+  // ----------------------------------------------------------------------------
+  &__button {
+    @include button-base;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+
+    &:hover:not(:disabled) {
+      @include button-hover;
+    }
+
+    &:active:not(:disabled) {
+      @include button-active;
+    }
+
+    &:disabled {
+      @include button-disabled;
+    }
+
+    // Active page button
+    &--active {
+      background: $pager-primary-color;
+      border-color: $pager-primary-color;
+      color: white;
+      box-shadow: $pager-shadow-sm;
+      font-weight: 600;
+
+      &:hover {
+        background: $pager-primary-hover;
+        border-color: $pager-primary-hover;
+        box-shadow: $pager-shadow-md;
+        color: white;
+      }
+
+      &:active {
+        background: $pager-primary-active;
+        border-color: $pager-primary-active;
+      }
+    }
+
+    // Button types
+    &--first,
+    &--last {
+      min-width: 40px;
+    }
+
+    &--previous,
+    &--next {
+      min-width: 40px;
+    }
+
+    &--page {
+      min-width: 36px;
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Icons
+  // ----------------------------------------------------------------------------
+  &__icon {
+    font-size: 12px;
+    font-weight: bold;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Responsive Design
+// ----------------------------------------------------------------------------
+@media (max-width: 768px) {
+  .ngxsmk-pager {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+
+    &__navigation {
+      order: 1;
+    }
+
+    &__page-size,
+    &__range,
+    &__total {
+      order: 2;
+    }
+
+    &__page-numbers {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    &__button {
+      min-width: 32px;
+      height: 32px;
+      font-size: 13px;
+      padding: 0 8px;
+    }
+
+    &__page-size,
+    &__range,
+    &__total {
+      font-size: 13px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .ngxsmk-pager {
+    padding: 8px;
+    gap: 8px;
+
+    &__button {
+      min-width: 28px;
+      height: 28px;
+      font-size: 12px;
+      padding: 0 6px;
+
+      &--first,
+      &--last,
+      &--previous,
+      &--next {
+        min-width: 32px;
+      }
+    }
+
+    &__page-size,
+    &__range,
+    &__total {
+      font-size: 12px;
+    }
+
+    &__ellipsis {
+      padding: 6px 2px;
+    }
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Dark Theme Support
+// ----------------------------------------------------------------------------
+@media (prefers-color-scheme: dark) {
+  .ngxsmk-pager {
+    $pager-dark-bg: #111827;
+    $pager-dark-bg-hover: #1f2937;
+    $pager-dark-bg-active: #374151;
+    $pager-dark-text-primary: #f3f4f6;
+    $pager-dark-text-secondary: #d1d5db;
+    $pager-dark-text-tertiary: #9ca3af;
+    $pager-dark-border: #4b5563;
+    $pager-dark-border-hover: #6b7280;
+
+    color: $pager-dark-text-primary;
+
+    &__page-size {
+      &-label {
+        color: $pager-dark-text-secondary;
+      }
+
+      &-select {
+        background: $pager-dark-bg;
+        border-color: $pager-dark-border;
+        color: $pager-dark-text-primary;
+
+        &:hover {
+          border-color: $pager-dark-border-hover;
+          background: $pager-dark-bg-hover;
+        }
+
+        &:focus {
+          border-color: $pager-primary-color;
+          box-shadow: 0 0 0 3px rgba($pager-primary-color, 0.2);
+        }
+      }
+    }
+
+    &__range,
+    &__total {
+      &-text {
+        color: $pager-dark-text-secondary;
+      }
+    }
+
+    &__ellipsis {
+      color: $pager-dark-text-tertiary;
+    }
+
+    &__button {
+      background: $pager-dark-bg;
+      border-color: $pager-dark-border;
+      color: $pager-dark-text-primary;
+
+      &:hover:not(:disabled) {
+        background: $pager-dark-bg-hover;
+        border-color: $pager-dark-border-hover;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+      }
+
+      &:active:not(:disabled) {
+        background: $pager-dark-bg-active;
+      }
+
+      &:disabled {
+        opacity: 0.3;
+        background: $pager-dark-bg;
+        border-color: $pager-dark-border;
+        color: $pager-dark-text-tertiary;
+      }
+
+      &--active {
+        background: $pager-primary-color;
+        border-color: $pager-primary-color;
+        color: white;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+
+        &:hover {
+          background: $pager-primary-hover;
+          border-color: $pager-primary-hover;
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        &:active {
+          background: $pager-primary-active;
+          border-color: $pager-primary-active;
+        }
+      }
+    }
+  }
+}

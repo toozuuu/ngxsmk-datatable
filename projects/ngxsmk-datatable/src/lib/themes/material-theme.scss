@@ -1,0 +1,535 @@
+// ============================================================================
+// Material Design Theme for ngxsmk-datatable
+// Based on Material Design 3 (Material You) guidelines
+// Clean, modern implementation without unnecessary borders
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// Material Design Color Tokens
+// ----------------------------------------------------------------------------
+$md-primary: #6750a4;
+$md-primary-light: rgba(103, 80, 164, 0.08);
+$md-on-primary: #ffffff;
+$md-primary-container: #eaddff;
+$md-on-primary-container: #21005d;
+
+$md-surface: #fef7ff;
+$md-surface-variant: #e7e0ec;
+$md-on-surface: #1c1b1f;
+$md-on-surface-variant: #49454f;
+
+$md-outline: #79747e;
+$md-outline-variant: #cac4d0;
+
+$md-surface-hover: #f5eeff;
+$md-surface-selected: #e8deff;
+
+// Typography
+$md-font: 'Roboto', 'Segoe UI', Arial, sans-serif;
+
+// Shadows
+$md-shadow-1: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+$md-shadow-2: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+
+// ----------------------------------------------------------------------------
+// Material Theme Application
+// ----------------------------------------------------------------------------
+.ngxsmk-datatable {
+  font-family: $md-font;
+  background: $md-surface;
+  color: $md-on-surface;
+  border: 1px solid $md-outline-variant;
+  border-radius: 12px;
+  box-shadow: $md-shadow-1;
+
+  // ----------------------------------------------------------------------------
+  // Header
+  // ----------------------------------------------------------------------------
+  &__header {
+    background: $md-surface-variant;
+    border-bottom: 1px solid $md-outline-variant;
+
+    &-row {
+      background: $md-surface-variant;
+    }
+
+    &-cell {
+      background: $md-surface-variant;
+      color: $md-on-surface-variant;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.1px;
+      padding: 16px 12px;
+
+      &--sortable {
+        &:hover {
+          background: $md-primary-container;
+          color: $md-on-primary-container;
+        }
+      }
+
+      &--sorted {
+        background: $md-primary-container;
+        color: $md-on-primary-container;
+        font-weight: 600;
+      }
+
+      &--frozen-left,
+      &--frozen-right {
+        background: $md-surface-variant;
+      }
+
+      &-sort-icon {
+        color: $md-primary;
+      }
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Body
+  // ----------------------------------------------------------------------------
+  &__body {
+    background: $md-surface;
+    scrollbar-color: $md-outline transparent;
+
+    &::-webkit-scrollbar-thumb {
+      background: $md-outline;
+
+      &:hover {
+        background: $md-on-surface-variant;
+      }
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Rows
+  // ----------------------------------------------------------------------------
+  &__row {
+    transition: background-color 0.2s ease;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid $md-outline-variant;
+    }
+
+    &:hover {
+      background: $md-surface-hover !important;
+      box-shadow: inset 0 0 0 1px rgba($md-primary, 0.12);
+    }
+
+    &--selected {
+      background: $md-surface-selected !important;
+      box-shadow: inset 3px 0 0 0 $md-primary;
+
+      &:hover {
+        background: darken($md-surface-selected, 2%) !important;
+      }
+    }
+
+    &--odd {
+      background: $md-surface;
+    }
+
+    &--even {
+      background: rgba($md-primary, 0.02);
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Cells
+  // ----------------------------------------------------------------------------
+  &__cell {
+    color: $md-on-surface;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+
+    &--frozen-left,
+    &--frozen-right {
+      background: inherit;
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Checkbox
+  // ----------------------------------------------------------------------------
+  &__checkbox {
+    accent-color: $md-primary;
+    border-radius: 2px;
+  }
+
+  // ----------------------------------------------------------------------------
+  // Row Detail
+  // ----------------------------------------------------------------------------
+  &__row-detail {
+    background: $md-surface-variant;
+    border-top: 1px solid $md-outline-variant;
+
+    &--expanded {
+      border-bottom: 1px solid $md-outline-variant;
+    }
+
+    &-content {
+      background: $md-surface-variant;
+      color: $md-on-surface-variant;
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Detail Toggle
+  // ----------------------------------------------------------------------------
+  &__detail-toggle {
+    &-button {
+      background: transparent;
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+
+      &:hover {
+        background: $md-primary-container;
+      }
+
+      &--expanded {
+        background: $md-primary;
+
+        .ngxsmk-datatable__detail-toggle-icon {
+          color: $md-on-primary;
+        }
+      }
+    }
+
+    &-icon {
+      color: $md-primary;
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Footer
+  // ----------------------------------------------------------------------------
+  &__footer {
+    background: $md-surface-variant;
+    border-top: 1px solid $md-outline-variant;
+  }
+
+  // ----------------------------------------------------------------------------
+  // Loading
+  // ----------------------------------------------------------------------------
+  &__loading {
+    background: rgba($md-surface, 0.95);
+
+    &-spinner {
+      border-color: $md-outline-variant;
+      border-top-color: $md-primary;
+    }
+
+    &-text {
+      color: $md-on-surface-variant;
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Empty State
+  // ----------------------------------------------------------------------------
+  &__empty {
+    color: $md-on-surface-variant;
+
+    &-icon {
+      color: $md-outline;
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Resize Handle
+  // ----------------------------------------------------------------------------
+  &__resize-handle {
+    &:hover {
+      background: rgba($md-primary, 0.2);
+    }
+
+    &::after {
+      background: transparent;
+    }
+
+    &:hover::after {
+      background: $md-primary;
+    }
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Material Pager Styling
+// ----------------------------------------------------------------------------
+.ngxsmk-pager {
+  font-family: $md-font;
+
+  &__page-size {
+    &-label {
+      color: $md-on-surface-variant;
+    }
+
+    &-select {
+      border-color: $md-outline;
+      color: $md-on-surface;
+
+      &:hover {
+        border-color: $md-on-surface-variant;
+      }
+
+      &:focus {
+        border-color: $md-primary;
+        box-shadow: 0 0 0 3px rgba($md-primary, 0.12);
+      }
+    }
+  }
+
+  &__range,
+  &__total {
+    &-text {
+      color: $md-on-surface-variant;
+    }
+  }
+
+  &__button {
+    border-color: $md-outline;
+    color: $md-on-surface;
+
+    &:hover:not(:disabled) {
+      border-color: $md-on-surface-variant;
+      background: $md-surface-variant;
+    }
+
+    &--active {
+      background: $md-primary;
+      border-color: $md-primary;
+      color: $md-on-primary;
+
+      &:hover {
+        background: darken($md-primary, 5%);
+        border-color: darken($md-primary, 5%);
+      }
+    }
+  }
+
+  &__ellipsis {
+    color: $md-outline;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Material Design Dark Theme
+// ----------------------------------------------------------------------------
+@media (prefers-color-scheme: dark) {
+  .ngxsmk-datatable {
+    $md-dark-primary: #d0bcff;
+    $md-dark-on-primary: #381e72;
+    $md-dark-primary-container: #4f378b;
+    $md-dark-on-primary-container: #eaddff;
+    $md-dark-surface: #141218;
+    $md-dark-surface-variant: #49454f;
+    $md-dark-on-surface: #e6e0e9;
+    $md-dark-on-surface-variant: #cac4d0;
+    $md-dark-outline: #938f99;
+    $md-dark-outline-variant: #49454f;
+    $md-dark-surface-hover: rgba(208, 188, 255, 0.08);
+    $md-dark-surface-selected: rgba(208, 188, 255, 0.12);
+
+    background: $md-dark-surface;
+    color: $md-dark-on-surface;
+    border-color: $md-dark-outline-variant;
+
+    &__header {
+      background: $md-dark-surface-variant;
+      border-bottom-color: $md-dark-outline-variant;
+
+      &-row {
+        background: $md-dark-surface-variant;
+      }
+
+      &-cell {
+        background: $md-dark-surface-variant;
+        color: $md-dark-on-surface-variant;
+
+        &--sortable:hover {
+          background: $md-dark-primary-container;
+          color: $md-dark-on-primary-container;
+        }
+
+        &--sorted {
+          background: $md-dark-primary-container;
+          color: $md-dark-on-primary-container;
+        }
+
+        &--frozen-left,
+        &--frozen-right {
+          background: $md-dark-surface-variant;
+        }
+
+        &-sort-icon {
+          color: $md-dark-primary;
+        }
+      }
+    }
+
+    &__body {
+      background: $md-dark-surface;
+      scrollbar-color: $md-dark-outline transparent;
+    }
+
+    &__row {
+      border-bottom-color: $md-dark-outline-variant;
+
+      &:hover {
+        background: $md-dark-surface-hover !important;
+        box-shadow: inset 0 0 0 1px $md-dark-outline;
+      }
+
+      &--selected {
+        background: $md-dark-surface-selected !important;
+        box-shadow: inset 3px 0 0 0 $md-dark-primary;
+      }
+
+      &--odd {
+        background: $md-dark-surface;
+      }
+
+      &--even {
+        background: rgba($md-dark-primary, 0.02);
+      }
+    }
+
+    &__cell {
+      color: $md-dark-on-surface;
+    }
+
+    &__checkbox {
+      accent-color: $md-dark-primary;
+    }
+
+    &__row-detail {
+      background: $md-dark-surface-variant;
+      border-top-color: $md-dark-outline-variant;
+      border-bottom-color: $md-dark-outline-variant;
+
+      &-content {
+        background: $md-dark-surface-variant;
+        color: $md-dark-on-surface-variant;
+      }
+    }
+
+    &__detail-toggle {
+      &-button {
+        &:hover {
+          background: $md-dark-primary-container;
+        }
+
+        &--expanded {
+          background: $md-dark-primary;
+
+          .ngxsmk-datatable__detail-toggle-icon {
+            color: $md-dark-on-primary;
+          }
+        }
+      }
+
+      &-icon {
+        color: $md-dark-primary;
+      }
+    }
+
+    &__footer {
+      background: $md-dark-surface-variant;
+      border-top-color: $md-dark-outline-variant;
+    }
+
+    &__loading {
+      background: rgba($md-dark-surface, 0.95);
+
+      &-spinner {
+        border-color: $md-dark-outline-variant;
+        border-top-color: $md-dark-primary;
+      }
+
+      &-text {
+        color: $md-dark-on-surface-variant;
+      }
+    }
+
+    &__empty {
+      color: $md-dark-on-surface-variant;
+
+      &-icon {
+        color: $md-dark-outline;
+      }
+    }
+
+    &__resize-handle {
+      &:hover {
+        background: rgba($md-dark-primary, 0.2);
+      }
+
+      &:hover::after {
+        background: $md-dark-primary;
+      }
+    }
+  }
+
+  .ngxsmk-pager {
+    $md-dark-primary: #d0bcff;
+    $md-dark-surface: #141218;
+    $md-dark-surface-variant: #49454f;
+    $md-dark-on-surface: #e6e0e9;
+    $md-dark-on-surface-variant: #cac4d0;
+    $md-dark-outline: #938f99;
+
+    &__page-size {
+      &-label {
+        color: $md-dark-on-surface-variant;
+      }
+
+      &-select {
+        background: $md-dark-surface;
+        border-color: $md-dark-outline;
+        color: $md-dark-on-surface;
+
+        &:hover {
+          background: $md-dark-surface-variant;
+        }
+
+        &:focus {
+          border-color: $md-dark-primary;
+          box-shadow: 0 0 0 3px rgba($md-dark-primary, 0.2);
+        }
+      }
+    }
+
+    &__range,
+    &__total {
+      &-text {
+        color: $md-dark-on-surface-variant;
+      }
+    }
+
+    &__button {
+      background: $md-dark-surface;
+      border-color: $md-dark-outline;
+      color: $md-dark-on-surface;
+
+      &:hover:not(:disabled) {
+        background: $md-dark-surface-variant;
+        border-color: $md-dark-on-surface-variant;
+      }
+
+      &--active {
+        background: $md-dark-primary;
+        border-color: $md-dark-primary;
+        color: $md-dark-on-surface;
+      }
+    }
+
+    &__ellipsis {
+      color: $md-dark-outline;
+    }
+  }
+}

@@ -1,0 +1,127 @@
+@if (config) {
+  <div class="ngxsmk-pager">
+    
+    <!-- Page size selector -->
+    @if (config.showPageSizeOptions) {
+      <div class="ngxsmk-pager__page-size">
+        <label class="ngxsmk-pager__page-size-label">Items per page:</label>
+        <select 
+          class="ngxsmk-pager__page-size-select"
+          [value]="pageSize"
+          (change)="onPageSizeChange($any($event.target).value)"
+        >
+          @for (size of getPageSizeOptions(); track size) {
+            <option [value]="size">
+              {{ size }}
+            </option>
+          }
+        </select>
+      </div>
+    }
+
+    <!-- Range information -->
+    @if (config.showRangeLabels) {
+      <div class="ngxsmk-pager__range">
+        <span class="ngxsmk-pager__range-text">{{ getRangeLabel() }}</span>
+      </div>
+    }
+
+    <!-- Total items -->
+    @if (config.showTotalItems) {
+      <div class="ngxsmk-pager__total">
+        <span class="ngxsmk-pager__total-text">{{ getTotalItemsLabel() }}</span>
+      </div>
+    }
+
+    <!-- Navigation controls -->
+    <div class="ngxsmk-pager__navigation">
+      
+      <!-- First page button -->
+      @if (config.showFirstLastButtons) {
+        <button 
+          class="ngxsmk-pager__button ngxsmk-pager__button--first"
+          [disabled]="!hasPreviousPage"
+          (click)="goToFirstPage()"
+          title="First page"
+        >
+          <i class="ngxsmk-pager__icon">⏮</i>
+        </button>
+      }
+
+      <!-- Previous page button -->
+      <button 
+        class="ngxsmk-pager__button ngxsmk-pager__button--previous"
+        [disabled]="!hasPreviousPage"
+        (click)="goToPreviousPage()"
+        title="Previous page"
+      >
+        <i class="ngxsmk-pager__icon">◀</i>
+      </button>
+
+      <!-- Page numbers -->
+      <div class="ngxsmk-pager__page-numbers">
+        
+        <!-- Ellipsis before -->
+        @if (shouldShowEllipsisBefore()) {
+          <span class="ngxsmk-pager__ellipsis">
+            ...
+          </span>
+        }
+
+        <!-- Page number buttons -->
+        @for (page of pageNumbers; track page) {
+          <button 
+            class="ngxsmk-pager__button ngxsmk-pager__button--page"
+            [class.ngxsmk-pager__button--active]="page === currentPage"
+            (click)="onPageChange(page)"
+          >
+            {{ page }}
+          </button>
+        }
+
+        <!-- Ellipsis after -->
+        @if (shouldShowEllipsisAfter()) {
+          <span class="ngxsmk-pager__ellipsis">
+            ...
+          </span>
+        }
+
+      </div>
+
+      <!-- Next page button -->
+      <button 
+        class="ngxsmk-pager__button ngxsmk-pager__button--next"
+        [disabled]="!hasNextPage"
+        (click)="goToNextPage()"
+        title="Next page"
+      >
+        <i class="ngxsmk-pager__icon">▶</i>
+      </button>
+
+      <!-- Last page button -->
+      @if (config.showFirstLastButtons) {
+        <button 
+          class="ngxsmk-pager__button ngxsmk-pager__button--last"
+          [disabled]="!hasNextPage"
+          (click)="goToLastPage()"
+          title="Last page"
+        >
+          <i class="ngxsmk-pager__icon">⏭</i>
+        </button>
+      }
+
+    </div>
+
+    <!-- Refresh button (PR #2184) -->
+    @if (showRefreshButton) {
+      <button 
+        class="ngxsmk-pager__button ngxsmk-pager__button--refresh"
+        (click)="onRefresh()"
+        title="Refresh"
+      >
+        <i class="ngxsmk-pager__icon">↻</i>
+      </button>
+    }
+
+  </div>
+}

@@ -1,0 +1,367 @@
+<div 
+  #datatableContainer
+  class="ngxsmk-datatable"
+  [class]="class"
+  [class.ngxsmk-datatable--virtual]="virtualScrolling"
+  [class.ngxsmk-datatable--loading]="loadingIndicator"
+  [class.ngxsmk-datatable--empty]="rows.length === 0"
+>
+  
+  <!-- Loading indicator -->
+  @if (loadingIndicator) {
+    <div class="ngxsmk-datatable__loading">
+      <div class="ngxsmk-datatable__loading-spinner"></div>
+      <span class="ngxsmk-datatable__loading-text">Loading...</span>
+    </div>
+  }
+
+  <!-- Empty state -->
+  @if (!loadingIndicator && rows.length === 0) {
+    <div class="ngxsmk-datatable__empty">
+      <i [class]="emptyIconClass" class="ngxsmk-datatable__empty-icon"></i>
+      <p class="ngxsmk-datatable__empty-message">{{ emptyMessage }}</p>
+    </div>
+  }
+
+  <!-- Data table content -->
+  @if (!loadingIndicator && rows.length > 0) {
+    <div class="ngxsmk-datatable__content">
+      
+      <!-- Header -->
+      <div 
+        #headerElement
+        class="ngxsmk-datatable__header"
+        [class]="headerClass"
+        [style.height.px]="headerHeight"
+      >
+        <div class="ngxsmk-datatable__header-row">
+          
+          <!-- Row detail toggle column -->
+          @if (rowDetail) {
+            <div 
+              class="ngxsmk-datatable__header-cell ngxsmk-datatable__header-cell--detail-toggle"
+              [style.width.px]="40"
+            >
+              <span class="ngxsmk-datatable__header-cell-text">Details</span>
+            </div>
+          }
+
+          <!-- Selection checkbox column -->
+          @if (selectionType === 'checkbox' && selectCheckboxPosition === 'left') {
+            <div 
+              class="ngxsmk-datatable__header-cell ngxsmk-datatable__header-cell--checkbox"
+              [style.width.px]="50"
+            >
+              <input 
+                type="checkbox"
+                class="ngxsmk-datatable__checkbox"
+                [checked]="selectionModel.isAllSelected(rows)"
+                [indeterminate]="selectionModel.isIndeterminate(rows)"
+                (change)="selectAll()"
+              />
+            </div>
+          }
+
+          <!-- Frozen left columns -->
+          @for (column of frozenLeftColumns; track column.id) {
+            <div 
+              class="ngxsmk-datatable__header-cell ngxsmk-datatable__header-cell--frozen-left"
+              [class]="getHeaderClass(column)"
+              [style.width.px]="columnWidths[column.id]"
+              [class.ngxsmk-datatable__header-cell--sortable]="column.sortable"
+              [class.ngxsmk-datatable__header-cell--sorted]="isColumnSorted(column)"
+              [class.ngxsmk-datatable__header-cell--resizing]="isResizingColumn(column)"
+              (click)="onHeaderClick($event, column)"
+            >
+              <div class="ngxsmk-datatable__header-cell-content">
+                <span class="ngxsmk-datatable__header-cell-text">{{ column.name }}</span>
+                @if (column.sortable) {
+                  <i 
+                    class="ngxsmk-datatable__header-cell-sort-icon"
+                    [class.ngxsmk-datatable__header-cell-sort-icon--asc]="isColumnSortedAsc(column)"
+                    [class.ngxsmk-datatable__header-cell-sort-icon--desc]="isColumnSortedDesc(column)"
+                  ></i>
+                }
+              </div>
+              <!-- Resize handle -->
+              @if (column.resizable !== false) {
+                <div 
+                  class="ngxsmk-datatable__resize-handle"
+                  (mousedown)="onResizeStart($event, column)"
+                ></div>
+              }
+            </div>
+          }
+
+          <!-- Scrollable columns -->
+          @for (column of scrollableColumns; track column.id) {
+            <div 
+              class="ngxsmk-datatable__header-cell"
+              [class]="getHeaderClass(column)"
+              [style.width.px]="columnWidths[column.id]"
+              [class.ngxsmk-datatable__header-cell--sortable]="column.sortable"
+              [class.ngxsmk-datatable__header-cell--sorted]="isColumnSorted(column)"
+              [class.ngxsmk-datatable__header-cell--resizing]="isResizingColumn(column)"
+              (click)="onHeaderClick($event, column)"
+            >
+              <div class="ngxsmk-datatable__header-cell-content">
+                <span class="ngxsmk-datatable__header-cell-text">{{ column.name }}</span>
+                @if (column.sortable) {
+                  <i 
+                    class="ngxsmk-datatable__header-cell-sort-icon"
+                    [class.ngxsmk-datatable__header-cell-sort-icon--asc]="isColumnSortedAsc(column)"
+                    [class.ngxsmk-datatable__header-cell-sort-icon--desc]="isColumnSortedDesc(column)"
+                  ></i>
+                }
+              </div>
+              <!-- Resize handle -->
+              @if (column.resizable !== false) {
+                <div 
+                  class="ngxsmk-datatable__resize-handle"
+                  (mousedown)="onResizeStart($event, column)"
+                ></div>
+              }
+            </div>
+          }
+
+          <!-- Frozen right columns -->
+          @for (column of frozenRightColumns; track column.id) {
+            <div 
+              class="ngxsmk-datatable__header-cell ngxsmk-datatable__header-cell--frozen-right"
+              [class]="getHeaderClass(column)"
+              [style.width.px]="columnWidths[column.id]"
+              [class.ngxsmk-datatable__header-cell--sortable]="column.sortable"
+              [class.ngxsmk-datatable__header-cell--sorted]="isColumnSorted(column)"
+              [class.ngxsmk-datatable__header-cell--resizing]="isResizingColumn(column)"
+              (click)="onHeaderClick($event, column)"
+            >
+              <div class="ngxsmk-datatable__header-cell-content">
+                <span class="ngxsmk-datatable__header-cell-text">{{ column.name }}</span>
+                @if (column.sortable) {
+                  <i 
+                    class="ngxsmk-datatable__header-cell-sort-icon"
+                    [class.ngxsmk-datatable__header-cell-sort-icon--asc]="isColumnSortedAsc(column)"
+                    [class.ngxsmk-datatable__header-cell-sort-icon--desc]="isColumnSortedDesc(column)"
+                  ></i>
+                }
+              </div>
+              <!-- Resize handle -->
+              @if (column.resizable !== false) {
+                <div 
+                  class="ngxsmk-datatable__resize-handle"
+                  (mousedown)="onResizeStart($event, column)"
+                ></div>
+              }
+            </div>
+          }
+
+          <!-- Selection checkbox column -->
+          @if (selectionType === 'checkbox' && selectCheckboxPosition === 'right') {
+            <div 
+              class="ngxsmk-datatable__header-cell ngxsmk-datatable__header-cell--checkbox"
+              [style.width.px]="50"
+            >
+              <input 
+                type="checkbox"
+                class="ngxsmk-datatable__checkbox"
+                [checked]="selectionModel.isAllSelected(rows)"
+                [indeterminate]="selectionModel.isIndeterminate(rows)"
+                (change)="selectAll()"
+              />
+            </div>
+          }
+
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div 
+        #bodyElement
+        class="ngxsmk-datatable__body"
+        [class.ngxsmk-datatable__body--scrollable]="scrollbarV || scrollbarH"
+        [class.ngxsmk-datatable__body--virtual]="virtualScrolling"
+        [style.overflow-y]="scrollbarV || virtualScrolling ? 'auto' : 'hidden'"
+        [style.overflow-x]="scrollbarH ? 'auto' : 'hidden'"
+      >
+        <!-- Virtual scroll container -->
+        <div class="ngxsmk-datatable__scroll-content" [style.height.px]="virtualScrolling ? totalHeight : 'auto'">
+          <!-- Virtual scrolling spacer -->
+          @if (virtualScrolling) {
+            <div 
+              class="ngxsmk-datatable__virtual-spacer"
+              [style.height.px]="visibleStartIndex * rowHeight"
+            ></div>
+          }
+
+          <!-- Rows -->
+        @for (row of visibleRows; track rowIdentity(row); let i = $index) {
+          <div 
+            class="ngxsmk-datatable__row"
+            [class]="getRowClass(row, visibleStartIndex + i)"
+            [class.ngxsmk-datatable__row--selected]="selectionModel.isSelected(row)"
+            [class.ngxsmk-datatable__row--odd]="(visibleStartIndex + i) % 2 === 1"
+            [class.ngxsmk-datatable__row--even]="(visibleStartIndex + i) % 2 === 0"
+            [style.height.px]="rowHeight"
+            (click)="onRowClick($event, row, visibleStartIndex + i)"
+          >
+            
+            <!-- Row detail toggle cell -->
+            @if (rowDetail) {
+              <div 
+                class="ngxsmk-datatable__cell ngxsmk-datatable__cell--detail-toggle"
+                [style.width.px]="40"
+                (click)="toggleRowDetail($event, row, visibleStartIndex + i)"
+              >
+                <button 
+                  class="ngxsmk-datatable__detail-toggle-button"
+                  [class.ngxsmk-datatable__detail-toggle-button--expanded]="row.$$expanded"
+                >
+                  <i class="ngxsmk-datatable__detail-toggle-icon">▶</i>
+                </button>
+              </div>
+            }
+
+            <!-- Selection checkbox cell -->
+            @if (selectionType === 'checkbox' && selectCheckboxPosition === 'left') {
+              <div 
+                class="ngxsmk-datatable__cell ngxsmk-datatable__cell--checkbox"
+                [style.width.px]="50"
+              >
+                <input 
+                  type="checkbox"
+                  class="ngxsmk-datatable__checkbox"
+                  [checked]="selectionModel.isSelected(row)"
+                  (change)="handleRowSelection($event, row)"
+                />
+              </div>
+            }
+
+            <!-- Frozen left cells -->
+            @for (column of frozenLeftColumns; track column.id) {
+              <div 
+                class="ngxsmk-datatable__cell ngxsmk-datatable__cell--frozen-left"
+                [class]="getCellClass(row, column, row[column.prop || column.id], visibleStartIndex + i)"
+                [style.width.px]="columnWidths[column.id]"
+                (click)="onCellClick($event, row, column, row[column.prop || column.id])"
+              >
+                <div class="ngxsmk-datatable__cell-content">
+                  @if (column.cellTemplate) {
+                    <ng-container 
+                      *ngTemplateOutlet="column.cellTemplate; context: { $implicit: row, row: row, column: column, value: row[column.prop || column.id], rowIndex: visibleStartIndex + i }"
+                    ></ng-container>
+                  } @else {
+                    <span [innerHTML]="row[column.prop || column.id] | safeHtml"></span>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Scrollable cells -->
+            @for (column of scrollableColumns; track column.id) {
+              <div 
+                class="ngxsmk-datatable__cell"
+                [class]="getCellClass(row, column, row[column.prop || column.id], visibleStartIndex + i)"
+                [style.width.px]="columnWidths[column.id]"
+                (click)="onCellClick($event, row, column, row[column.prop || column.id])"
+              >
+                <div class="ngxsmk-datatable__cell-content">
+                  @if (column.cellTemplate) {
+                    <ng-container 
+                      *ngTemplateOutlet="column.cellTemplate; context: { $implicit: row, row: row, column: column, value: row[column.prop || column.id], rowIndex: visibleStartIndex + i }"
+                    ></ng-container>
+                  } @else {
+                    <span [innerHTML]="row[column.prop || column.id] | safeHtml"></span>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Frozen right cells -->
+            @for (column of frozenRightColumns; track column.id) {
+              <div 
+                class="ngxsmk-datatable__cell ngxsmk-datatable__cell--frozen-right"
+                [class]="getCellClass(row, column, row[column.prop || column.id], visibleStartIndex + i)"
+                [style.width.px]="columnWidths[column.id]"
+                (click)="onCellClick($event, row, column, row[column.prop || column.id])"
+              >
+                <div class="ngxsmk-datatable__cell-content">
+                  @if (column.cellTemplate) {
+                    <ng-container 
+                      *ngTemplateOutlet="column.cellTemplate; context: { $implicit: row, row: row, column: column, value: row[column.prop || column.id], rowIndex: visibleStartIndex + i }"
+                    ></ng-container>
+                  } @else {
+                    <span [innerHTML]="row[column.prop || column.id] | safeHtml"></span>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Selection checkbox cell -->
+            @if (selectionType === 'checkbox' && selectCheckboxPosition === 'right') {
+              <div 
+                class="ngxsmk-datatable__cell ngxsmk-datatable__cell--checkbox"
+                [style.width.px]="50"
+              >
+                <input 
+                  type="checkbox"
+                  class="ngxsmk-datatable__checkbox"
+                  [checked]="selectionModel.isSelected(row)"
+                  (change)="handleRowSelection($event, row)"
+                />
+              </div>
+            }
+
+          </div>
+        }
+
+        <!-- Row detail views -->
+        @for (row of visibleRows; track rowIdentity(row); let i = $index) {
+          <div 
+            class="ngxsmk-datatable__row-detail"
+            [class.ngxsmk-datatable__row-detail--expanded]="row.$$expanded"
+            [style.height.px]="row.$$expanded ? (rowDetail?.rowHeight || 100) : 0"
+            [style.margin-top.px]="row.$$expanded ? 0 : -(rowDetail?.rowHeight || 100)"
+          >
+            @if (row.$$expanded && rowDetailTemplate) {
+              <div class="ngxsmk-datatable__row-detail-content">
+                <ng-container 
+                  *ngTemplateOutlet="rowDetailTemplate; context: { $implicit: row, row: row, rowIndex: visibleStartIndex + i }"
+                ></ng-container>
+              </div>
+            }
+          </div>
+        }
+
+          <!-- Virtual scrolling spacer -->
+          @if (virtualScrolling) {
+            <div 
+              class="ngxsmk-datatable__virtual-spacer"
+              [style.height.px]="(rows.length - visibleEndIndex - 1) * rowHeight"
+            ></div>
+          }
+        </div>
+      </div>
+
+      <!-- Footer -->
+      @if (pagination) {
+        <div 
+          #footerElement
+          class="ngxsmk-datatable__footer"
+          [class]="footerClass"
+          [style.height.px]="footerHeight"
+        >
+          <ngxsmk-pager
+            [config]="pagination"
+            [currentPage]="currentPage"
+            [pageSize]="pageSize"
+            [totalItems]="totalItems"
+            [showRefreshButton]="showRefreshButton"
+            (pageChange)="onPageChange($event)"
+            (refresh)="onRefreshClick()"
+          ></ngxsmk-pager>
+        </div>
+      }
+
+    </div>
+  }
+</div>

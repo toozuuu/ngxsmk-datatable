@@ -1,0 +1,35 @@
+{
+  "name": "ngxsmk-datatable",
+  "version": "1.0.0",
+  "description": "A powerful, feature-rich Angular datatable component with virtual DOM support, built for Angular 17+",
+  "keywords": [
+    "angular",
+    "datatable",
+    "table",
+    "virtual-dom",
+    "pagination",
+    "sorting",
+    "material",
+    "typescript"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/ngxsmk-datatable.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/ngxsmk-datatable/issues"
+  },
+  "homepage": "https://github.com/yourusername/ngxsmk-datatable#readme",
+  "peerDependencies": {
+    "@angular/common": "^17.0.0 || ^18.0.0",
+    "@angular/core": "^17.0.0 || ^18.0.0",
+    "@angular/forms": "^17.0.0 || ^18.0.0",
+    "@angular/platform-browser": "^17.0.0 || ^18.0.0",
+    "rxjs": "^7.0.0"
+  },
+  "dependencies": {},
+  "sideEffects": false
+}
+

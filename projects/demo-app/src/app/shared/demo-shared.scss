@@ -1,0 +1,423 @@
+/* Shared styles for all demo components */
+
+/* User Avatar Component */
+.user-avatar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .avatar-image {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e0e0e0;
+  }
+
+  .user-name {
+    font-weight: 500;
+    color: #333;
+  }
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+
+  .btn-sm {
+    padding: 6px 10px;
+    font-size: 12px;
+    min-width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      font-size: 14px;
+    }
+  }
+}
+
+/* Status Badges */
+.status-active {
+  color: #28a745;
+  font-weight: 500;
+
+  i {
+    margin-right: 4px;
+  }
+}
+
+.status-inactive {
+  color: #dc3545;
+  font-weight: 500;
+
+  i {
+    margin-right: 4px;
+  }
+}
+
+.status-pending {
+  color: #ffc107;
+  font-weight: 500;
+
+  i {
+    margin-right: 4px;
+  }
+}
+
+/* Event Log */
+.event-log {
+  max-height: 200px;
+  overflow-y: auto;
+  background: #f8f9fa;
+  border-radius: 4px;
+  padding: 10px;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+}
+
+.event-item {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .event-time {
+    font-size: 11px;
+    color: #6c757d;
+    min-width: 80px;
+    font-family: 'Courier New', monospace;
+  }
+
+  .event-type {
+    font-weight: 600;
+    min-width: 120px;
+    color: #495057;
+    font-size: 13px;
+  }
+
+  .event-message {
+    color: #6c757d;
+    font-size: 13px;
+    flex: 1;
+  }
+}
+
+/* Config Panel */
+.config-panel {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+
+  .config-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .config-group {
+    flex: 1;
+    min-width: 200px;
+  }
+}
+
+/* Stats Cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+
+  .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2196f3;
+    margin-bottom: 5px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+/* Theme Switcher */
+.theme-switcher {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+
+  .theme-option {
+    flex: 1;
+    min-width: 150px;
+    padding: 15px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+
+    &:hover {
+      border-color: #2196f3;
+      background: #f8f9fa;
+    }
+
+    &.active {
+      border-color: #2196f3;
+      background: #e3f2fd;
+    }
+
+    .theme-name {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .theme-preview {
+      height: 40px;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+  }
+}
+
+/* Performance Metrics */
+.performance-metrics {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+
+  .metric {
+    flex: 1;
+    min-width: 150px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border-left: 4px solid #2196f3;
+
+    .metric-label {
+      font-size: 11px;
+      color: #6c757d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+    }
+
+    .metric-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #333;
+    }
+  }
+}
+
+/* Info Panels */
+.demo-info {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  border-left: 4px solid #2196f3;
+  margin-top: 20px;
+
+  h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #2196f3;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 20px;
+    list-style-type: disc;
+  }
+
+  li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+    color: #495057;
+
+    strong {
+      color: #212529;
+      font-weight: 600;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  p {
+    margin: 0 0 10px 0;
+    line-height: 1.6;
+    color: #495057;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+
+    .btn-sm {
+      width: 100%;
+    }
+  }
+
+  .config-row {
+    flex-direction: column;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .theme-switcher {
+    flex-direction: column;
+  }
+
+  .event-item {
+    flex-direction: column;
+    gap: 4px;
+
+    .event-time,
+    .event-type {
+      min-width: auto;
+    }
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .user-avatar {
+    .avatar-image {
+      border-color: #555;
+    }
+
+    .user-name {
+      color: #ffffff;
+    }
+  }
+
+  .event-log {
+    background: #2d2d2d;
+  }
+
+  .event-item {
+    border-bottom-color: #555;
+
+    .event-time,
+    .event-message {
+      color: #b0b0b0;
+    }
+
+    .event-type {
+      color: #ffffff;
+    }
+  }
+
+  .config-panel {
+    background: #2d2d2d;
+  }
+
+  .stat-card {
+    background: #1e1e1e;
+
+    .stat-label {
+      color: #b0b0b0;
+    }
+  }
+
+  .theme-option {
+    border-color: #555;
+    background: #2d2d2d;
+
+    &:hover {
+      background: #3d3d3d;
+    }
+
+    &.active {
+      background: #1e3a5f;
+    }
+  }
+
+  .metric {
+    background: #2d2d2d;
+
+    .metric-label {
+      color: #b0b0b0;
+    }
+
+    .metric-value {
+      color: #ffffff;
+    }
+  }
+
+  .demo-info {
+    background: #2d2d2d;
+    border-left-color: #64b5f6;
+
+    h4 {
+      color: #64b5f6;
+    }
+
+    li {
+      color: #e0e0e0;
+
+      strong {
+        color: #ffffff;
+      }
+    }
+
+    p {
+      color: #e0e0e0;
+    }
+  }
+}

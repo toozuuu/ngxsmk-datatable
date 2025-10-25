@@ -1,0 +1,892 @@
+// ============================================================================
+// NGXSMK DataTable Component Styles
+// Modern, clean design with minimal borders and excellent hover states
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// CSS Custom Properties (CSS Variables) - Fully Customizable
+// Users can override these in their own CSS to customize the datatable
+// ----------------------------------------------------------------------------
+:root {
+  // Primary Colors
+  --ngxsmk-dt-primary-color: #3b82f6;
+  --ngxsmk-dt-primary-hover: #2563eb;
+  --ngxsmk-dt-primary-light: rgba(59, 130, 246, 0.08);
+  --ngxsmk-dt-primary-lighter: rgba(59, 130, 246, 0.04);
+
+  // Background Colors
+  --ngxsmk-dt-bg-white: #ffffff;
+  --ngxsmk-dt-bg-light: #fafbfc;
+  --ngxsmk-dt-bg-lighter: #f8f9fb;
+  --ngxsmk-dt-bg-hover: #f0f4ff;
+  --ngxsmk-dt-bg-selected: #e8f0ff;
+
+  // Text Colors
+  --ngxsmk-dt-text-primary: #1f2937;
+  --ngxsmk-dt-text-secondary: #6b7280;
+  --ngxsmk-dt-text-tertiary: #9ca3af;
+
+  // Border Colors
+  --ngxsmk-dt-border-light: #f0f1f3;
+  --ngxsmk-dt-border-medium: #e5e7eb;
+  --ngxsmk-dt-border-dark: #d1d5db;
+
+  // Shadows
+  --ngxsmk-dt-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --ngxsmk-dt-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --ngxsmk-dt-shadow-hover: 0 0 0 1px var(--ngxsmk-dt-border-medium);
+
+  // Border Radius
+  --ngxsmk-dt-radius-sm: 4px;
+  --ngxsmk-dt-radius-md: 8px;
+  --ngxsmk-dt-radius-lg: 10px;
+
+  // Transitions
+  --ngxsmk-dt-transition-fast: 0.15s ease;
+  --ngxsmk-dt-transition-normal: 0.2s ease;
+
+  // Typography
+  --ngxsmk-dt-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Helvetica Neue', Arial, sans-serif;
+  --ngxsmk-dt-font-size: 14px;
+  --ngxsmk-dt-font-size-sm: 13px;
+  --ngxsmk-dt-font-size-xs: 12px;
+  --ngxsmk-dt-line-height: 1.6;
+
+  // Spacing
+  --ngxsmk-dt-padding: 16px;
+  --ngxsmk-dt-padding-sm: 12px;
+  --ngxsmk-dt-padding-xs: 8px;
+
+  // Row Height
+  --ngxsmk-dt-row-height: 54px;
+  --ngxsmk-dt-header-height: auto;
+}
+
+// ----------------------------------------------------------------------------
+// SCSS Variables (use CSS variables for flexibility)
+// ----------------------------------------------------------------------------
+$dt-primary-color: var(--ngxsmk-dt-primary-color);
+$dt-primary-hover: var(--ngxsmk-dt-primary-hover);
+$dt-primary-light: var(--ngxsmk-dt-primary-light);
+$dt-primary-lighter: var(--ngxsmk-dt-primary-lighter);
+
+$dt-bg-white: var(--ngxsmk-dt-bg-white);
+$dt-bg-light: var(--ngxsmk-dt-bg-light);
+$dt-bg-lighter: var(--ngxsmk-dt-bg-lighter);
+$dt-bg-hover: var(--ngxsmk-dt-bg-hover);
+$dt-bg-selected: var(--ngxsmk-dt-bg-selected);
+
+$dt-text-primary: var(--ngxsmk-dt-text-primary);
+$dt-text-secondary: var(--ngxsmk-dt-text-secondary);
+$dt-text-tertiary: var(--ngxsmk-dt-text-tertiary);
+
+$dt-border-light: var(--ngxsmk-dt-border-light);
+$dt-border-medium: var(--ngxsmk-dt-border-medium);
+$dt-border-dark: var(--ngxsmk-dt-border-dark);
+
+$dt-shadow-sm: var(--ngxsmk-dt-shadow-sm);
+$dt-shadow-md: var(--ngxsmk-dt-shadow-md);
+$dt-shadow-hover: var(--ngxsmk-dt-shadow-hover);
+
+$dt-radius-sm: var(--ngxsmk-dt-radius-sm);
+$dt-radius-md: var(--ngxsmk-dt-radius-md);
+$dt-radius-lg: var(--ngxsmk-dt-radius-lg);
+
+$dt-transition-fast: var(--ngxsmk-dt-transition-fast);
+$dt-transition-normal: var(--ngxsmk-dt-transition-normal);
+
+// ----------------------------------------------------------------------------
+// Mixins
+// ----------------------------------------------------------------------------
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: $dt-border-dark transparent;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $dt-border-dark;
+    border-radius: $dt-radius-sm;
+
+    &:hover {
+      background: $dt-text-tertiary;
+    }
+  }
+}
+
+@mixin frozen-column-shadow($direction: 'left') {
+  @if $direction == 'left' {
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.06);
+  } @else {
+    box-shadow: -2px 0 4px rgba(0, 0, 0, 0.06);
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Main Component
+// ----------------------------------------------------------------------------
+.ngxsmk-datatable {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: $dt-bg-white;
+  border: none;
+  border-radius: $dt-radius-lg;
+  overflow: hidden;
+  font-family: var(--ngxsmk-dt-font-family);
+  font-size: var(--ngxsmk-dt-font-size);
+  line-height: var(--ngxsmk-dt-line-height);
+  box-shadow: $dt-shadow-md;
+
+  // States
+  &--loading {
+    .ngxsmk-datatable__content {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+  }
+
+  &--empty {
+    .ngxsmk-datatable__content {
+      display: none;
+    }
+  }
+
+  &--virtual {
+    .ngxsmk-datatable__body {
+      position: relative;
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Loading Indicator
+  // ----------------------------------------------------------------------------
+  &__loading {
+    @include flex-center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.95);
+    z-index: 10;
+
+    &-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid $dt-border-light;
+      border-top: 3px solid $dt-primary-color;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 12px;
+    }
+
+    &-text {
+      color: $dt-text-secondary;
+      font-size: 14px;
+      font-weight: 500;
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Empty State
+  // ----------------------------------------------------------------------------
+  &__empty {
+    @include flex-center;
+    flex-direction: column;
+    padding: 60px 20px;
+    color: $dt-text-secondary;
+
+    &-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.4;
+      color: $dt-text-tertiary;
+    }
+
+    &-message {
+      font-size: 16px;
+      font-weight: 500;
+      margin: 0;
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Content Wrapper
+  // ----------------------------------------------------------------------------
+  &__content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+
+  // ----------------------------------------------------------------------------
+  // Header
+  // ----------------------------------------------------------------------------
+  &__header {
+    display: flex;
+    flex-direction: column;
+    background: $dt-bg-light;
+    border-bottom: 1px solid $dt-border-medium;
+    z-index: 2;
+
+    &-row {
+      display: flex;
+      min-height: 100%;
+      background: $dt-bg-light;
+    }
+
+    &-cell {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      background: $dt-bg-light;
+      font-weight: 600;
+      font-size: 13px;
+      color: $dt-text-primary;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      cursor: default;
+      user-select: none;
+      min-width: 0;
+      flex-shrink: 0;
+      position: relative;
+      transition: background-color $dt-transition-fast, color $dt-transition-fast;
+
+      // Sortable
+      &--sortable {
+        cursor: pointer;
+
+        &:hover {
+          background: $dt-bg-hover;
+          color: $dt-primary-color;
+        }
+
+        &:active {
+          background: $dt-primary-light;
+        }
+      }
+
+      // Sorted
+      &--sorted {
+        background: $dt-primary-light;
+        color: $dt-primary-color;
+        font-weight: 700;
+      }
+
+      // Frozen columns (inherit header background)
+      &--frozen-left {
+        position: sticky;
+        left: 0;
+        z-index: 3;
+        background: $dt-bg-light;
+        @include frozen-column-shadow('left');
+      }
+
+      &--frozen-right {
+        position: sticky;
+        right: 0;
+        z-index: 3;
+        background: $dt-bg-light;
+        @include frozen-column-shadow('right');
+      }
+
+      // Checkbox column
+      &--checkbox {
+        justify-content: center;
+        padding: 0 8px;
+      }
+
+      // Content
+      &-content {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        min-width: 0;
+      }
+
+      &-text {
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      // Sort icon
+      &-sort-icon {
+        margin-left: 8px;
+        font-size: 12px;
+        opacity: 0.7;
+        transition: opacity $dt-transition-normal;
+
+        &--asc::before {
+          content: '▲';
+        }
+
+        &--desc::before {
+          content: '▼';
+        }
+
+        &:not(.ngxsmk-datatable__header-cell-sort-icon--asc):not(.ngxsmk-datatable__header-cell-sort-icon--desc)::before {
+          content: '⇅';
+        }
+      }
+
+      // Resizing state
+      &--resizing {
+        background: $dt-primary-light !important;
+      }
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Resize Handle
+  // ----------------------------------------------------------------------------
+  &__resize-handle {
+    position: absolute;
+    top: 0;
+    right: -4px;
+    width: 8px;
+    height: 100%;
+    cursor: col-resize !important;
+    z-index: 100;
+    background: transparent;
+    transition: background-color $dt-transition-normal;
+
+    &:hover {
+      background: rgba($dt-primary-color, 0.2);
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 2px;
+      height: 60%;
+      background: transparent;
+      transition: background $dt-transition-normal;
+    }
+
+    &:hover::after {
+      background: $dt-primary-color;
+    }
+
+    &:active {
+      background: rgba($dt-primary-color, 0.3);
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Body
+  // ----------------------------------------------------------------------------
+  &__body {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+    min-height: 0;
+    @include custom-scrollbar;
+
+    &--virtual {
+      overflow-y: scroll;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+
+  // Scroll content wrapper
+  &__scroll-content {
+    position: relative;
+    width: 100%;
+  }
+
+  // Virtual spacer
+  &__virtual-spacer {
+    width: 100%;
+    flex-shrink: 0;
+  }
+
+  // ----------------------------------------------------------------------------
+  // Rows
+  // ----------------------------------------------------------------------------
+  &__row {
+    display: flex;
+    min-height: var(--ngxsmk-dt-row-height);
+    transition: background-color $dt-transition-fast, box-shadow $dt-transition-fast;
+    cursor: pointer;
+    position: relative;
+
+    // Hover state - much more visible
+    &:hover {
+      background: $dt-bg-hover !important;
+      box-shadow: inset 0 0 0 1px rgba($dt-primary-color, 0.15);
+      z-index: 1;
+    }
+
+    // Selected state
+    &--selected {
+      background: $dt-bg-selected !important;
+      box-shadow: inset 3px 0 0 0 $dt-primary-color;
+      z-index: 1;
+
+      &:hover {
+        background: #dae7ff !important;
+      }
+    }
+
+    // Striping (optional, very subtle)
+    &--odd {
+      background: $dt-bg-white;
+    }
+
+    &--even {
+      background: $dt-bg-light;
+    }
+
+    // Separator between rows (minimal)
+    &:not(:last-child) {
+      border-bottom: 1px solid $dt-border-light;
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Cells
+  // ----------------------------------------------------------------------------
+  &__cell {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    min-width: 0;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    color: $dt-text-primary;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.6;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    // Frozen columns
+    &--frozen-left {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: inherit;
+      @include frozen-column-shadow('left');
+    }
+
+    &--frozen-right {
+      position: sticky;
+      right: 0;
+      z-index: 2;
+      background: inherit;
+      @include frozen-column-shadow('right');
+    }
+
+    // Checkbox column
+    &--checkbox {
+      justify-content: center;
+      padding: 0 8px;
+    }
+
+    // Content
+    &-content {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      min-width: 0;
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Checkboxes
+  // ----------------------------------------------------------------------------
+  &__checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: $dt-primary-color;
+    border-radius: $dt-radius-sm;
+    transition: transform 0.1s ease;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Row Detail
+  // ----------------------------------------------------------------------------
+  &__row-detail {
+    display: block;
+    background: $dt-bg-lighter;
+    overflow: hidden;
+    transition: height 0.3s ease, margin-top 0.3s ease;
+
+    &--expanded {
+      height: auto !important;
+      margin-top: 0 !important;
+      border-top: 1px solid $dt-border-light;
+      border-bottom: 1px solid $dt-border-light;
+    }
+
+    &-content {
+      width: 100%;
+      padding: 20px;
+      background: $dt-bg-lighter;
+      min-height: 100px;
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Detail Toggle
+  // ----------------------------------------------------------------------------
+  &__detail-toggle {
+    &-button {
+      @include flex-center;
+      width: 24px;
+      height: 24px;
+      border: 1px solid $dt-border-dark;
+      background: white;
+      cursor: pointer;
+      border-radius: $dt-radius-sm;
+      transition: all $dt-transition-normal;
+
+      &:hover {
+        background: $dt-bg-lighter;
+        border-color: $dt-primary-color;
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+
+      &--expanded {
+        background: $dt-primary-color;
+        border-color: $dt-primary-color;
+
+        .ngxsmk-datatable__detail-toggle-icon {
+          color: white;
+          transform: rotate(90deg);
+        }
+      }
+    }
+
+    &-icon {
+      font-size: 10px;
+      color: $dt-text-secondary;
+      transition: all $dt-transition-normal;
+      font-style: normal;
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Footer
+  // ----------------------------------------------------------------------------
+  &__footer {
+    display: block;
+    background: $dt-bg-light;
+    border-top: 1px solid $dt-border-medium;
+    padding: 0;
+    width: 100%;
+    flex-shrink: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Body class for resizing
+// ----------------------------------------------------------------------------
+body.ngxsmk-resizing {
+  cursor: col-resize !important;
+  user-select: none !important;
+  
+  * {
+    cursor: col-resize !important;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Animations
+// ----------------------------------------------------------------------------
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// ----------------------------------------------------------------------------
+// Responsive Design
+// ----------------------------------------------------------------------------
+@media (max-width: 768px) {
+  .ngxsmk-datatable {
+    font-size: 13px;
+    border-radius: $dt-radius-md;
+
+    &__header {
+      &-cell {
+        padding: 10px 12px;
+        font-size: 12px;
+        min-width: 80px;
+
+        &-sort-icon {
+          font-size: 10px;
+        }
+      }
+    }
+
+    &__cell {
+      padding: 10px 12px;
+      font-size: 13px;
+      min-width: 80px;
+    }
+
+    &__resize-handle {
+      display: none;
+    }
+
+    &__footer {
+      padding: 0;
+    }
+
+    &__loading {
+      &-spinner {
+        width: 32px;
+        height: 32px;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .ngxsmk-datatable {
+    font-size: 12px;
+    border-radius: $dt-radius-sm;
+
+    &__header {
+      &-cell {
+        padding: 8px 10px;
+        font-size: 11px;
+        min-width: 60px;
+        letter-spacing: 0.03em;
+      }
+    }
+
+    &__cell {
+      padding: 8px 10px;
+      font-size: 12px;
+      min-width: 60px;
+    }
+
+    &__row {
+      min-height: 44px;
+    }
+
+    &__checkbox {
+      width: 16px;
+      height: 16px;
+    }
+
+    &__detail-toggle-button {
+      width: 20px;
+      height: 20px;
+    }
+
+    &__empty {
+      padding: 30px 15px;
+
+      &-icon {
+        font-size: 36px;
+      }
+
+      &-message {
+        font-size: 14px;
+      }
+    }
+
+    &__loading {
+      &-spinner {
+        width: 28px;
+        height: 28px;
+      }
+
+      &-text {
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Touch Devices Optimization
+// ----------------------------------------------------------------------------
+@media (hover: none) and (pointer: coarse) {
+  .ngxsmk-datatable {
+    &__header-cell,
+    &__cell {
+      padding: 12px 14px;
+    }
+
+    &__checkbox {
+      width: 20px;
+      height: 20px;
+    }
+
+    &__detail-toggle-button {
+      width: 28px;
+      height: 28px;
+    }
+
+    &__row {
+      min-height: 52px;
+    }
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Dark Theme Support
+// ----------------------------------------------------------------------------
+@media (prefers-color-scheme: dark) {
+  .ngxsmk-datatable {
+    $dt-dark-bg: #111827;
+    $dt-dark-bg-light: #1f2937;
+    $dt-dark-bg-lighter: #374151;
+    $dt-dark-bg-hover: rgba(59, 130, 246, 0.15);
+    $dt-dark-bg-selected: rgba(59, 130, 246, 0.25);
+    $dt-dark-text-primary: #f3f4f6;
+    $dt-dark-text-secondary: #d1d5db;
+    $dt-dark-text-tertiary: #9ca3af;
+    $dt-dark-border: #374151;
+    $dt-dark-border-light: #4b5563;
+
+    background: $dt-dark-bg;
+    border-color: $dt-dark-border;
+    color: $dt-dark-text-primary;
+
+    &__loading {
+      background: rgba($dt-dark-bg, 0.95);
+
+      &-spinner {
+        border-color: $dt-dark-border-light;
+        border-top-color: $dt-primary-color;
+      }
+
+      &-text {
+        color: $dt-dark-text-tertiary;
+      }
+    }
+
+    &__header {
+      background: $dt-dark-bg-light;
+      border-bottom-color: $dt-dark-border;
+
+      &-cell {
+        color: $dt-dark-text-secondary;
+
+        &--sortable:hover {
+          background: $dt-dark-bg-hover;
+          color: $dt-dark-text-primary;
+        }
+
+        &--sorted {
+          background: $dt-dark-bg-hover;
+          color: $dt-primary-color;
+        }
+      }
+    }
+
+    &__row {
+      border-bottom-color: $dt-dark-border;
+
+      &:hover {
+        background: $dt-dark-bg-hover !important;
+        box-shadow: inset 0 0 0 1px $dt-dark-border-light;
+      }
+
+      &--selected {
+        background: $dt-dark-bg-selected !important;
+        box-shadow: inset 3px 0 0 0 $dt-primary-color;
+      }
+
+      &--odd {
+        background: $dt-dark-bg;
+      }
+
+      &--even {
+        background: $dt-dark-bg-light;
+      }
+    }
+
+    &__cell {
+      color: $dt-dark-text-primary;
+    }
+
+    &__checkbox {
+      accent-color: $dt-primary-color;
+    }
+
+    &__footer {
+      background: $dt-dark-bg-light;
+      border-top-color: $dt-dark-border;
+    }
+
+    &__empty {
+      color: $dt-dark-text-tertiary;
+    }
+
+    &__row-detail {
+      background: $dt-dark-bg-light;
+      border-top-color: $dt-dark-border;
+      border-bottom-color: $dt-dark-border;
+
+      &-content {
+        background: $dt-dark-bg-light;
+      }
+    }
+
+    &__detail-toggle {
+      &-button {
+        background: $dt-dark-bg-lighter;
+        border-color: $dt-dark-border-light;
+
+        &:hover {
+          background: $dt-dark-border-light;
+          border-color: $dt-primary-color;
+        }
+
+        &--expanded {
+          background: $dt-primary-color;
+          border-color: $dt-primary-color;
+        }
+      }
+
+      &-icon {
+        color: $dt-dark-text-tertiary;
+      }
+    }
+  }
+}
