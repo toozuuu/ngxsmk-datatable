@@ -1,6 +1,6 @@
 {
   "name": "ngxsmk-datatable",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A powerful, feature-rich Angular datatable component with virtual scrolling, built for Angular 17+",
   "keywords": [
     "angular",

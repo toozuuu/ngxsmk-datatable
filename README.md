@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![ngxsmk-datatable](https://img.shields.io/badge/ngxsmk--datatable-v1.0.0-blue.svg)
+![ngxsmk-datatable](https://img.shields.io/badge/ngxsmk--datatable-v1.0.1-blue.svg)
 ![Angular](https://img.shields.io/badge/angular-17%2B-red.svg)
 ![TypeScript](https://img.shields.io/badge/typescript-5.0%2B-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
