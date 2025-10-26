@@ -538,7 +538,7 @@ ngxsmk-datatable/
 - [ ] Column grouping in header
 - [ ] Responsive mobile layouts
 
-Have a feature request? [Open an issue](https://github.com/your-username/ngxsmk-datatable/issues/new) with the `feature-request` label!
+Have a feature request? [Open an issue](https://github.com/toozuuu/ngxsmk-datatable/issues/new) with the `feature-request` label!
 
 ---
 
@@ -587,11 +587,21 @@ Special thanks to:
 
 ---
 
+## 👨‍💻 Author
+
+**Sachin Dilshan**
+
+- 📧 Email: sachindilshan040@gmail.com
+- 🐙 GitHub: [@toozuuu](https://github.com/toozuuu)
+- 📦 NPM: [ngxsmk-datatable](https://www.npmjs.com/package/ngxsmk-datatable)
+
+---
+
 ## 📞 Support & Contact
 
-- **Issues:** [GitHub Issues](https://github.com/your-username/ngxsmk-datatable/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/your-username/ngxsmk-datatable/discussions)
-- **Email:** support@ngxsmk-datatable.com
+- **Issues:** [GitHub Issues](https://github.com/toozuuu/ngxsmk-datatable/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/toozuuu/ngxsmk-datatable/discussions)
+- **Email:** sachindilshan040@gmail.com
 
 ---
 
@@ -611,8 +621,8 @@ If you find this project useful, please consider:
 
 **Made with ❤️ for the Angular Community**
 
-[![GitHub Stars](https://img.shields.io/github/stars/your-username/ngxsmk-datatable?style=social)](https://github.com/your-username/ngxsmk-datatable)
-[![GitHub Forks](https://img.shields.io/github/forks/your-username/ngxsmk-datatable?style=social)](https://github.com/your-username/ngxsmk-datatable)
+[![GitHub Stars](https://img.shields.io/github/stars/toozuuu/ngxsmk-datatable?style=social)](https://github.com/toozuuu/ngxsmk-datatable)
+[![GitHub Forks](https://img.shields.io/github/forks/toozuuu/ngxsmk-datatable?style=social)](https://github.com/toozuuu/ngxsmk-datatable)
 
 [Website](#) • [Demo](#) • [Docs](#)
 

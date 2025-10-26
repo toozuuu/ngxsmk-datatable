@@ -325,8 +325,8 @@ See [LICENSE](../../LICENSE) for full details.
 
 - **Documentation:** [Full Docs](../../README.md)
 - **Examples:** [Demo App](../demo-app/)
-- **Issues:** [GitHub Issues](https://github.com/your-username/ngxsmk-datatable/issues)
-- **Email:** support@ngxsmk-datatable.com
+- **Issues:** [GitHub Issues](https://github.com/toozuuu/ngxsmk-datatable/issues)
+- **Email:** sachindilshan040@gmail.com
 
 ---
 
@@ -335,8 +335,8 @@ See [LICENSE](../../LICENSE) for full details.
 **Made with ❤️ for Angular Developers**
 
 [![npm version](https://img.shields.io/npm/v/ngxsmk-datatable)](https://www.npmjs.com/package/ngxsmk-datatable)
-[![GitHub stars](https://img.shields.io/github/stars/your-username/ngxsmk-datatable?style=social)](https://github.com/your-username/ngxsmk-datatable)
+[![GitHub stars](https://img.shields.io/github/stars/toozuuu/ngxsmk-datatable?style=social)](https://github.com/toozuuu/ngxsmk-datatable)
 
-[View on GitHub](https://github.com/your-username/ngxsmk-datatable) • [View on npm](https://www.npmjs.com/package/ngxsmk-datatable)
+[View on GitHub](https://github.com/toozuuu/ngxsmk-datatable) • [View on npm](https://www.npmjs.com/package/ngxsmk-datatable)
 
 </div>

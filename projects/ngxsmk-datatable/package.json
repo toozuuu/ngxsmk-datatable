@@ -1,35 +1,50 @@
 {
   "name": "ngxsmk-datatable",
   "version": "1.0.0",
-  "description": "A powerful, feature-rich Angular datatable component with virtual DOM support, built for Angular 17+",
+  "description": "A powerful, feature-rich Angular datatable component with virtual scrolling, built for Angular 17+",
   "keywords": [
     "angular",
     "datatable",
     "table",
-    "virtual-dom",
+    "virtual-scrolling",
     "pagination",
     "sorting",
+    "selection",
+    "row-details",
     "material",
-    "typescript"
+    "typescript",
+    "standalone",
+    "angular17",
+    "angular18",
+    "angular19",
+    "ngxsmk",
+    "grid",
+    "data-grid",
+    "filtering",
+    "export",
+    "customizable"
   ],
-  "author": "Your Name <your.email@example.com>",
+  "author": "Sachin Dilshan <sachindilshan040@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/ngxsmk-datatable.git"
+    "url": "https://github.com/toozuuu/ngxsmk-datatable.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/ngxsmk-datatable/issues"
+    "url": "https://github.com/toozuuu/ngxsmk-datatable/issues"
   },
-  "homepage": "https://github.com/yourusername/ngxsmk-datatable#readme",
+  "homepage": "https://github.com/toozuuu/ngxsmk-datatable#readme",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "peerDependencies": {
-    "@angular/common": "^17.0.0 || ^18.0.0",
-    "@angular/core": "^17.0.0 || ^18.0.0",
-    "@angular/forms": "^17.0.0 || ^18.0.0",
-    "@angular/platform-browser": "^17.0.0 || ^18.0.0",
+    "@angular/common": "^17.0.0 || ^18.0.0 || ^19.0.0",
+    "@angular/core": "^17.0.0 || ^18.0.0 || ^19.0.0",
+    "@angular/forms": "^17.0.0 || ^18.0.0 || ^19.0.0",
+    "@angular/platform-browser": "^17.0.0 || ^18.0.0 || ^19.0.0",
     "rxjs": "^7.0.0"
   },
   "dependencies": {},
   "sideEffects": false
 }
-
