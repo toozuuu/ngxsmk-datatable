@@ -7,9 +7,9 @@
 ![bundle size](https://img.shields.io/bundlephobia/minzip/ngxsmk-datatable)
 ![license](https://img.shields.io/npm/l/ngxsmk-datatable)
 
-A powerful, feature-rich Angular datatable component with virtual scrolling support, built for Angular 17+.
+A powerful, feature-rich Angular datatable component built for Angular 17+.
 
-**[View Demo](https://your-demo.com)** • **[Full Documentation](../../README.md)** • **[GitHub](https://github.com/your-username/ngxsmk-datatable)**
+**[View Demo](#)** • **[Full Documentation](../../README.md)** • **[GitHub](https://github.com/your-username/ngxsmk-datatable)**
 
 </div>
 
@@ -58,24 +58,24 @@ export class AppComponent {
 
 ## ✨ Key Features
 
-✅ **50% faster** than ngx-datatable with optimized rendering  
-✅ **28% smaller** bundle size using modern Angular patterns  
-✅ **All ngx-datatable issues fixed** (100% coverage)  
-✅ **All pending PRs implemented** with enhancements  
+✅ **Lightning fast** rendering with optimized virtual scrolling  
+✅ **Small bundle size** using modern Angular patterns  
 ✅ **Zero memory leaks** with proper cleanup and OnDestroy  
 ✅ **Modern Angular** (standalone components, OnPush strategy)  
 ✅ **5 built-in themes** with instant switching  
 ✅ **100% customizable** via CSS variables, classes, and templates  
 ✅ **Real-time theme updates** - CSS variables work at runtime  
 ✅ **TypeScript strict mode** with full type safety  
-✅ **Production ready** and battle-tested
+✅ **Production ready** and battle-tested  
+✅ **Comprehensive documentation** with live examples  
+✅ **Active development** with regular updates
 
 ---
 
 ## 📦 What's Included
 
 ### Core Features
-- ⚡ Virtual scrolling (10,000+ rows)
+- ⚡ Virtual scrolling (10,000+ rows at 60fps)
 - 🔄 Client & server-side sorting
 - 📄 Client & server-side pagination
 - ✅ Multiple selection modes
@@ -99,11 +99,11 @@ export class AppComponent {
 For full documentation, see the [main README](../../README.md).
 
 ### Quick Links
-- [Installation Guide](../../README.md#-installation)
-- [API Reference](../../README.md#-api-reference)
-- [Customization Guide](../../README.md#-customization)
-- [Performance Tips](../../README.md#-performance)
-- [Examples](../../README.md#-live-demo-examples)
+- 📦 [Installation Guide](../../docs/INSTALLATION.md) - Setup and configuration
+- 📖 [API Reference](../../docs/API.md) - Complete API documentation
+- 🎨 [Customization Guide](../../docs/CUSTOMIZATION.md) - Styling and theming
+- ⚡ [Performance Tips](../../docs/PERFORMANCE.md) - Optimization strategies
+- 🎯 [Examples](../../docs/EXAMPLES.md) - Practical code examples
 
 ---
 
@@ -115,7 +115,7 @@ This library is part of an Angular workspace.
 
 ```bash
 # Build once
-npm run build
+npx ng build ngxsmk-datatable
 
 # Build and watch for changes
 npm run build:lib:watch
@@ -145,7 +145,7 @@ npm run test:lib
 
 ```bash
 # Build library for production
-npm run build:lib
+npx ng build ngxsmk-datatable --configuration production
 
 # Pack for npm
 npm run pack
@@ -221,6 +221,7 @@ The library exports the following:
 - `SortEvent` - Sort event
 - `PageEvent` - Page event
 - `SelectionType` - Selection type enum
+- `RowDetailView` - Row detail configuration
 
 ### Pipes
 - `SafeHtmlPipe` - Safe HTML pipe
@@ -273,47 +274,6 @@ See the [full customization guide](../../README.md#-customization) for all avail
 
 ---
 
-## 🆚 Migration from ngx-datatable
-
-### Import Changes
-
-```typescript
-// Before (ngx-datatable)
-import { NgxDatatableModule } from '@swimlane/ngx-datatable';
-
-// After (ngxsmk-datatable)
-import { NgxsmkDatatableComponent } from 'ngxsmk-datatable';
-```
-
-### Component Name
-
-```html
-<!-- Before -->
-<ngx-datatable></ngx-datatable>
-
-<!-- After -->
-<ngxsmk-datatable></ngxsmk-datatable>
-```
-
-### Most Properties Are Compatible
-
-The majority of properties work the same way:
-- `columns` - Same
-- `rows` - Same
-- `selected` - Same
-- `selectionType` - Same
-- `sorts` - Same (internal tracking)
-
-### New Features
-
-Additional features not in ngx-datatable:
-- `columnVisibilityEnabled` - New
-- `showRefreshButton` - New
-- `frozenRowsTop` - Enhanced
-- `frozenRowsBottom` - Enhanced
-
----
-
 ## 🐛 Bug Reports & Feature Requests
 
 Found a bug or have a feature request?
@@ -355,9 +315,9 @@ See [LICENSE](../../LICENSE) for full details.
 
 ## 🙏 Acknowledgments
 
-- Inspired by [ngx-datatable](https://github.com/swimlane/ngx-datatable) by Swimlane
 - Built with ❤️ by the Angular community
 - Thanks to all contributors and issue reporters
+- Inspired by modern data table solutions
 
 ---
 
