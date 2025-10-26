@@ -105,6 +105,26 @@ interface Employee extends NgxsmkRow {
         </div>
       </div>
 
+      <!-- Templates (must be defined before datatable) -->
+      <ng-template #statusTemplate let-row="row" let-value="value">
+        <span class="status-badge" [class]="'status-' + value">
+          {{value}}
+        </span>
+      </ng-template>
+
+      <ng-template #salaryTemplate let-row="row" let-value="value">
+        <span class="salary">
+          {{ '$' + formatNumber(value) }}
+        </span>
+      </ng-template>
+
+      <ng-template #performanceTemplate let-row="row" let-value="value">
+        <div class="performance-bar">
+          <div class="bar-fill" [style.width.%]="value"></div>
+          <span class="bar-text">{{value}}%</span>
+        </div>
+      </ng-template>
+
       @if (!isReady) {
         <div class="loading-state">
           <div class="spinner"></div>
@@ -145,26 +165,6 @@ interface Employee extends NgxsmkRow {
         </div>
       }
     </div>
-
-    <!-- Templates -->
-    <ng-template #statusTemplate let-row="row" let-value="value">
-      <span class="status-badge" [class]="'status-' + value">
-        {{value}}
-      </span>
-    </ng-template>
-
-    <ng-template #salaryTemplate let-row="row" let-value="value">
-      <span class="salary">
-        {{ '$' + formatNumber(value) }}
-      </span>
-    </ng-template>
-
-    <ng-template #performanceTemplate let-row="row" let-value="value">
-      <div class="performance-bar">
-        <div class="bar-fill" [style.width.%]="value"></div>
-        <span class="bar-text">{{value}}%</span>
-      </div>
-    </ng-template>
   `,
   styles: [`
     .demo-container {
@@ -184,7 +184,6 @@ interface Employee extends NgxsmkRow {
     .header-content h1 {
       font-size: 32px;
       font-weight: 700;
-      color: #1f2937;
       margin: 0 0 8px 0;
       display: flex;
       align-items: center;
@@ -193,7 +192,6 @@ interface Employee extends NgxsmkRow {
 
     .subtitle {
       font-size: 16px;
-      color: #6b7280;
       margin: 0;
     }
 
@@ -341,6 +339,11 @@ interface Employee extends NgxsmkRow {
       border-radius: 12px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       overflow: hidden;
+      height: 600px;
+    }
+
+    .datatable-container ::ng-deep ngxsmk-datatable {
+      height: 100%;
     }
 
     .loading-state {
@@ -505,13 +508,17 @@ interface Employee extends NgxsmkRow {
     .modal-body pre {
       margin: 0;
       padding: 20px;
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
+      background: #1f2937;
+      border: 1px solid #374151;
       border-radius: 8px;
       font-size: 13px;
       line-height: 1.6;
       overflow: auto;
       max-height: 400px;
+      color: #f3f4f6;
+      font-family: 'Courier New', 'Consolas', monospace;
+      white-space: pre-wrap;
+      word-wrap: break-word;
     }
 
     .modal-footer {
@@ -683,7 +690,11 @@ export class ExportDemoComponent implements OnInit, AfterViewInit {
 
   loadData(): void {
     this.rows = this.generateMockData(100);
-    this.paginationConfig.totalItems = this.rows.length;
+    this.paginationConfig = {
+      ...this.paginationConfig,
+      totalItems: this.rows.length
+    };
+    this.cdr.detectChanges();
   }
 
   generateMockData(count: number): Employee[] {

@@ -500,56 +500,6 @@ import { Subject, takeUntil } from 'rxjs';
       }
     }
 
-    /* Dark mode support */
-    @media (prefers-color-scheme: dark) {
-      .theme-preview h4,
-      .code-example h4 {
-        color: #64b5f6;
-      }
-
-      .preview-container {
-        border-color: #3d3d3d;
-        background: #1e1e1e;
-      }
-
-      .info-card {
-        background: #2d2d2d;
-        border-color: #3d3d3d;
-        color: #e0e0e0;
-      }
-
-      .info-card h5 {
-        color: #64b5f6;
-      }
-
-      .info-card p,
-      .info-card li {
-        color: #e0e0e0;
-      }
-
-      .variable {
-        background: #1e1e1e;
-        border-color: #3d3d3d;
-      }
-
-      .variable code {
-        background: #3d3d3d;
-        color: #64b5f6;
-      }
-
-      .variable span {
-        color: #e0e0e0;
-      }
-
-      .code-example {
-        background: #2d2d2d;
-        border-color: #3d3d3d;
-      }
-
-      .code-block {
-        background: #1e1e1e;
-      }
-    }
   `]
 })
 export class ThemesDemoComponent implements OnInit, AfterViewInit, OnDestroy {

@@ -95,7 +95,6 @@ import type { NgxsmkColumn } from 'ngxsmk-datatable';
   styles: [`
     .demo-container {
       padding: 30px;
-      max-width: 1400px;
       margin: 0 auto;
     }
 
@@ -267,54 +266,6 @@ import type { NgxsmkColumn } from 'ngxsmk-datatable';
     @media (max-width: 1024px) {
       .feature-grid {
         grid-template-columns: 1fr;
-      }
-    }
-
-    @media (prefers-color-scheme: dark) {
-      h2 {
-        color: #f3f4f6;
-      }
-
-      .demo-description {
-        color: #d1d5db;
-      }
-
-      .control-panel {
-        background: #1f2937;
-        border-color: #374151;
-      }
-
-      .control-panel h3 {
-        color: #f3f4f6;
-      }
-
-      .checkbox-label span {
-        color: #e5e7eb;
-      }
-
-      .checkbox-label:hover {
-        background: #374151;
-      }
-
-      .table-container {
-        background: #111827;
-      }
-
-      .demo-info {
-        background: #1f2937;
-        border-left-color: #60a5fa;
-      }
-
-      .demo-info h4 {
-        color: #60a5fa;
-      }
-
-      .demo-info li {
-        color: #d1d5db;
-      }
-
-      .demo-info strong {
-        color: #f3f4f6;
       }
     }
   `]

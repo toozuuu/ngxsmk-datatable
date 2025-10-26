@@ -22,29 +22,71 @@ body {
 
 .demo-section {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   margin-bottom: 30px;
   overflow: hidden;
 }
 
 .demo-header {
-  background: #2196f3;
+  background: linear-gradient(135deg, #0057e7 0%, #008744 100%);
   color: white;
-  padding: 20px;
+  padding: 32px;
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 4px solid rgba(255, 255, 255, 0.1);
+
+  i {
+    font-size: 32px;
+    opacity: 0.9;
+  }
+
+  .header-content {
+    flex: 1;
+
+    .header-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+      letter-spacing: -0.5px;
+    }
+
+    .header-description {
+      font-size: 14px;
+      opacity: 0.95;
+      margin: 0;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+  }
+
+  .header-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
 }
 
 .demo-content {
-  padding: 20px;
+  padding: 32px;
 }
 
 .demo-controls {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 24px;
   flex-wrap: wrap;
   align-items: center;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
 }
 
 .btn {
@@ -61,12 +103,13 @@ body {
 }
 
 .btn-primary {
-  background: #2196f3;
+  background: #0057e7;
   color: white;
 }
 
 .btn-primary:hover {
-  background: #1976d2;
+  background: #0046b8;
+  box-shadow: 0 4px 12px rgba(0, 87, 231, 0.3);
 }
 
 .btn-secondary {
@@ -79,30 +122,33 @@ body {
 }
 
 .btn-success {
-  background: #28a745;
+  background: #008744;
   color: white;
 }
 
 .btn-success:hover {
-  background: #218838;
+  background: #006633;
+  box-shadow: 0 4px 12px rgba(0, 135, 68, 0.3);
 }
 
 .btn-danger {
-  background: #dc3545;
+  background: #d62d20;
   color: white;
 }
 
 .btn-danger:hover {
-  background: #c82333;
+  background: #b32418;
+  box-shadow: 0 4px 12px rgba(214, 45, 32, 0.3);
 }
 
 .btn-warning {
-  background: #ffc107;
-  color: #212529;
+  background: #ffa700;
+  color: white;
 }
 
 .btn-warning:hover {
-  background: #e0a800;
+  background: #e69500;
+  box-shadow: 0 4px 12px rgba(255, 167, 0, 0.3);
 }
 
 .form-group {
@@ -125,8 +171,8 @@ body {
 
 .form-control:focus {
   outline: none;
-  border-color: #2196f3;
-  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+  border-color: #0057e7;
+  box-shadow: 0 0 0 2px rgba(0, 87, 231, 0.2);
 }
 
 .form-check {
@@ -156,53 +202,64 @@ body {
 }
 
 .badge-success {
-  background: #d4edda;
-  color: #155724;
+  background: #008744;
+  color: white;
 }
 
 .badge-danger {
-  background: #f8d7da;
-  color: #721c24;
+  background: #d62d20;
+  color: white;
 }
 
 .badge-warning {
-  background: #fff3cd;
-  color: #856404;
+  background: #ffa700;
+  color: white;
 }
 
 .badge-info {
-  background: #d1ecf1;
-  color: #0c5460;
+  background: #0057e7;
+  color: white;
 }
 
 .alert {
-  padding: 12px 16px;
-  border-radius: 4px;
-  margin-bottom: 20px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-left: 4px solid;
+  font-size: 14px;
+  line-height: 1.6;
+
+  i {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
 }
 
 .alert-info {
-  background: #d1ecf1;
-  color: #0c5460;
-  border: 1px solid #bee5eb;
+  background: rgba(0, 87, 231, 0.1);
+  color: #0046b8;
+  border-color: #0057e7;
 }
 
 .alert-success {
-  background: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+  background: rgba(0, 135, 68, 0.1);
+  color: #006633;
+  border-color: #008744;
 }
 
 .alert-warning {
-  background: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeaa7;
+  background: rgba(255, 167, 0, 0.1);
+  color: #cc8500;
+  border-color: #ffa700;
 }
 
 .alert-danger {
-  background: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+  background: rgba(214, 45, 32, 0.1);
+  color: #b32418;
+  border-color: #d62d20;
 }
 
 .card {
@@ -218,6 +275,10 @@ body {
   padding: 15px 20px;
   border-bottom: 1px solid #dee2e6;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .card-body {
@@ -327,6 +388,77 @@ body {
 .gap-4 { gap: 1.5rem; }
 .gap-5 { gap: 3rem; }
 
+/* Datatable Container */
+.datatable-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin-bottom: 24px;
+  
+  &.with-header {
+    padding-top: 0;
+  }
+}
+
+.datatable-header {
+  padding: 20px 24px;
+  background: #f8f9fa;
+  border-bottom: 2px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  
+  .datatable-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    
+    i {
+      color: #0057e7;
+      font-size: 20px;
+    }
+  }
+  
+  .datatable-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+}
+
+.datatable-wrapper {
+  min-height: 400px;
+}
+
+/* Section Headers */
+.section-header {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 16px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  
+  i {
+    color: #0057e7;
+    font-size: 22px;
+  }
+}
+
+.section-divider {
+  height: 1px;
+  background: linear-gradient(to right, #e9ecef 0%, transparent 100%);
+  margin: 32px 0;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .container {
@@ -343,35 +475,5 @@ body {
   }
 }
 
-/* Dark theme support */
-@media (prefers-color-scheme: dark) {
-  body {
-    background: #121212;
-    color: #ffffff;
-  }
-  
-  .demo-section {
-    background: #1e1e1e;
-    color: #ffffff;
-  }
-  
-  .demo-header {
-    background: #1976d2;
-  }
-  
-  .form-control {
-    background: #2d2d2d;
-    border-color: #555;
-    color: #ffffff;
-  }
-  
-  .card {
-    background: #1e1e1e;
-    color: #ffffff;
-  }
-  
-  .card-header {
-    background: #2d2d2d;
-    border-bottom-color: #555;
-  }
-}
+/* Dark theme support - Disabled to prevent automatic switching */
+/* Users can manually toggle dark theme if needed */

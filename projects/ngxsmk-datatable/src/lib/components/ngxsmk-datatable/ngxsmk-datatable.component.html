@@ -322,10 +322,10 @@
             [style.height.px]="row.$$expanded ? (rowDetail?.rowHeight || 100) : 0"
             [style.margin-top.px]="row.$$expanded ? 0 : -(rowDetail?.rowHeight || 100)"
           >
-            @if (row.$$expanded && rowDetailTemplate) {
+            @if (row.$$expanded && (rowDetail?.template || rowDetailTemplate)) {
               <div class="ngxsmk-datatable__row-detail-content">
                 <ng-container 
-                  *ngTemplateOutlet="rowDetailTemplate; context: { $implicit: row, row: row, rowIndex: visibleStartIndex + i }"
+                  *ngTemplateOutlet="rowDetail?.template || rowDetailTemplate; context: { $implicit: row, row: row, rowIndex: visibleStartIndex + i }"
                 ></ng-container>
               </div>
             }

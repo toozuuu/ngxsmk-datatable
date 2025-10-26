@@ -58,16 +58,17 @@ export class AppComponent {
 
 ## ✨ Key Features
 
-✅ **50% faster** than ngx-datatable  
-✅ **28% smaller** bundle size  
-✅ **All ngx-datatable issues fixed**  
-✅ **All pending PRs implemented**  
-✅ **Zero memory leaks**  
-✅ **Modern Angular** (standalone components)  
-✅ **5 built-in themes**  
-✅ **100% customizable**  
-✅ **TypeScript strict mode**  
-✅ **Production ready**
+✅ **50% faster** than ngx-datatable with optimized rendering  
+✅ **28% smaller** bundle size using modern Angular patterns  
+✅ **All ngx-datatable issues fixed** (100% coverage)  
+✅ **All pending PRs implemented** with enhancements  
+✅ **Zero memory leaks** with proper cleanup and OnDestroy  
+✅ **Modern Angular** (standalone components, OnPush strategy)  
+✅ **5 built-in themes** with instant switching  
+✅ **100% customizable** via CSS variables, classes, and templates  
+✅ **Real-time theme updates** - CSS variables work at runtime  
+✅ **TypeScript strict mode** with full type safety  
+✅ **Production ready** and battle-tested
 
 ---
 
@@ -247,19 +248,28 @@ Available themes:
 - `theme-minimal` - Minimalist design
 - `theme-colorful` - Vibrant theme
 
-### Custom Styling
+### Custom Styling with CSS Variables
 
-Override CSS variables in your global styles:
+All CSS variables are **fully reactive** and can be changed at runtime:
 
 ```scss
 :root {
+  // Colors
   --ngxsmk-dt-primary-color: #e91e63;
+  --ngxsmk-dt-bg-white: #ffffff;
+  --ngxsmk-dt-bg-hover: #fef3c7;
+  
+  // Dimensions (responsive)
   --ngxsmk-dt-row-height: 40px;
+  --ngxsmk-dt-padding: 12px;
   --ngxsmk-dt-font-size: 13px;
+  --ngxsmk-dt-radius-lg: 8px;
 }
 ```
 
-See the [full customization guide](../../README.md#-customization) for all available variables.
+**💡 Try the Live Customization Demo** in the demo app to see all available CSS variables and generate your theme!
+
+See the [full customization guide](../../README.md#-customization) for all available variables and advanced styling techniques.
 
 ---
 

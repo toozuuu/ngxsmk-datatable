@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild, TemplateRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, TemplateRef, ChangeDetectorRef, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgxsmkDatatableComponent, NgxsmkColumn, NgxsmkRow, PaginationConfig } from 'ngxsmk-datatable';
@@ -116,7 +116,7 @@ interface CustomTheme {
 
         <div class="preview-panel">
           <h3>Live Preview</h3>
-          <div class="table-wrapper" [attr.data-custom-theme]="'custom'">
+          <div class="table-wrapper" #tableWrapper [attr.data-custom-theme]="'custom'">
             @if (isReady) {
               <ngxsmk-datatable
                 [columns]="columns"
@@ -161,7 +161,6 @@ interface CustomTheme {
         font-size: 28px;
         font-weight: 700;
         margin: 0 0 10px;
-        color: #1f2937;
       }
       
       p {
@@ -379,24 +378,13 @@ interface CustomTheme {
       }
     }
 
-    /* Custom theme variables */
-    .table-wrapper[data-custom-theme="custom"] {
-      ::ng-deep {
-        .ngxsmk-datatable {
-          --ngxsmk-dt-primary-color: var(--custom-primary);
-          --ngxsmk-dt-bg-white: var(--custom-bg);
-          --ngxsmk-dt-bg-hover: var(--custom-hover);
-          --ngxsmk-dt-row-height: var(--custom-row-height);
-          --ngxsmk-dt-font-size: var(--custom-font-size);
-          --ngxsmk-dt-padding: var(--custom-padding);
-          --ngxsmk-dt-radius-lg: var(--custom-radius);
-        }
-      }
-    }
+    /* Custom theme variables are set dynamically via JavaScript */
   `]
 })
 export class CustomizationDemoComponent implements OnInit, AfterViewInit {
   @ViewChild('statusTemplate') statusTemplate!: TemplateRef<any>;
+  @ViewChild('tableWrapper') tableWrapper!: ElementRef<HTMLDivElement>;
+  @ViewChild(NgxsmkDatatableComponent, { read: ElementRef }) datatableElement!: ElementRef<HTMLElement>;
 
   columns: NgxsmkColumn[] = [];
   rows: NgxsmkRow[] = [];
@@ -517,7 +505,12 @@ export class CustomizationDemoComponent implements OnInit, AfterViewInit {
       this.loadData();
       this.isReady = true;
       this.updateCSS();
-      this.applyCSSVariables();
+      this.cdr.detectChanges(); // Ensure the table is rendered
+      
+      // Apply initial CSS variables after table is rendered
+      setTimeout(() => {
+        this.applyCSSVariables();
+      }, 50);
     });
   }
 
@@ -560,6 +553,7 @@ export class CustomizationDemoComponent implements OnInit, AfterViewInit {
   }
 
   applyTheme(theme: CustomTheme) {
+    console.log('Applying theme:', theme.name);
     this.selectedTheme = theme.name;
     this.primaryColor = theme.variables['primaryColor'];
     this.bgColor = theme.variables['bgColor'];
@@ -570,6 +564,7 @@ export class CustomizationDemoComponent implements OnInit, AfterViewInit {
     this.borderRadius = parseInt(theme.variables['borderRadius']);
     
     this.updateAll();
+    this.cdr.detectChanges();
   }
 
   updateColors() {
@@ -605,14 +600,18 @@ export class CustomizationDemoComponent implements OnInit, AfterViewInit {
   }
 
   applyCSSVariables() {
-    const root = document.documentElement;
-    root.style.setProperty('--custom-primary', this.primaryColor);
-    root.style.setProperty('--custom-bg', this.bgColor);
-    root.style.setProperty('--custom-hover', this.hoverColor);
-    root.style.setProperty('--custom-row-height', `${this.rowHeight}px`);
-    root.style.setProperty('--custom-font-size', `${this.fontSize}px`);
-    root.style.setProperty('--custom-padding', `${this.padding}px`);
-    root.style.setProperty('--custom-radius', `${this.borderRadius}px`);
+    if (this.tableWrapper?.nativeElement) {
+      const wrapper = this.tableWrapper.nativeElement;
+      wrapper.style.setProperty('--ngxsmk-dt-primary-color', this.primaryColor);
+      wrapper.style.setProperty('--ngxsmk-dt-primary-hover', this.primaryColor);
+      wrapper.style.setProperty('--ngxsmk-dt-primary-light', this.primaryColor + '14'); // Add alpha
+      wrapper.style.setProperty('--ngxsmk-dt-bg-white', this.bgColor);
+      wrapper.style.setProperty('--ngxsmk-dt-bg-hover', this.hoverColor);
+      wrapper.style.setProperty('--ngxsmk-dt-row-height', `${this.rowHeight}px`);
+      wrapper.style.setProperty('--ngxsmk-dt-font-size', `${this.fontSize}px`);
+      wrapper.style.setProperty('--ngxsmk-dt-padding', `${this.padding}px`);
+      wrapper.style.setProperty('--ngxsmk-dt-radius-lg', `${this.borderRadius}px`);
+    }
   }
 
   resetToDefaults() {

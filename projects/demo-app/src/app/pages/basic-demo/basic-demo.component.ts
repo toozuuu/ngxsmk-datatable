@@ -11,15 +11,21 @@ import { Subject, takeUntil } from 'rxjs';
   imports: [CommonModule, FormsModule, NgxsmkDatatableComponent],
   template: `
     <div class="demo-section">
-      <h2 class="demo-header">
-        <i class="fas fa-play"></i>
-        Basic Usage Demo
-      </h2>
+      <div class="demo-header">
+        <i class="fas fa-play-circle"></i>
+        <div class="header-content">
+          <h1 class="header-title">Basic Usage</h1>
+          <p class="header-description">
+            Get started with ngxsmk-datatable - sorting, pagination, and selection out of the box
+          </p>
+        </div>
+        <span class="header-badge">Beginner</span>
+      </div>
       
       <div class="demo-content">
         <div class="alert alert-info">
           <i class="fas fa-info-circle"></i>
-          This demo shows the basic features of ngxsmk-datatable including sorting, pagination, and selection.
+          <span>This demo showcases the core features including sorting, pagination, multi-select, and data manipulation.</span>
         </div>
 
         <div class="demo-controls">
@@ -67,41 +73,65 @@ import { Subject, takeUntil } from 'rxjs';
           </div>
         </ng-template>
 
-        @if (isReady) {
-          <ngxsmk-datatable
-            [columns]="columns"
-            [rows]="rows"
-            [virtualScrolling]="virtualScrolling"
-            [selectionType]="'multi'"
-            [pagination]="paginationConfig"
-            [loadingIndicator]="loading"
-            [emptyMessage]="'No users found'"
-            [rowHeight]="themeSettings.rowHeight"
-            [class]="getTableClass()"
-            [style.font-size.px]="themeSettings.fontSize"
-            (select)="onSelect($event)"
-            (sort)="onSort($event)"
-            (page)="onPage($event)"
-            (activate)="onActivate($event)"
-          >
-          </ngxsmk-datatable>
-        }
+        <div class="datatable-container with-header">
+          <div class="datatable-header">
+            <h3 class="datatable-title">
+              <i class="fas fa-table"></i>
+              User Data Table
+            </h3>
+            <div class="datatable-actions">
+              <span class="badge badge-info">{{rows.length}} users</span>
+            </div>
+          </div>
+          
+          @if (isReady) {
+            <div class="datatable-wrapper">
+              <ngxsmk-datatable
+                [columns]="columns"
+                [rows]="rows"
+                [virtualScrolling]="virtualScrolling"
+                [selectionType]="'multi'"
+                [pagination]="paginationConfig"
+                [loadingIndicator]="loading"
+                [emptyMessage]="'No users found'"
+                [rowHeight]="themeSettings.rowHeight"
+                [class]="getTableClass()"
+                [style.font-size.px]="themeSettings.fontSize"
+                (select)="onSelect($event)"
+                (sort)="onSort($event)"
+                (page)="onPage($event)"
+                (activate)="onActivate($event)"
+              >
+              </ngxsmk-datatable>
+            </div>
+          }
+        </div>
 
         <!-- Selection summary -->
         @if (selectedRows.length > 0) {
           <div class="alert alert-success">
-          <i class="fas fa-check-circle"></i>
-          {{ selectedRows.length }} row(s) selected
-          <button class="btn btn-sm btn-secondary" (click)="clearSelection()">
-            Clear Selection
-          </button>
+            <i class="fas fa-check-circle"></i>
+            <span>
+              {{ selectedRows.length }} row(s) selected
+              <button class="btn btn-sm btn-secondary" style="margin-left: 12px;" (click)="clearSelection()">
+                Clear Selection
+              </button>
+            </span>
           </div>
         }
 
         <!-- Event log -->
+        <h2 class="section-header">
+          <i class="fas fa-list-alt"></i>
+          Event Log
+        </h2>
+        
         <div class="card">
           <div class="card-header">
-            <h4>Event Log</h4>
+            <span style="font-weight: 600;">Recent Events</span>
+            <button class="btn btn-sm btn-secondary" (click)="events = []" style="margin-left: auto;">
+              <i class="fas fa-trash"></i> Clear
+            </button>
           </div>
           <div class="card-body">
             <div class="event-log">

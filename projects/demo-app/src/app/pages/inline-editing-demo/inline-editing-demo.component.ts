@@ -135,14 +135,10 @@ import { NgxsmkDatatableComponent, NgxsmkColumn, NgxsmkRow, PaginationConfig } f
     </div>
   `,
   styles: [`
-    .demo-section {
-      padding: 20px;
-    }
 
     .demo-header {
       font-size: 28px;
       font-weight: 700;
-      color: #1f2937;
       margin-bottom: 20px;
       display: flex;
       align-items: center;

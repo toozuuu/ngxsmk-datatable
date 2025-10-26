@@ -1,21 +1,15 @@
 import { Component, OnInit, AfterViewInit, ViewChild, TemplateRef, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { NgxsmkDatatableComponent, NgxsmkColumn, NgxsmkRow, PaginationConfig, RowDetailView } from 'ngxsmk-datatable';
 
 @Component({
   selector: 'app-advanced-demo',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, NgxsmkDatatableComponent],
+  imports: [CommonModule, FormsModule, NgxsmkDatatableComponent],
   template: `
     <div class="demo-section">
-      <nav class="breadcrumb">
-        <a routerLink="/" class="breadcrumb-item">Home</a>
-        <span class="breadcrumb-separator">/</span>
-        <span class="breadcrumb-item active">Advanced Features</span>
-      </nav>
-
+    
       <h2 class="demo-header">
         <i class="fas fa-cogs"></i>
         Advanced Features Demo
@@ -750,7 +744,7 @@ export class AdvancedDemoComponent implements OnInit, AfterViewInit {
   selectedRows: NgxsmkRow[] = [];
   loading = false;
   templatesReady = false;
-  
+
   selectionType: 'single' | 'multi' | 'checkbox' = 'checkbox';
   columnMode: 'standard' | 'flex' | 'force' = 'standard';
   enableRowDetails = true;
@@ -769,9 +763,9 @@ export class AdvancedDemoComponent implements OnInit, AfterViewInit {
     maxSize: 5
   };
 
-  events: Array<{time: Date, type: string, message: string}> = [];
+  events: Array<{ time: Date, type: string, message: string }> = [];
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
     // Data will be loaded after templates are ready
@@ -864,13 +858,21 @@ export class AdvancedDemoComponent implements OnInit, AfterViewInit {
 
   getRowDetailConfig(): RowDetailView | null {
     if (!this.enableRowDetails) return null;
-    
-    return {
+
+    const config = {
       template: this.rowDetailTemplate,
       rowHeight: 200,
       toggleOnClick: true,
       expandOnInit: false
     };
+    
+    console.log('Row Detail Config:', {
+      enabled: this.enableRowDetails,
+      hasTemplate: !!this.rowDetailTemplate,
+      config
+    });
+    
+    return config;
   }
 
   getTableClass(): string {
@@ -893,7 +895,7 @@ export class AdvancedDemoComponent implements OnInit, AfterViewInit {
   loadData() {
     this.loading = true;
     this.logEvent('Data Loading', 'Loading advanced demo data...');
-    
+
     setTimeout(() => {
       this.rows = this.generateMockData(100);
       this.paginationConfig.totalItems = this.rows.length;

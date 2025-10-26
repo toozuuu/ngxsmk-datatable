@@ -34,11 +34,11 @@ import { CommonModule } from '@angular/common';
           </div>
           
           <div class="header-actions">
-            <a href="https://github.com/yourusername/ngxsmk-datatable" target="_blank" class="btn-header">
+            <a href="https://github.com/toozuuu/ngxsmk-datatable" target="_blank" class="btn-header" rel="noopener noreferrer">
               <i class="fas fa-star"></i>
               Star on GitHub
             </a>
-            <a href="https://npmjs.com/package/ngxsmk-datatable" target="_blank" class="btn-header btn-primary">
+            <a href="https://npmjs.com/package/ngxsmk-datatable" target="_blank" class="btn-header btn-primary" rel="noopener noreferrer">
               <i class="fas fa-download"></i>
               Install
             </a>
@@ -437,55 +437,6 @@ import { CommonModule } from '@angular/common';
       }
     }
 
-    /* Dark mode support */
-    @media (prefers-color-scheme: dark) {
-      .app-container {
-        background: #111827;
-      }
-      
-      .sidebar {
-        background: #1f2937;
-        border-right-color: #374151;
-      }
-      
-      .sidebar-header {
-        border-bottom-color: #374151;
-      }
-      
-      .sidebar-header h3 {
-        color: #f3f4f6;
-      }
-      
-      .nav-link {
-        color: #9ca3af;
-      }
-      
-      .nav-link:hover {
-        background: #374151;
-        color: #f3f4f6;
-      }
-      
-      .nav-icon {
-        background: #374151;
-      }
-      
-      .sidebar-features {
-        background: #111827;
-        border-top-color: #374151;
-      }
-      
-      .sidebar-features h4 {
-        color: #f3f4f6;
-      }
-      
-      .sidebar-features li {
-        color: #9ca3af;
-      }
-      
-      .main-content {
-        background: #111827;
-      }
-    }
   `]
 })
 export class AppComponent {

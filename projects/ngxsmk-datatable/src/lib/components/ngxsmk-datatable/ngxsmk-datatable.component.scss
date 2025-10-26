@@ -16,12 +16,12 @@
 
   // Background Colors
   --ngxsmk-dt-bg-white: #ffffff;
-  --ngxsmk-dt-bg-light: #fafbfc;
+  --ngxsmk-dt-bg-light: #f3f4f6;
   --ngxsmk-dt-bg-lighter: #f8f9fb;
   --ngxsmk-dt-bg-hover: #f0f4ff;
   --ngxsmk-dt-bg-selected: #e8f0ff;
 
-  // Text Colors
+  // Text Colorsy
   --ngxsmk-dt-text-primary: #1f2937;
   --ngxsmk-dt-text-secondary: #6b7280;
   --ngxsmk-dt-text-tertiary: #9ca3af;
@@ -256,7 +256,7 @@ $dt-transition-normal: var(--ngxsmk-dt-transition-normal);
     &-cell {
       display: flex;
       align-items: center;
-      padding: 16px;
+      padding: var(--ngxsmk-dt-padding);
       background: $dt-bg-light;
       font-weight: 600;
       font-size: 13px;
@@ -474,12 +474,12 @@ $dt-transition-normal: var(--ngxsmk-dt-transition-normal);
   &__cell {
     display: flex;
     align-items: center;
-    padding: 16px;
+    padding: var(--ngxsmk-dt-padding);
     min-width: 0;
     flex-shrink: 0;
     box-sizing: border-box;
     color: $dt-text-primary;
-    font-size: 14px;
+    font-size: var(--ngxsmk-dt-font-size);
     font-weight: 400;
     line-height: 1.6;
     overflow: hidden;
@@ -649,7 +649,7 @@ body.ngxsmk-resizing {
 
     &__header {
       &-cell {
-        padding: 10px 12px;
+        padding: var(--ngxsmk-dt-padding-sm, 10px 12px);
         font-size: 12px;
         min-width: 80px;
 
@@ -660,7 +660,7 @@ body.ngxsmk-resizing {
     }
 
     &__cell {
-      padding: 10px 12px;
+      padding: var(--ngxsmk-dt-padding-sm, 10px 12px);
       font-size: 13px;
       min-width: 80px;
     }
@@ -689,7 +689,7 @@ body.ngxsmk-resizing {
 
     &__header {
       &-cell {
-        padding: 8px 10px;
+        padding: var(--ngxsmk-dt-padding-xs, 8px 10px);
         font-size: 11px;
         min-width: 60px;
         letter-spacing: 0.03em;
@@ -697,7 +697,7 @@ body.ngxsmk-resizing {
     }
 
     &__cell {
-      padding: 8px 10px;
+      padding: var(--ngxsmk-dt-padding-xs, 8px 10px);
       font-size: 12px;
       min-width: 60px;
     }
@@ -748,7 +748,7 @@ body.ngxsmk-resizing {
   .ngxsmk-datatable {
     &__header-cell,
     &__cell {
-      padding: 12px 14px;
+      padding: var(--ngxsmk-dt-padding-sm, 12px 14px);
     }
 
     &__checkbox {
@@ -763,130 +763,6 @@ body.ngxsmk-resizing {
 
     &__row {
       min-height: 52px;
-    }
-  }
-}
-
-// ----------------------------------------------------------------------------
-// Dark Theme Support
-// ----------------------------------------------------------------------------
-@media (prefers-color-scheme: dark) {
-  .ngxsmk-datatable {
-    $dt-dark-bg: #111827;
-    $dt-dark-bg-light: #1f2937;
-    $dt-dark-bg-lighter: #374151;
-    $dt-dark-bg-hover: rgba(59, 130, 246, 0.15);
-    $dt-dark-bg-selected: rgba(59, 130, 246, 0.25);
-    $dt-dark-text-primary: #f3f4f6;
-    $dt-dark-text-secondary: #d1d5db;
-    $dt-dark-text-tertiary: #9ca3af;
-    $dt-dark-border: #374151;
-    $dt-dark-border-light: #4b5563;
-
-    background: $dt-dark-bg;
-    border-color: $dt-dark-border;
-    color: $dt-dark-text-primary;
-
-    &__loading {
-      background: rgba($dt-dark-bg, 0.95);
-
-      &-spinner {
-        border-color: $dt-dark-border-light;
-        border-top-color: $dt-primary-color;
-      }
-
-      &-text {
-        color: $dt-dark-text-tertiary;
-      }
-    }
-
-    &__header {
-      background: $dt-dark-bg-light;
-      border-bottom-color: $dt-dark-border;
-
-      &-cell {
-        color: $dt-dark-text-secondary;
-
-        &--sortable:hover {
-          background: $dt-dark-bg-hover;
-          color: $dt-dark-text-primary;
-        }
-
-        &--sorted {
-          background: $dt-dark-bg-hover;
-          color: $dt-primary-color;
-        }
-      }
-    }
-
-    &__row {
-      border-bottom-color: $dt-dark-border;
-
-      &:hover {
-        background: $dt-dark-bg-hover !important;
-        box-shadow: inset 0 0 0 1px $dt-dark-border-light;
-      }
-
-      &--selected {
-        background: $dt-dark-bg-selected !important;
-        box-shadow: inset 3px 0 0 0 $dt-primary-color;
-      }
-
-      &--odd {
-        background: $dt-dark-bg;
-      }
-
-      &--even {
-        background: $dt-dark-bg-light;
-      }
-    }
-
-    &__cell {
-      color: $dt-dark-text-primary;
-    }
-
-    &__checkbox {
-      accent-color: $dt-primary-color;
-    }
-
-    &__footer {
-      background: $dt-dark-bg-light;
-      border-top-color: $dt-dark-border;
-    }
-
-    &__empty {
-      color: $dt-dark-text-tertiary;
-    }
-
-    &__row-detail {
-      background: $dt-dark-bg-light;
-      border-top-color: $dt-dark-border;
-      border-bottom-color: $dt-dark-border;
-
-      &-content {
-        background: $dt-dark-bg-light;
-      }
-    }
-
-    &__detail-toggle {
-      &-button {
-        background: $dt-dark-bg-lighter;
-        border-color: $dt-dark-border-light;
-
-        &:hover {
-          background: $dt-dark-border-light;
-          border-color: $dt-primary-color;
-        }
-
-        &--expanded {
-          background: $dt-primary-color;
-          border-color: $dt-primary-color;
-        }
-      }
-
-      &-icon {
-        color: $dt-dark-text-tertiary;
-      }
     }
   }
 }

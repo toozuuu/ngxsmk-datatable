@@ -215,24 +215,29 @@ onColumnVisibilityChange(event: { column: NgxsmkColumn; visible: boolean }) {
 
 ### Method 1: CSS Variables (Recommended)
 
-The easiest way to customize colors, spacing, and typography:
+The easiest way to customize colors, spacing, and typography. **All CSS variables are fully reactive** and can be changed at runtime:
 
 ```scss
-// In your styles.scss
+// In your styles.scss or component styles
 :root {
-  // Change primary color
+  // Colors
   --ngxsmk-dt-primary-color: #e91e63;
   --ngxsmk-dt-primary-hover: #c2185b;
+  --ngxsmk-dt-bg-white: #ffffff;
+  --ngxsmk-dt-bg-hover: #fef3c7;
   
-  // Make table compact
+  // Dimensions (responsive to changes)
   --ngxsmk-dt-row-height: 40px;
   --ngxsmk-dt-padding: 12px;
   --ngxsmk-dt-font-size: 13px;
+  --ngxsmk-dt-radius-lg: 8px;
   
-  // Custom font
+  // Typography
   --ngxsmk-dt-font-family: 'Inter', sans-serif;
 }
 ```
+
+**💡 Pro Tip:** Use the **Live Customization Demo** to experiment with CSS variables and generate your custom theme code!
 
 ### Method 2: CSS Classes
 
@@ -295,16 +300,16 @@ applyTheme(theme: string) {
 
 The demo application includes 10 comprehensive examples:
 
-1. **Basic Usage** - Get started quickly with essential features
-2. **Advanced Features** - Selection, templates, row details, and column pinning
-3. **Virtual Scrolling** - Handle 10,000+ rows with smooth performance
-4. **Server-Side** - External pagination, sorting, and data loading
-5. **Column Visibility** - Dynamic show/hide columns with persistence
-6. **Themes & Styling** - 5 built-in themes (Default, Material, Dark, Minimal, Colorful)
-7. **🎨 Customization** - Live CSS editor with real-time preview
-8. **✏️ Inline Editing** - Edit cells directly, track changes, export modified data
-9. **🔍 Search & Filter** - Advanced multi-criteria filtering and global search
-10. **📊 Export Data** - Export to CSV, Excel, JSON, or print-friendly format
+1. **Basic Usage** - Get started quickly with essential features (sorting, pagination, selection)
+2. **Advanced Features** - Selection modes, custom templates, row details, and column pinning
+3. **Virtual Scrolling** - Handle 10,000+ rows with smooth 60fps performance
+4. **Server-Side** - External pagination, sorting, and async data loading
+5. **Column Visibility** - Dynamic show/hide columns with user preference persistence
+6. **Themes & Styling** - 5 built-in themes (Default, Material, Dark, Minimal, Colorful) with instant switching
+7. **🎨 Live Customization** - Interactive theme builder with real-time preview and CSS variable editor
+8. **✏️ Inline Editing** - Edit cells directly, track changes, validation, export modified data
+9. **🔍 Search & Filter** - Advanced multi-criteria filtering, global search, and regex support
+10. **📤 Export Data** - Export to CSV, Excel, JSON, or print-friendly format with custom formatting
 
 **Run the demo:**
 ```bash
@@ -534,12 +539,15 @@ ngxsmk-datatable/
 - Refresh button feature (PR #2184)
 - Frozen row details (PR #2149)
 - Memory leak fixes (PR #2138)
-- Interactive column resizing
-- 5 built-in themes with dark mode
-- Virtual scrolling optimization
-- Server-side pagination and sorting
-- Inline editing capabilities
-- Advanced search and filtering
+- Interactive column resizing with drag-and-drop
+- 5 built-in themes with dark mode support
+- **Fully reactive CSS variables** for real-time theme customization
+- Live customization demo with theme builder
+- Virtual scrolling optimization for 10,000+ rows
+- Client-side and server-side pagination
+- Client-side and server-side sorting
+- Inline editing capabilities with change tracking
+- Advanced search and filtering with multi-criteria support
 - Export functionality (CSV, Excel, JSON, Print)
 
 #### 🐛 Bug Fixes
@@ -549,6 +557,9 @@ ngxsmk-datatable/
 - Fixed column width with flex (#2251)
 - Fixed pageCallback during sort (#2235)
 - Fixed trackByProp functionality (#2234)
+- Fixed CSS variable inheritance for nested components
+- Fixed padding and font-size responsive behavior
+- Improved change detection for theme switching
 
 ---
 

@@ -357,6 +357,20 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
 
   // Event handlers
   onRowClick(event: Event, row: NgxsmkRow, rowIndex: number): void {
+    console.log('Row clicked:', { 
+      row, 
+      rowIndex, 
+      hasRowDetail: !!this.rowDetail, 
+      toggleOnClick: this.rowDetail?.toggleOnClick,
+      template: this.rowDetail?.template,
+      currentExpanded: row.$$expanded
+    });
+    
+    // Toggle row detail if toggleOnClick is enabled
+    if (this.rowDetail && this.rowDetail.toggleOnClick) {
+      this.toggleRowDetail(event, row, rowIndex);
+    }
+    
     if (this.selectionType !== 'none') {
       this.handleRowSelection(event, row);
     }
@@ -413,8 +427,22 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
   }
 
   toggleRowDetail(event: Event, row: NgxsmkRow, rowIndex: number): void {
-    event.stopPropagation();
+    // Only stop propagation if clicking on a detail toggle button, not the row itself
+    const target = event.target as HTMLElement;
+    if (target.closest('.ngxsmk-datatable__detail-toggle-button')) {
+      event.stopPropagation();
+    }
+    
+    const wasExpanded = row.$$expanded;
     row.$$expanded = !row.$$expanded;
+    
+    console.log('Toggle row detail:', {
+      rowIndex,
+      wasExpanded,
+      nowExpanded: row.$$expanded,
+      hasTemplate: !!(this.rowDetail?.template),
+      rowDetailConfig: this.rowDetail
+    });
     
     // PR #2149: Handle frozen row detail state
     if (this.rowDetail?.frozen && row.$$expanded) {
