@@ -337,6 +337,8 @@ See [LICENSE](../../LICENSE) for full details.
 [![npm version](https://img.shields.io/npm/v/ngxsmk-datatable)](https://www.npmjs.com/package/ngxsmk-datatable)
 [![GitHub stars](https://img.shields.io/github/stars/toozuuu/ngxsmk-datatable?style=social)](https://github.com/toozuuu/ngxsmk-datatable)
 
-[View on GitHub](https://github.com/toozuuu/ngxsmk-datatable) • [View on npm](https://www.npmjs.com/package/ngxsmk-datatable)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/~/github.com/toozuuu/ngxsmk-datatable)
+
+[View on GitHub](https://github.com/toozuuu/ngxsmk-datatable) • [View on npm](https://www.npmjs.com/package/ngxsmk-datatable) • [Try on StackBlitz](https://stackblitz.com/~/github.com/toozuuu/ngxsmk-datatable)
 
 </div>

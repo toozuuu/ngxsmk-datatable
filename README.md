@@ -6,12 +6,16 @@
 ![Angular](https://img.shields.io/badge/angular-17%2B-red.svg)
 ![TypeScript](https://img.shields.io/badge/typescript-5.0%2B-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
+[![npm version](https://img.shields.io/npm/v/ngxsmk-datatable)](https://www.npmjs.com/package/ngxsmk-datatable)
+[![npm downloads](https://img.shields.io/npm/dm/ngxsmk-datatable)](https://www.npmjs.com/package/ngxsmk-datatable)
 
 **The Ultimate Angular DataTable Component**
 
 🚀 Performance-First • 🎨 Fully Customizable • 📦 Standalone Components • ✅ Production Ready
 
-[Live Demo](#) • [Documentation](#) • [GitHub](#)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/~/github.com/toozuuu/ngxsmk-datatable)
+
+[Documentation](./docs/README.md) • [StackBlitz Guide](./STACKBLITZ.md) • [API Reference](./docs/API.md)
 
 </div>
 
@@ -76,6 +80,18 @@ export class AppComponent {
   ];
 }
 ```
+
+---
+
+## 🎮 Try it Online
+
+Want to try ngxsmk-datatable without installing anything? Click the button below to open a fully functional demo in StackBlitz:
+
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/~/github.com/toozuuu/ngxsmk-datatable)
+
+You can edit the code, experiment with features, and see changes in real-time!
+
+📖 **[StackBlitz Setup Guide](./STACKBLITZ.md)** - Learn how to use the project on StackBlitz
 
 ---
 

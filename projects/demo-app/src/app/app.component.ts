@@ -38,7 +38,11 @@ import { CommonModule } from '@angular/common';
               <i class="fas fa-star"></i>
               Star on GitHub
             </a>
-            <a href="https://npmjs.com/package/ngxsmk-datatable" target="_blank" class="btn-header btn-primary" rel="noopener noreferrer">
+            <a href="https://stackblitz.com/~/github.com/toozuuu/ngxsmk-datatable" target="_blank" class="btn-header btn-secondary" rel="noopener noreferrer">
+              <i class="fas fa-bolt"></i>
+              Try on StackBlitz
+            </a>
+            <a href="https://www.npmjs.com/package/ngxsmk-datatable" target="_blank" class="btn-header btn-primary" rel="noopener noreferrer">
               <i class="fas fa-download"></i>
               Install
             </a>
@@ -264,6 +268,17 @@ import { CommonModule } from '@angular/common';
 
     .btn-header.btn-primary:hover {
       background: #f8f9fa;
+    }
+
+    .btn-header.btn-secondary {
+      background: rgba(255,255,255,0.25);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .btn-header.btn-secondary:hover {
+      background: rgba(255,255,255,0.35);
+      border-color: rgba(255,255,255,0.5);
     }
 
     /* Sidebar Layout */

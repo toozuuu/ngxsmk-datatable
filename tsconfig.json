@@ -24,7 +24,7 @@
     ],
     "paths": {
       "ngxsmk-datatable": [
-        "dist/ngxsmk-datatable"
+        "projects/ngxsmk-datatable/src/public-api"
       ]
     }
   },

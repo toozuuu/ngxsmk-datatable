@@ -34,6 +34,7 @@
     "url": "https://github.com/toozuuu/ngxsmk-datatable/issues"
   },
   "homepage": "https://github.com/toozuuu/ngxsmk-datatable#readme",
+  "stackblitz": "https://stackblitz.com/~/github.com/toozuuu/ngxsmk-datatable",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
