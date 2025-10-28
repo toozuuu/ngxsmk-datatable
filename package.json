@@ -1,6 +1,6 @@
 {
   "name": "ngxsmk-datatable",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "A powerful, feature-rich Angular datatable component with virtual scrolling, built for Angular 17+",
   "keywords": [
     "angular",
@@ -13,6 +13,8 @@
     "row-details",
     "material",
     "typescript",
+    "typed-rows",
+    "type-safe",
     "standalone",
     "angular17",
     "angular18",
@@ -46,11 +48,10 @@
     "@angular/platform-browser": "^17.0.0 || ^18.0.0 || ^19.0.0",
     "rxjs": "^7.0.0"
   },
-  "dependencies": {},
   "devDependencies": {
     "@angular-devkit/build-angular": "^17.0.0",
-    "@angular/cli": "^17.0.0",
     "@angular/animations": "^17.0.0",
+    "@angular/cli": "^17.0.0",
     "@angular/common": "^17.0.0",
     "@angular/compiler": "^17.0.0",
     "@angular/compiler-cli": "^17.0.0",
@@ -72,7 +73,7 @@
     "rimraf": "^5.0.0",
     "rxjs": "^7.8.0",
     "tslib": "^2.3.0",
-    "typescript": "~5.2.0",
+    "typescript": "~5.4.0",
     "zone.js": "^0.14.0"
   },
   "scripts": {

@@ -79,41 +79,57 @@ import { NgxsmkDatatableComponent, NgxsmkColumn, NgxsmkRow, PaginationConfig } f
           </div>
         }
 
+        <!-- Template definitions (must be outside datatable for @ViewChild to work) -->
+        <ng-template #indexTemplate let-row="row" let-rowIndex="rowIndex">
+          <span class="row-index">{{ rowIndex + 1 }}</span>
+        </ng-template>
+
+        <ng-template #dataTemplate let-row="row" let-value="value">
+          <div class="data-cell">
+            <span class="data-value">{{ value }}</span>
+            <small class="data-meta">Row {{ row.id }}</small>
+          </div>
+        </ng-template>
+
+        <ng-template #progressTemplate let-row="row" let-value="value">
+          <div class="progress-container">
+            <div class="progress-bar" [style.width.%]="value"></div>
+            <span class="progress-text">{{ value }}%</span>
+          </div>
+        </ng-template>
+
+        <div style="margin-bottom: 10px; padding: 10px; background: #f0f0f0; border-radius: 4px;">
+          <strong>Debug Info:</strong> Templates Ready: {{ templatesReady }}, Rows: {{ rows.length }}, Columns: {{ columns.length }}, Virtual: {{ virtualScrolling }}<br>
+          <strong>Row Height:</strong> {{ rowHeight }}px, <strong>Table Height:</strong> {{ tableHeight }}px<br>
+          <strong>Expected Visible Rows:</strong> ~{{ Math.ceil(tableHeight / rowHeight) + 2 }} (with buffer)<br>
+          <strong style="color: #dc3545;">⚠️ SCROLL DOWN in the table below to see more rows appear dynamically!</strong>
+        </div>
+
         <div class="datatable-container" [style.height.px]="tableHeight">
           @if (templatesReady) {
-          <ngxsmk-datatable
-            [columns]="columns"
-            [rows]="rows"
-            [virtualScrolling]="virtualScrolling"
-            [rowHeight]="rowHeight"
-            [headerHeight]="50"
-            [selectionType]="'multi'"
-            [pagination]="null"
-            [loadingIndicator]="loading"
-            [emptyMessage]="'No data available'"
-            (activate)="onActivate($event)"
-          >
-            <!-- Custom index cell template -->
-            <ng-template #indexTemplate let-row="row" let-rowIndex="rowIndex">
-              <span class="row-index">{{ rowIndex + 1 }}</span>
-            </ng-template>
-
-            <!-- Custom data cell template -->
-            <ng-template #dataTemplate let-row="row" let-value="value">
-              <div class="data-cell">
-                <span class="data-value">{{ value }}</span>
-                <small class="data-meta">Row {{ row.id }}</small>
-              </div>
-            </ng-template>
-
-            <!-- Custom progress cell template -->
-            <ng-template #progressTemplate let-row="row" let-value="value">
-              <div class="progress-container">
-                <div class="progress-bar" [style.width.%]="value"></div>
-                <span class="progress-text">{{ value }}%</span>
-              </div>
-            </ng-template>
-          </ngxsmk-datatable>
+            <div class="datatable-wrapper">
+              <ngxsmk-datatable
+                #datatableRef
+                [columns]="columns"
+                [rows]="rows"
+                [virtualScrolling]="virtualScrolling"
+                [rowHeight]="rowHeight"
+                [headerHeight]="50"
+                [externalPaging]="false"
+                [externalSorting]="false"
+                [selectionType]="'multi'"
+                [pagination]="null"
+                [loadingIndicator]="loading"
+                [emptyMessage]="'No data available'"
+                (activate)="onActivate($event)"
+              >
+              </ngxsmk-datatable>
+            </div>
+          }
+          @else {
+            <div style="padding: 20px; text-align: center;">
+              <i class="fas fa-spinner fa-spin"></i> Loading templates...
+            </div>
           }
         </div>
 
@@ -173,6 +189,82 @@ import { NgxsmkDatatableComponent, NgxsmkColumn, NgxsmkRow, PaginationConfig } f
       border-radius: 8px;
       overflow: hidden;
       margin-bottom: 20px;
+      display: block;
+    }
+
+    .datatable-wrapper {
+      height: 100%;
+      display: block;
+    }
+
+    .datatable-container ::ng-deep ngxsmk-datatable {
+      height: 100%;
+      display: block;
+    }
+
+    .datatable-container ::ng-deep .ngxsmk-datatable {
+      height: 100%;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    .datatable-container ::ng-deep .ngxsmk-datatable__content {
+      display: flex !important;
+      flex-direction: column !important;
+      height: 100% !important;
+      flex: 1 !important;
+    }
+
+    .datatable-container ::ng-deep .ngxsmk-datatable__header {
+      flex-shrink: 0 !important;
+    }
+
+    .datatable-container ::ng-deep .ngxsmk-datatable__body {
+      flex: 1 !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      position: relative !important;
+      min-height: 0 !important;
+      max-height: 100% !important;
+    }
+
+    .datatable-container ::ng-deep .ngxsmk-datatable__row {
+      display: flex !important;
+    }
+
+    .datatable-container ::ng-deep .ngxsmk-datatable__viewport {
+      height: 100% !important;
+    }
+
+    .datatable-container ::ng-deep .ngxsmk-pager {
+      display: none !important;
+    }
+
+    .datatable-container ::ng-deep .ngxsmk-datatable__scroll-content {
+      position: relative !important;
+    }
+
+    .datatable-container ::ng-deep .ngxsmk-datatable__virtual-spacer {
+      flex-shrink: 0 !important;
+    }
+
+    /* Make scrollbar more visible */
+    .datatable-container ::ng-deep .ngxsmk-datatable__body::-webkit-scrollbar {
+      width: 12px;
+    }
+
+    .datatable-container ::ng-deep .ngxsmk-datatable__body::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 6px;
+    }
+
+    .datatable-container ::ng-deep .ngxsmk-datatable__body::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 6px;
+    }
+
+    .datatable-container ::ng-deep .ngxsmk-datatable__body::-webkit-scrollbar-thumb:hover {
+      background: #555;
     }
 
     .row-index {
@@ -228,9 +320,10 @@ import { NgxsmkDatatableComponent, NgxsmkColumn, NgxsmkRow, PaginationConfig } f
   `]
 })
 export class VirtualDemoComponent implements OnInit, AfterViewInit {
-  @ViewChild('indexTemplate') indexTemplate!: TemplateRef<any>;
-  @ViewChild('dataTemplate') dataTemplate!: TemplateRef<any>;
-  @ViewChild('progressTemplate') progressTemplate!: TemplateRef<any>;
+  @ViewChild('indexTemplate', { static: false }) indexTemplate!: TemplateRef<any>;
+  @ViewChild('dataTemplate', { static: false }) dataTemplate!: TemplateRef<any>;
+  @ViewChild('progressTemplate', { static: false }) progressTemplate!: TemplateRef<any>;
+  @ViewChild('datatableRef', { static: false }) datatableRef: any;
 
   columns: NgxsmkColumn[] = [];
   rows: NgxsmkRow[] = [];
@@ -239,12 +332,15 @@ export class VirtualDemoComponent implements OnInit, AfterViewInit {
   datasetSize = 1000;
   templatesReady = false;
   rowHeight = 50;
-  tableHeight = 400;
+  tableHeight = 600;
   showPerformance = true;
   
   visibleRows = 0;
   renderTime = 0;
   memoryUsage = 0;
+
+  // For template access
+  Math = Math;
 
   constructor(private cdr: ChangeDetectorRef) {}
 
@@ -253,14 +349,13 @@ export class VirtualDemoComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    setTimeout(() => {
-      this.initializeColumns();
-      this.generateData();
-      this.updatePerformanceMetrics();
-      this.templatesReady = true;
-      this.cdr.detectChanges();
-    });
+    this.initializeColumns();
+    this.templatesReady = true;
+    this.rows = this.generateMockData(this.datasetSize);
+    this.updatePerformanceMetrics();
+    this.cdr.detectChanges();
   }
+
 
   private initializeColumns() {
     this.columns = [
@@ -331,18 +426,17 @@ export class VirtualDemoComponent implements OnInit, AfterViewInit {
     this.loading = true;
     const startTime = performance.now();
     
-    setTimeout(() => {
-      this.rows = this.generateMockData(this.datasetSize);
-      this.loading = false;
-      
-      const endTime = performance.now();
-      this.renderTime = Math.round(endTime - startTime);
-      this.updatePerformanceMetrics();
-    }, 100);
+    this.rows = this.generateMockData(this.datasetSize);
+    this.loading = false;
+    
+    const endTime = performance.now();
+    this.renderTime = Math.round(endTime - startTime);
+    this.updatePerformanceMetrics();
+    this.cdr.detectChanges();
   }
 
   onActivate(event: any) {
-    console.log('Activated row:', event.row);
+    // Handle row activation
   }
 
   private generateMockData(count: number): NgxsmkRow[] {

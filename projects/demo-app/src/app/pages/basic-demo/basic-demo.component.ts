@@ -92,6 +92,8 @@ import { Subject, takeUntil } from 'rxjs';
                 [virtualScrolling]="virtualScrolling"
                 [selectionType]="'multi'"
                 [pagination]="paginationConfig"
+                [externalPaging]="false"
+                [externalSorting]="false"
                 [loadingIndicator]="loading"
                 [emptyMessage]="'No users found'"
                 [rowHeight]="themeSettings.rowHeight"

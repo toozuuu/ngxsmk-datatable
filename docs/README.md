@@ -15,6 +15,13 @@ Complete documentation for ngxsmk-datatable.
    - Importing styles and themes
    - Troubleshooting
 
+1.5 **[Type Safety Guide](./TYPED-ROWS.md)** ⭐ NEW!
+   - Strongly-typed rows and columns
+   - Template type safety
+   - IntelliSense support
+   - Compile-time error detection
+   - Migration guide
+
 ### Core Documentation
 
 2. **[API Reference](./API.md)**
@@ -56,6 +63,7 @@ Complete documentation for ngxsmk-datatable.
 
 ### By Feature
 
+- **Type Safety** → [Type Safety Guide](./TYPED-ROWS.md) ⭐ NEW!
 - **Virtual Scrolling** → [Performance Tips](./PERFORMANCE.md#virtual-scrolling)
 - **Pagination** → [API Reference](./API.md#pagination-inputs) + [Performance](./PERFORMANCE.md#pagination-strategies)
 - **Sorting** → [API Reference](./API.md#sorting-inputs) + [Performance](./PERFORMANCE.md#sorting-optimization)
@@ -146,9 +154,9 @@ Guidelines:
 
 <div align="center">
 
-**Documentation Version**: 1.0.0
+**Documentation Version**: 1.1.0
 
-Last Updated: 2024
+Last Updated: 2025
 
 [Back to Main README](../README.md)
 

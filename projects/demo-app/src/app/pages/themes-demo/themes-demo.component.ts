@@ -70,37 +70,45 @@ import { Subject, takeUntil } from 'rxjs';
           </button>
         </div>
 
+        <!-- Templates defined outside datatable so @ViewChild can find them -->
+        <ng-template #themeTemplate let-row="row" let-value="value">
+          <div class="theme-cell" [class]="getCellThemeClass(value)">
+            <span class="theme-value">{{ value }}</span>
+            <div class="theme-indicator" [style.background-color]="getThemeColor(value)"></div>
+          </div>
+        </ng-template>
+
+        <ng-template #statusTemplate let-row="row" let-value="value">
+          <span [class]="getStatusClass(value)">
+            <i [class]="getStatusIcon(value)"></i>
+            {{ value }}
+          </span>
+        </ng-template>
+
         <div class="theme-preview">
           <h4>Theme Preview</h4>
+          <p>Templates Ready: {{ templatesReady }}, Rows: {{ rows.length }}, Columns: {{ columns.length }}</p>
           <div class="preview-container" [class]="getThemeClass()">
             @if (templatesReady) {
-            <ngxsmk-datatable
-              [columns]="columns"
-              [rows]="rows"
-              [virtualScrolling]="false"
-              [rowHeight]="rowHeight"
-              [selectionType]="'multi'"
-              [pagination]="paginationConfig"
-              [class]="getTableClass()"
-              [style.font-size.px]="fontSize"
-              (select)="onSelect($event)"
-            >
-              <!-- Custom theme cell template -->
-              <ng-template #themeTemplate let-row="row" let-value="value">
-                <div class="theme-cell" [class]="getCellThemeClass(value)">
-                  <span class="theme-value">{{ value }}</span>
-                  <div class="theme-indicator" [style.background-color]="getThemeColor(value)"></div>
-                </div>
-              </ng-template>
-
-              <!-- Custom status cell template -->
-              <ng-template #statusTemplate let-row="row" let-value="value">
-                <span [class]="getStatusClass(value)">
-                  <i [class]="getStatusIcon(value)"></i>
-                  {{ value }}
-                </span>
-              </ng-template>
-            </ngxsmk-datatable>
+              <div class="datatable-wrapper" [class.striped-rows]="stripedRows" [class.hover-effects]="hoverEffects">
+                <ngxsmk-datatable
+                  [columns]="columns"
+                  [rows]="rows"
+                  [virtualScrolling]="false"
+                  [rowHeight]="rowHeight"
+                  [selectionType]="'multi'"
+                  [externalPaging]="false"
+                  [externalSorting]="false"
+                  [pagination]="paginationConfig"
+                  [style.font-size.px]="fontSize"
+                  (select)="onSelect($event)"
+                >
+                </ngxsmk-datatable>
+              </div>
+            } @else {
+              <div class="loading-message">
+                <p>Loading table... templatesReady: {{ templatesReady }}</p>
+              </div>
             }
           </div>
         </div>
@@ -165,11 +173,38 @@ import { Subject, takeUntil } from 'rxjs';
       overflow: hidden;
       margin-bottom: 20px;
       background: #ffffff;
-      min-height: 500px;
+      height: 600px;
+      display: block;
+    }
+
+    .datatable-wrapper {
+      height: 100%;
+      display: block;
     }
 
     .preview-container ::ng-deep ngxsmk-datatable {
-      height: 500px;
+      height: 100%;
+      display: block;
+    }
+    
+    .preview-container ::ng-deep .ngxsmk-datatable {
+      height: 100%;
+    }
+    
+    .preview-container ::ng-deep .ngxsmk-datatable__body {
+      height: calc(100% - 100px) !important;
+      overflow-y: auto !important;
+    }
+    
+    .preview-container ::ng-deep .ngxsmk-datatable__row {
+      display: flex !important;
+    }
+    
+    .loading-message {
+      padding: 40px;
+      text-align: center;
+      color: #666;
+      font-size: 16px;
     }
 
     .theme-cell {
@@ -188,24 +223,29 @@ import { Subject, takeUntil } from 'rxjs';
       border-radius: 50%;
     }
 
-    .theme-default .theme-cell {
-      color: #333;
+    .preview-container.theme-default .theme-cell,
+    .preview-container.theme-default .theme-value {
+      color: #333 !important;
     }
 
-    .theme-material .theme-cell {
-      color: #1976d2;
+    .preview-container.theme-material .theme-cell,
+    .preview-container.theme-material .theme-value {
+      color: white !important;
     }
 
-    .theme-dark .theme-cell {
-      color: #fff;
+    .preview-container.theme-dark .theme-cell,
+    .preview-container.theme-dark .theme-value {
+      color: #e0e0e0 !important;
     }
 
-    .theme-minimal .theme-cell {
-      color: #666;
+    .preview-container.theme-minimal .theme-cell,
+    .preview-container.theme-minimal .theme-value {
+      color: #666 !important;
     }
 
-    .theme-colorful .theme-cell {
-      color: #e91e63;
+    .preview-container.theme-colorful .theme-cell,
+    .preview-container.theme-colorful .theme-value {
+      color: white !important;
     }
 
     .info-grid {
@@ -296,15 +336,28 @@ import { Subject, takeUntil } from 'rxjs';
     }
 
     .status-active {
-      color: #28a745;
+      color: #28a745 !important;
     }
 
     .status-inactive {
-      color: #dc3545;
+      color: #dc3545 !important;
     }
 
     .status-pending {
-      color: #ffc107;
+      color: #ffc107 !important;
+    }
+
+    /* Ensure status badges are visible in dark theme */
+    .preview-container.theme-dark .status-active {
+      color: #4ade80 !important;
+    }
+
+    .preview-container.theme-dark .status-inactive {
+      color: #f87171 !important;
+    }
+
+    .preview-container.theme-dark .status-pending {
+      color: #fbbf24 !important;
     }
 
     /* Theme-specific styles */
@@ -320,21 +373,60 @@ import { Subject, takeUntil } from 'rxjs';
       --background-color: #ffffff;
     }
 
-    /* Material theme styling */
-    .theme-material ::ng-deep .ngxsmk-datatable {
+    /* Material theme styling - HIGHEST SPECIFICITY */
+    .preview-container.theme-material ::ng-deep .ngxsmk-datatable {
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
-    .theme-material ::ng-deep .ngxsmk-datatable__header {
+    .preview-container.theme-material ::ng-deep .ngxsmk-datatable__header {
       background: #1976d2 !important;
       color: white !important;
     }
 
-    .theme-material ::ng-deep .ngxsmk-datatable__header-cell-text {
+    .preview-container.theme-material ::ng-deep .ngxsmk-datatable__header-row {
+      background: #1976d2 !important;
+    }
+
+    .preview-container.theme-material ::ng-deep .ngxsmk-datatable__header-cell {
+      color: white !important;
+      background: transparent !important;
+    }
+
+    .preview-container.theme-material ::ng-deep .ngxsmk-datatable__header-cell * {
       color: white !important;
     }
 
-    .theme-material ::ng-deep .ngxsmk-pager {
+    .preview-container.theme-material ::ng-deep .ngxsmk-datatable__header-cell-text {
+      color: white !important;
+    }
+    
+    .preview-container.theme-material ::ng-deep .ngxsmk-datatable__header-cell-content {
+      color: white !important;
+    }
+    
+    .preview-container.theme-material ::ng-deep .ngxsmk-datatable__header-cell-sort-icon {
+      color: white !important;
+    }
+    
+    .preview-container.theme-material ::ng-deep .ngxsmk-datatable__header-cell span {
+      color: white !important;
+    }
+    
+    .preview-container.theme-material ::ng-deep .ngxsmk-datatable__header-cell:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: white !important;
+    }
+
+    .preview-container.theme-material ::ng-deep .ngxsmk-datatable__header-cell--sorted {
+      background: rgba(255, 255, 255, 0.2) !important;
+      color: white !important;
+    }
+    
+    .preview-container.theme-material ::ng-deep .ngxsmk-datatable__header-cell--sorted * {
+      color: white !important;
+    }
+
+    .preview-container.theme-material ::ng-deep .ngxsmk-pager {
       background: #e3f2fd !important;
       border-top-color: #1976d2 !important;
     }
@@ -345,55 +437,120 @@ import { Subject, takeUntil } from 'rxjs';
       --background-color: #1e1e1e;
     }
 
-    /* Dark theme styling */
-    .theme-dark ::ng-deep .ngxsmk-datatable {
+    /* Dark theme styling - HIGHEST SPECIFICITY */
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable {
       background: #1e1e1e !important;
     }
 
-    .theme-dark ::ng-deep .ngxsmk-datatable__header {
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__header {
       background: #2d2d2d !important;
       border-bottom-color: #404040 !important;
-    }
-
-    .theme-dark ::ng-deep .ngxsmk-datatable__header-cell-text {
       color: #64b5f6 !important;
     }
 
-    .theme-dark ::ng-deep .ngxsmk-datatable__body {
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__header-row {
+      background: #2d2d2d !important;
+    }
+
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__header-cell {
+      color: #64b5f6 !important;
+      background: transparent !important;
+      border-bottom-color: #404040 !important;
+    }
+
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__header-cell * {
+      color: #64b5f6 !important;
+    }
+
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__header-cell-text {
+      color: #64b5f6 !important;
+    }
+
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__header-cell-content {
+      color: #64b5f6 !important;
+    }
+
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__header-cell-sort-icon {
+      color: #64b5f6 !important;
+    }
+
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__header-cell span {
+      color: #64b5f6 !important;
+    }
+
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__header-cell:hover {
+      background: rgba(100, 181, 246, 0.1) !important;
+      color: #64b5f6 !important;
+    }
+
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__header-cell--sorted {
+      background: rgba(100, 181, 246, 0.15) !important;
+      color: #64b5f6 !important;
+    }
+
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__body {
       background: #1e1e1e !important;
     }
 
-    .theme-dark ::ng-deep .ngxsmk-datatable__row {
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__row {
       background: #1e1e1e !important;
       border-bottom-color: #333 !important;
     }
 
-    .theme-dark ::ng-deep .ngxsmk-datatable__row:nth-child(even) {
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__row:nth-child(even) {
       background: #252525 !important;
     }
 
-    .theme-dark ::ng-deep .ngxsmk-datatable__row:hover {
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__row:hover {
       background: #2d2d2d !important;
     }
 
-    .theme-dark ::ng-deep .ngxsmk-datatable__cell {
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__cell {
       color: #e0e0e0 !important;
       border-bottom-color: #333 !important;
     }
 
-    .theme-dark ::ng-deep .ngxsmk-pager {
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__cell * {
+      color: #e0e0e0 !important;
+    }
+
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__cell span {
+      color: #e0e0e0 !important;
+    }
+
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__cell div {
+      color: #e0e0e0 !important;
+    }
+
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__cell .status-badge {
+      color: #e0e0e0 !important;
+    }
+
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__cell .category-badge {
+      color: white !important;
+    }
+
+    .preview-container.theme-dark ::ng-deep .ngxsmk-datatable__row * {
+      color: #e0e0e0 !important;
+    }
+
+    .preview-container.theme-dark ::ng-deep .ngxsmk-pager {
       background: #2d2d2d !important;
       border-top-color: #404040 !important;
       color: #e0e0e0 !important;
     }
 
-    .theme-dark ::ng-deep .ngxsmk-pager__button {
+    .preview-container.theme-dark ::ng-deep .ngxsmk-pager * {
+      color: #e0e0e0 !important;
+    }
+
+    .preview-container.theme-dark ::ng-deep .ngxsmk-pager__button {
       background: #1e1e1e !important;
       border-color: #555 !important;
       color: #e0e0e0 !important;
     }
 
-    .theme-dark ::ng-deep .ngxsmk-pager__button--active {
+    .preview-container.theme-dark ::ng-deep .ngxsmk-pager__button--active {
       background: #64b5f6 !important;
       border-color: #64b5f6 !important;
       color: #1e1e1e !important;
@@ -405,21 +562,28 @@ import { Subject, takeUntil } from 'rxjs';
       --background-color: #ffffff;
     }
 
-    /* Minimal theme styling */
-    .theme-minimal ::ng-deep .ngxsmk-datatable {
+    /* Minimal theme styling - HIGHEST SPECIFICITY */
+    .preview-container.theme-minimal ::ng-deep .ngxsmk-datatable {
       border: none;
     }
 
-    .theme-minimal ::ng-deep .ngxsmk-datatable__header {
+    .preview-container.theme-minimal ::ng-deep .ngxsmk-datatable__header {
       background: transparent !important;
       border-bottom: 2px solid #e0e0e0 !important;
+      color: #666 !important;
     }
 
-    .theme-minimal ::ng-deep .ngxsmk-datatable__header-cell {
+    .preview-container.theme-minimal ::ng-deep .ngxsmk-datatable__header-cell {
       border-right: none !important;
+      color: #666 !important;
+      background: transparent !important;
     }
 
-    .theme-minimal ::ng-deep .ngxsmk-datatable__header-cell-text {
+    .preview-container.theme-minimal ::ng-deep .ngxsmk-datatable__header-cell * {
+      color: #666 !important;
+    }
+
+    .preview-container.theme-minimal ::ng-deep .ngxsmk-datatable__header-cell-text {
       color: #666 !important;
       font-size: 13px;
       font-weight: 600;
@@ -427,16 +591,25 @@ import { Subject, takeUntil } from 'rxjs';
       letter-spacing: 0.5px;
     }
 
-    .theme-minimal ::ng-deep .ngxsmk-datatable__row {
+    .preview-container.theme-minimal ::ng-deep .ngxsmk-datatable__header-cell span {
+      color: #666 !important;
+    }
+
+    .preview-container.theme-minimal ::ng-deep .ngxsmk-datatable__header-cell-sort-icon {
+      color: #666 !important;
+    }
+
+    .preview-container.theme-minimal ::ng-deep .ngxsmk-datatable__row {
       border-bottom: 1px solid #f0f0f0 !important;
     }
 
-    .theme-minimal ::ng-deep .ngxsmk-datatable__cell {
+    .preview-container.theme-minimal ::ng-deep .ngxsmk-datatable__cell {
       border-right: none !important;
       border-bottom-color: #f0f0f0 !important;
+      color: #333 !important;
     }
 
-    .theme-minimal ::ng-deep .ngxsmk-pager {
+    .preview-container.theme-minimal ::ng-deep .ngxsmk-pager {
       background: transparent !important;
       border-top: 1px solid #e0e0e0 !important;
     }
@@ -447,34 +620,55 @@ import { Subject, takeUntil } from 'rxjs';
       --background-color: #ffffff;
     }
 
-    /* Colorful theme styling */
-    .theme-colorful ::ng-deep .ngxsmk-datatable__header {
+    /* Colorful theme styling - HIGHEST SPECIFICITY */
+    .preview-container.theme-colorful ::ng-deep .ngxsmk-datatable__header {
       background: linear-gradient(135deg, #e91e63 0%, #f48fb1 100%) !important;
       color: white !important;
     }
 
-    .theme-colorful ::ng-deep .ngxsmk-datatable__header-cell-text {
+    .preview-container.theme-colorful ::ng-deep .ngxsmk-datatable__header-cell {
+      color: white !important;
+      background: transparent !important;
+    }
+
+    .preview-container.theme-colorful ::ng-deep .ngxsmk-datatable__header-cell * {
       color: white !important;
     }
 
-    .theme-colorful ::ng-deep .ngxsmk-datatable__row:nth-child(odd) {
+    .preview-container.theme-colorful ::ng-deep .ngxsmk-datatable__header-cell-text {
+      color: white !important;
+    }
+
+    .preview-container.theme-colorful ::ng-deep .ngxsmk-datatable__header-cell span {
+      color: white !important;
+    }
+
+    .preview-container.theme-colorful ::ng-deep .ngxsmk-datatable__header-cell-sort-icon {
+      color: white !important;
+    }
+
+    .preview-container.theme-colorful ::ng-deep .ngxsmk-datatable__row:nth-child(odd) {
       background: #fff !important;
     }
 
-    .theme-colorful ::ng-deep .ngxsmk-datatable__row:nth-child(even) {
+    .preview-container.theme-colorful ::ng-deep .ngxsmk-datatable__row:nth-child(even) {
       background: #fce4ec !important;
     }
 
-    .theme-colorful ::ng-deep .ngxsmk-datatable__row:hover {
+    .preview-container.theme-colorful ::ng-deep .ngxsmk-datatable__row:hover {
       background: #f8bbd0 !important;
     }
 
-    .theme-colorful ::ng-deep .ngxsmk-pager {
+    .preview-container.theme-colorful ::ng-deep .ngxsmk-datatable__cell {
+      color: #333 !important;
+    }
+
+    .preview-container.theme-colorful ::ng-deep .ngxsmk-pager {
       background: #fce4ec !important;
       border-top-color: #e91e63 !important;
     }
 
-    .theme-colorful ::ng-deep .ngxsmk-pager__button--active {
+    .preview-container.theme-colorful ::ng-deep .ngxsmk-pager__button--active {
       background: #e91e63 !important;
       border-color: #e91e63 !important;
       color: white !important;
@@ -561,20 +755,33 @@ export class ThemesDemoComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+    
+    // Clean up injected theme styles
+    if (this.themeStyleElement) {
+      this.themeStyleElement.remove();
+    }
   }
 
   ngAfterViewInit() {
+    console.log('🔵 ThemesDemo - ngAfterViewInit started');
+    console.log('   themeTemplate:', this.themeTemplate);
+    console.log('   statusTemplate:', this.statusTemplate);
+    
     setTimeout(() => {
+      console.log('🟡 ThemesDemo - Initializing...');
       this.initializeColumns();
       this.loadData();
       this.templatesReady = true;
-      console.log('ThemesDemo - Data loaded:', {
+      this.injectThemeStyles(); // Inject initial theme styles
+      console.log('✅ ThemesDemo - Data loaded:', {
         columns: this.columns.length,
         rows: this.rows.length,
-        templatesReady: this.templatesReady
+        templatesReady: this.templatesReady,
+        themeTemplate: !!this.themeTemplate,
+        statusTemplate: !!this.statusTemplate
       });
       this.cdr.detectChanges();
-    });
+    }, 100);
   }
 
   private initializeColumns() {
@@ -627,18 +834,568 @@ export class ThemesDemoComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadData() {
+    console.log('📊 ThemesDemo - loadData called');
     this.rows = this.generateMockData(50);
     this.paginationConfig.totalItems = this.rows.length;
-    console.log('ThemesDemo - loadData called:', {
+    console.log('✅ ThemesDemo - Data generated:', {
       rowsCount: this.rows.length,
       columnsCount: this.columns.length,
-      selectedTheme: this.selectedTheme
+      selectedTheme: this.selectedTheme,
+      firstRow: this.rows[0],
+      paginationTotal: this.paginationConfig.totalItems
     });
   }
 
+  private themeStyleElement?: HTMLStyleElement;
+
   applyTheme() {
+    console.log('🔄 Applying theme:', this.selectedTheme);
     this.themeService.setTheme(this.selectedTheme);
+    
+    // Force change detection first to update the class
     this.cdr.detectChanges();
+    
+    // Then inject the styles
+    setTimeout(() => {
+      this.injectThemeStyles();
+      this.cdr.detectChanges();
+    }, 0);
+  }
+
+  private injectThemeStyles() {
+    // Remove existing theme style element if it exists
+    if (this.themeStyleElement) {
+      this.themeStyleElement.remove();
+    }
+
+    // Create new style element
+    this.themeStyleElement = document.createElement('style');
+    this.themeStyleElement.id = 'dynamic-theme-styles';
+
+    let themeStyles = '';
+
+    switch (this.selectedTheme) {
+      case 'dark':
+        themeStyles = `
+          .preview-container.theme-dark .ngxsmk-datatable {
+            background: #1e1e1e !important;
+            font-size: ${this.fontSize}px !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-datatable__cell,
+          .preview-container.theme-dark .ngxsmk-datatable__header-cell {
+            font-size: ${this.fontSize}px !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-datatable__header {
+            background: #2d2d2d !important;
+            border-bottom-color: #404040 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-datatable__header-row {
+            background: #2d2d2d !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-datatable__header-cell {
+            color: #64b5f6 !important;
+            background: transparent !important;
+            border-bottom-color: #404040 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-datatable__header-cell,
+          .preview-container.theme-dark .ngxsmk-datatable__header-cell *,
+          .preview-container.theme-dark .ngxsmk-datatable__header-cell span {
+            color: #64b5f6 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-datatable__body {
+            background: #1e1e1e !important;
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-datatable__row {
+            background: #1e1e1e !important;
+            border-bottom-color: #333 !important;
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-datatable__row:nth-child(even) {
+            background: #252525 !important;
+          }
+
+          /* Hover effects for dark theme */
+          .preview-container.theme-dark .datatable-wrapper.hover-effects .ngxsmk-datatable__row:hover {
+            background: #2d2d2d !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+          }
+
+          .preview-container.theme-dark .datatable-wrapper:not(.hover-effects) .ngxsmk-datatable__row:hover {
+            background: inherit !important;
+            box-shadow: none !important;
+          }
+
+          /* Striped rows for dark theme */
+          .preview-container.theme-dark .datatable-wrapper.striped-rows .ngxsmk-datatable__row--odd {
+            background: #1e1e1e !important;
+          }
+
+          .preview-container.theme-dark .datatable-wrapper.striped-rows .ngxsmk-datatable__row--even {
+            background: #252525 !important;
+          }
+
+          .preview-container.theme-dark .datatable-wrapper.striped-rows .ngxsmk-datatable__row:nth-child(odd) {
+            background: #1e1e1e !important;
+          }
+
+          .preview-container.theme-dark .datatable-wrapper.striped-rows .ngxsmk-datatable__row:nth-child(even) {
+            background: #252525 !important;
+          }
+
+          .preview-container.theme-dark .datatable-wrapper.striped-rows.hover-effects .ngxsmk-datatable__row:hover {
+            background: #2d2d2d !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-datatable__cell {
+            color: #e0e0e0 !important;
+            background: transparent !important;
+            border-bottom-color: #333 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-datatable__cell *:not(.status-active):not(.status-inactive):not(.status-pending) {
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-datatable__cell span:not([class*="status-"]) {
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-datatable__cell div:not([class*="status-"]) {
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .theme-cell {
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .theme-value {
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .category-badge {
+            filter: brightness(1.3) !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-pager {
+            background: #2d2d2d !important;
+            border-top-color: #404040 !important;
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-pager * {
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-pager__button {
+            background: #1e1e1e !important;
+            border-color: #555 !important;
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-pager__button:hover {
+            background: #333 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-pager__button--active {
+            background: #64b5f6 !important;
+            border-color: #64b5f6 !important;
+            color: #1e1e1e !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-pager__range {
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-pager__range-text {
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-pager__total {
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-pager__total-text {
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-pager__page-size {
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-pager__page-size-label {
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-pager__page-size-select {
+            background: #1e1e1e !important;
+            color: #e0e0e0 !important;
+            border: 1px solid #555 !important;
+            padding: 4px 8px !important;
+            border-radius: 4px !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-pager__page-size-select option {
+            background: #1e1e1e !important;
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-pager__ellipsis {
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-pager label {
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-pager span {
+            color: #e0e0e0 !important;
+          }
+
+          .preview-container.theme-dark .ngxsmk-pager select {
+            background: #1e1e1e !important;
+            color: #e0e0e0 !important;
+            border-color: #555 !important;
+          }
+        `;
+        break;
+
+      case 'material':
+        themeStyles = `
+          .preview-container.theme-material .ngxsmk-datatable {
+            font-size: ${this.fontSize}px !important;
+          }
+
+          .preview-container.theme-material .ngxsmk-datatable__cell,
+          .preview-container.theme-material .ngxsmk-datatable__header-cell {
+            font-size: ${this.fontSize}px !important;
+          }
+
+          .preview-container.theme-material .ngxsmk-datatable__header {
+            background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+          }
+
+          .preview-container.theme-material .ngxsmk-datatable__header-cell {
+            color: white !important;
+            background: transparent !important;
+          }
+
+          .preview-container.theme-material .ngxsmk-datatable__header-cell,
+          .preview-container.theme-material .ngxsmk-datatable__header-cell *,
+          .preview-container.theme-material .ngxsmk-datatable__header-cell span,
+          .preview-container.theme-material .theme-cell,
+          .preview-container.theme-material .theme-value {
+            color: white !important;
+          }
+
+          .preview-container.theme-material .ngxsmk-datatable__row {
+            background: white !important;
+          }
+
+          /* Hover effects for material theme */
+          .preview-container.theme-material .datatable-wrapper.hover-effects .ngxsmk-datatable__row:hover {
+            background: #e3f2fd !important;
+            box-shadow: 0 2px 4px rgba(25, 118, 210, 0.1) !important;
+          }
+
+          .preview-container.theme-material .datatable-wrapper:not(.hover-effects) .ngxsmk-datatable__row:hover {
+            background: inherit !important;
+            box-shadow: none !important;
+          }
+
+          .preview-container.theme-material .ngxsmk-datatable__cell,
+          .preview-container.theme-material .ngxsmk-datatable__cell * {
+            color: #333 !important;
+          }
+
+          /* Striped rows for material theme */
+          .preview-container.theme-material .datatable-wrapper.striped-rows .ngxsmk-datatable__row:nth-child(odd) {
+            background: white !important;
+          }
+
+          .preview-container.theme-material .datatable-wrapper.striped-rows .ngxsmk-datatable__row:nth-child(even) {
+            background: #f5f5f5 !important;
+          }
+
+          .preview-container.theme-material .datatable-wrapper.striped-rows.hover-effects .ngxsmk-datatable__row:hover {
+            background: #e3f2fd !important;
+            box-shadow: 0 2px 4px rgba(25, 118, 210, 0.1) !important;
+          }
+        `;
+        break;
+
+      case 'minimal':
+        themeStyles = `
+          .preview-container.theme-minimal .ngxsmk-datatable {
+            font-size: ${this.fontSize}px !important;
+          }
+
+          .preview-container.theme-minimal .ngxsmk-datatable__cell,
+          .preview-container.theme-minimal .ngxsmk-datatable__header-cell {
+            font-size: ${this.fontSize}px !important;
+          }
+
+          .preview-container.theme-minimal .ngxsmk-datatable__header {
+            background: transparent !important;
+            border-bottom: 2px solid #e0e0e0 !important;
+          }
+
+          .preview-container.theme-minimal .ngxsmk-datatable__header-cell {
+            color: #666 !important;
+            background: transparent !important;
+            border-right: none !important;
+          }
+
+          .preview-container.theme-minimal .ngxsmk-datatable__header-cell,
+          .preview-container.theme-minimal .ngxsmk-datatable__header-cell *,
+          .preview-container.theme-minimal .theme-cell,
+          .preview-container.theme-minimal .theme-value {
+            color: #666 !important;
+          }
+
+          .preview-container.theme-minimal .ngxsmk-datatable__row {
+            background: white !important;
+            border-bottom: 1px solid #f0f0f0 !important;
+          }
+
+          /* Hover effects for minimal theme */
+          .preview-container.theme-minimal .datatable-wrapper.hover-effects .ngxsmk-datatable__row:hover {
+            background: #f9f9f9 !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+          }
+
+          .preview-container.theme-minimal .datatable-wrapper:not(.hover-effects) .ngxsmk-datatable__row:hover {
+            background: inherit !important;
+            box-shadow: none !important;
+          }
+
+          .preview-container.theme-minimal .ngxsmk-datatable__cell {
+            border-right: none !important;
+            border-bottom-color: #f0f0f0 !important;
+          }
+
+          .preview-container.theme-minimal .ngxsmk-datatable__cell,
+          .preview-container.theme-minimal .ngxsmk-datatable__cell * {
+            color: #333 !important;
+          }
+
+          /* Striped rows for minimal theme */
+          .preview-container.theme-minimal .datatable-wrapper.striped-rows .ngxsmk-datatable__row:nth-child(odd) {
+            background: white !important;
+          }
+
+          .preview-container.theme-minimal .datatable-wrapper.striped-rows .ngxsmk-datatable__row:nth-child(even) {
+            background: #fafafa !important;
+          }
+
+          .preview-container.theme-minimal .datatable-wrapper.striped-rows.hover-effects .ngxsmk-datatable__row:hover {
+            background: #f0f0f0 !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+          }
+        `;
+        break;
+
+      case 'colorful':
+        themeStyles = `
+          .preview-container.theme-colorful .ngxsmk-datatable {
+            background: white !important;
+            border: 1px solid #f48fb1 !important;
+            font-size: ${this.fontSize}px !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-datatable__cell,
+          .preview-container.theme-colorful .ngxsmk-datatable__header-cell {
+            font-size: ${this.fontSize}px !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-datatable__header {
+            background: linear-gradient(135deg, #e91e63 0%, #f48fb1 100%) !important;
+            border-bottom: 2px solid #e91e63 !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-datatable__header-row {
+            background: transparent !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-datatable__header-cell {
+            color: white !important;
+            background: transparent !important;
+            border-bottom-color: rgba(255, 255, 255, 0.3) !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-datatable__header-cell,
+          .preview-container.theme-colorful .ngxsmk-datatable__header-cell *,
+          .preview-container.theme-colorful .ngxsmk-datatable__header-cell span {
+            color: white !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-datatable__header-cell:hover {
+            background: rgba(255, 255, 255, 0.1) !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-datatable__header-cell--sorted {
+            background: rgba(255, 255, 255, 0.15) !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-datatable__body {
+            background: white !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-datatable__row {
+            background: white !important;
+            border-bottom-color: #f8bbd0 !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-datatable__row:nth-child(odd) {
+            background: #fff !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-datatable__row:nth-child(even) {
+            background: #fce4ec !important;
+          }
+
+          /* Striped rows for colorful theme */
+          .preview-container.theme-colorful .datatable-wrapper.striped-rows .ngxsmk-datatable__row:nth-child(odd) {
+            background: #fff !important;
+          }
+
+          .preview-container.theme-colorful .datatable-wrapper.striped-rows .ngxsmk-datatable__row:nth-child(even) {
+            background: #fce4ec !important;
+          }
+
+          /* Hover effects for colorful theme */
+          .preview-container.theme-colorful .datatable-wrapper.hover-effects .ngxsmk-datatable__row:hover {
+            background: #f8bbd0 !important;
+            box-shadow: 0 2px 4px rgba(233, 30, 99, 0.2) !important;
+          }
+
+          .preview-container.theme-colorful .datatable-wrapper:not(.hover-effects) .ngxsmk-datatable__row:hover {
+            background: inherit !important;
+            box-shadow: none !important;
+          }
+
+          .preview-container.theme-colorful .datatable-wrapper.striped-rows.hover-effects .ngxsmk-datatable__row:hover {
+            background: #f8bbd0 !important;
+            box-shadow: 0 2px 4px rgba(233, 30, 99, 0.2) !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-datatable__cell {
+            color: #333 !important;
+            border-bottom-color: #f8bbd0 !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-datatable__cell,
+          .preview-container.theme-colorful .ngxsmk-datatable__cell *:not(.status-active):not(.status-inactive):not(.status-pending) {
+            color: #333 !important;
+          }
+
+          .preview-container.theme-colorful .theme-cell,
+          .preview-container.theme-colorful .theme-value {
+            color: #333 !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-pager {
+            background: #fce4ec !important;
+            border-top: 2px solid #e91e63 !important;
+            color: #333 !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-pager * {
+            color: #333 !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-pager__page-size-label,
+          .preview-container.theme-colorful .ngxsmk-pager__range-text,
+          .preview-container.theme-colorful .ngxsmk-pager__total-text {
+            color: #333 !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-pager__page-size-select {
+            background: white !important;
+            color: #333 !important;
+            border: 1px solid #e91e63 !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-pager__button {
+            background: white !important;
+            border-color: #e91e63 !important;
+            color: #e91e63 !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-pager__button:hover {
+            background: #f8bbd0 !important;
+            color: #c2185b !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-pager__button--active {
+            background: #e91e63 !important;
+            border-color: #e91e63 !important;
+            color: white !important;
+          }
+
+          .preview-container.theme-colorful .ngxsmk-pager__button:disabled {
+            opacity: 0.4 !important;
+          }
+        `;
+        break;
+
+      default:
+        themeStyles = `
+          .preview-container.theme-default .ngxsmk-datatable {
+            font-size: ${this.fontSize}px !important;
+          }
+
+          .preview-container.theme-default .ngxsmk-datatable__cell,
+          .preview-container.theme-default .ngxsmk-datatable__header-cell {
+            font-size: ${this.fontSize}px !important;
+          }
+
+          .preview-container.theme-default .ngxsmk-datatable__header {
+            background: #f5f5f5 !important;
+          }
+
+          .preview-container.theme-default .ngxsmk-datatable__header-cell {
+            color: #333 !important;
+          }
+
+          .preview-container.theme-default .ngxsmk-datatable__row {
+            background: white !important;
+          }
+
+          /* Hover effects for default theme */
+          .preview-container.theme-default .datatable-wrapper.hover-effects .ngxsmk-datatable__row:hover {
+            background: #f0f7ff !important;
+            box-shadow: 0 1px 3px rgba(33, 150, 243, 0.1) !important;
+          }
+
+          .preview-container.theme-default .datatable-wrapper:not(.hover-effects) .ngxsmk-datatable__row:hover {
+            background: inherit !important;
+            box-shadow: none !important;
+          }
+
+          .preview-container.theme-default .ngxsmk-datatable__cell,
+          .preview-container.theme-default .ngxsmk-datatable__cell *,
+          .preview-container.theme-default .theme-cell,
+          .preview-container.theme-default .theme-value {
+            color: #333 !important;
+          }
+        `;
+    }
+
+    this.themeStyleElement.textContent = themeStyles;
+    document.head.appendChild(this.themeStyleElement);
+    
+    console.log('🎨 Injected theme styles for:', this.selectedTheme);
   }
 
   onRowHeightChange(value: number) {
@@ -649,16 +1406,27 @@ export class ThemesDemoComponent implements OnInit, AfterViewInit, OnDestroy {
   onFontSizeChange(value: number) {
     this.fontSize = Number(value);
     this.themeService.setFontSize(this.fontSize);
+    // Re-inject theme styles with updated font size
+    this.injectThemeStyles();
+    this.cdr.detectChanges();
   }
 
   onStripedRowsChange(value: boolean) {
+    console.log('🎨 Striped Rows changed to:', value);
     this.stripedRows = value;
     this.themeService.setStripedRows(value);
+    // Re-inject theme styles to ensure striped rows work with current theme
+    this.injectThemeStyles();
+    this.cdr.detectChanges();
   }
 
   onHoverEffectsChange(value: boolean) {
+    console.log('✨ Hover Effects changed to:', value);
     this.hoverEffects = value;
     this.themeService.setHoverEffects(value);
+    // Re-inject theme styles to ensure hover effects work with current theme
+    this.injectThemeStyles();
+    this.cdr.detectChanges();
   }
 
   resetTheme() {
@@ -670,7 +1438,9 @@ export class ThemesDemoComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getThemeClass(): string {
-    return `theme-${this.selectedTheme}`;
+    const classes = `preview-container theme-${this.selectedTheme}`;
+    console.log('🎯 Theme class:', classes);
+    return classes;
   }
 
   getTableClass(): string {

@@ -52,11 +52,11 @@ import { NgxsmkDatatableComponent, NgxsmkColumn, NgxsmkRow, PaginationConfig, Ro
 
           <button class="btn btn-primary" (click)="toggleTheme()">
             <i class="fas fa-palette"></i>
-            Toggle Theme
+            Toggle Theme ({{ isDarkTheme ? 'Dark' : 'Light' }})
           </button>
         </div>
 
-        <div class="datatable-container">
+        <div class="datatable-container" [class]="getTableClass()">
           <!-- Template definitions (must be outside @if) -->
           <ng-template #headerTemplate let-column="column">
               <div class="custom-header">
@@ -116,58 +116,313 @@ import { NgxsmkDatatableComponent, NgxsmkColumn, NgxsmkRow, PaginationConfig, Ro
               </div>
             </ng-template>
 
-            <!-- Row detail template -->
+            <!-- Row detail template - Redesigned with Modern UI -->
             <ng-template #rowDetailTemplate let-row="row" let-rowIndex="rowIndex">
-              <div class="row-detail-content">
-                <div class="detail-header">
-                  <h4>{{ row['name'] }} - Details</h4>
-                  <span class="detail-id">ID: {{ row['id'] }}</span>
+              <div class="row-detail-wrapper">
+                <!-- Profile Header Card -->
+                <div class="detail-profile-header">
+                  <div class="profile-avatar-section">
+                    <img [src]="row['avatar']" [alt]="row['name']" class="detail-avatar">
+                    <div class="profile-status-indicator" [class]="getStatusIndicatorClass(row['status'])"></div>
+                  </div>
+                  <div class="profile-info-section">
+                    <h3 class="profile-name">{{ row['name'] }}</h3>
+                    <p class="profile-email">
+                      <i class="fas fa-envelope"></i>
+                      {{ row['email'] }}
+                    </p>
+                    <div class="profile-badges">
+                      <span class="role-badge" [class]="getRoleClass(row['role'])">
+                        <i class="fas fa-user-shield"></i>
+                        {{ row['role'] }}</span>
+                      <span class="status-badge" [class]="getStatusClass(row['status'])">
+                        <i [class]="getStatusIcon(row['status'])"></i>
+                        {{ row['status'] }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="profile-id-section">
+                    <span class="profile-id">ID: #{{ row['id'] }}</span>
+                    <button class="btn-close-detail" (click)="closeDetail(row)" title="Close Details">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
                 </div>
-                <div class="detail-body">
-                  <div class="detail-section">
-                    <h5>Personal Information</h5>
-                    <div class="detail-grid">
-                      <div class="detail-item">
-                        <label>Email:</label>
-                        <span>{{ row['email'] }}</span>
-                      </div>
-                      <div class="detail-item">
-                        <label>Role:</label>
-                        <span class="role-badge" [class]="getRoleClass(row['role'])">{{ row['role'] }}</span>
-                      </div>
-                      <div class="detail-item">
-                        <label>Status:</label>
-                        <span [class]="getStatusClass(row['status'])">{{ row['status'] }}</span>
+
+                <!-- Stats Cards -->
+                <div class="detail-stats-grid">
+                  <div class="stat-card stat-card-blue">
+                    <div class="stat-icon">
+                      <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-content">
+                      <div class="stat-label">Progress</div>
+                      <div class="stat-value">{{ row['progress'] }}%</div>
+                      <div class="stat-mini-progress">
+                        <div class="stat-progress-bar" [style.width.%]="row['progress']"></div>
                       </div>
                     </div>
                   </div>
-                  <div class="detail-section">
-                    <h5>Activity</h5>
-                    <div class="detail-grid">
-                      <div class="detail-item">
-                        <label>Last Login:</label>
-                        <span>{{ row['lastLogin'] }}</span>
+
+                  <div class="stat-card stat-card-green">
+                    <div class="stat-icon">
+                      <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="stat-content">
+                      <div class="stat-label">Tasks Completed</div>
+                      <div class="stat-value">{{ Math.floor(row['progress'] * 2.4) }}</div>
+                      <div class="stat-trend stat-trend-up">
+                        <i class="fas fa-arrow-up"></i> 12%
                       </div>
-                      <div class="detail-item">
-                        <label>Progress:</label>
-                        <div class="progress-container">
-                          <div class="progress-bar" [style.width.%]="row['progress']"></div>
-                          <span class="progress-text">{{ row['progress'] }}%</span>
+                    </div>
+                  </div>
+
+                  <div class="stat-card stat-card-purple">
+                    <div class="stat-icon">
+                      <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                      <div class="stat-label">Last Login</div>
+                      <div class="stat-value stat-value-small">{{ row['lastLogin'] }}</div>
+                      <div class="stat-sub">{{ getDaysAgo(row['lastLogin']) }}</div>
+                    </div>
+                  </div>
+
+                  <div class="stat-card stat-card-orange">
+                    <div class="stat-icon">
+                      <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="stat-content">
+                      <div class="stat-label">Activity Score</div>
+                      <div class="stat-value">{{ Math.floor(row['progress'] * 8.5) }}</div>
+                      <div class="stat-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Tabbed Content -->
+                <div class="detail-tabs-container">
+                  <div class="detail-tabs">
+                    <button class="detail-tab detail-tab-active" data-tab="info">
+                      <i class="fas fa-info-circle"></i>
+                      Information
+                    </button>
+                    <button class="detail-tab" data-tab="activity">
+                      <i class="fas fa-history"></i>
+                      Activity
+                    </button>
+                    <button class="detail-tab" data-tab="settings">
+                      <i class="fas fa-cog"></i>
+                      Settings
+                    </button>
+                  </div>
+
+                  <div class="detail-tab-content">
+                    <!-- Info Tab -->
+                    <div class="tab-pane tab-pane-active" data-pane="info">
+                      <div class="info-cards-grid">
+                        <div class="info-card">
+                          <div class="info-card-header">
+                            <i class="fas fa-user-circle"></i>
+                            <h5>Personal Details</h5>
+                          </div>
+                          <div class="info-card-body">
+                            <div class="info-row">
+                              <span class="info-label">Full Name</span>
+                              <span class="info-value">{{ row['name'] }}</span>
+                            </div>
+                            <div class="info-row">
+                              <span class="info-label">Email Address</span>
+                              <span class="info-value">{{ row['email'] }}</span>
+                            </div>
+                            <div class="info-row">
+                              <span class="info-label">User ID</span>
+                              <span class="info-value">#{{ row['id'] }}</span>
+                            </div>
+                            <div class="info-row">
+                              <span class="info-label">Account Type</span>
+                              <span class="info-value">{{ row['role'] }}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="info-card">
+                          <div class="info-card-header">
+                            <i class="fas fa-shield-alt"></i>
+                            <h5>Security & Access</h5>
+                          </div>
+                          <div class="info-card-body">
+                            <div class="info-row">
+                              <span class="info-label">Account Status</span>
+                              <span class="info-value">
+                                <span class="mini-badge" [class]="getStatusClass(row['status'])">
+                                  {{ row['status'] }}
+                                </span>
+                              </span>
+                            </div>
+                            <div class="info-row">
+                              <span class="info-label">2FA Enabled</span>
+                              <span class="info-value">
+                                <i class="fas fa-check-circle" style="color: #10b981;"></i> Yes
+                              </span>
+                            </div>
+                            <div class="info-row">
+                              <span class="info-label">Last Password Change</span>
+                              <span class="info-value">30 days ago</span>
+                            </div>
+                            <div class="info-row">
+                              <span class="info-label">Login Attempts</span>
+                              <span class="info-value">0 failed</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Activity Tab -->
+                    <div class="tab-pane" data-pane="activity">
+                      <div class="activity-timeline">
+                        <div class="timeline-item">
+                          <div class="timeline-marker timeline-marker-green">
+                            <i class="fas fa-check"></i>
+                          </div>
+                          <div class="timeline-content">
+                            <div class="timeline-header">
+                              <h6>Profile Updated</h6>
+                              <span class="timeline-time">2 hours ago</span>
+                            </div>
+                            <p>Updated email address and notification preferences</p>
+                          </div>
+                        </div>
+
+                        <div class="timeline-item">
+                          <div class="timeline-marker timeline-marker-blue">
+                            <i class="fas fa-sign-in-alt"></i>
+                          </div>
+                          <div class="timeline-content">
+                            <div class="timeline-header">
+                              <h6>Login from New Device</h6>
+                              <span class="timeline-time">{{ row['lastLogin'] }}</span>
+                            </div>
+                            <p>Logged in from Chrome on Windows • IP: 192.168.1.1</p>
+                          </div>
+                        </div>
+
+                        <div class="timeline-item">
+                          <div class="timeline-marker timeline-marker-purple">
+                            <i class="fas fa-file-alt"></i>
+                          </div>
+                          <div class="timeline-content">
+                            <div class="timeline-header">
+                              <h6>Document Uploaded</h6>
+                              <span class="timeline-time">1 day ago</span>
+                            </div>
+                            <p>Uploaded contract_2024.pdf (2.4 MB)</p>
+                          </div>
+                        </div>
+
+                        <div class="timeline-item">
+                          <div class="timeline-marker timeline-marker-orange">
+                            <i class="fas fa-users"></i>
+                          </div>
+                          <div class="timeline-content">
+                            <div class="timeline-header">
+                              <h6>Team Collaboration</h6>
+                              <span class="timeline-time">3 days ago</span>
+                            </div>
+                            <p>Invited to Project Alpha team workspace</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Settings Tab -->
+                    <div class="tab-pane" data-pane="settings">
+                      <div class="settings-grid">
+                        <div class="setting-item">
+                          <div class="setting-info">
+                            <i class="fas fa-bell"></i>
+                            <div>
+                              <h6>Email Notifications</h6>
+                              <p>Receive updates via email</p>
+                            </div>
+                          </div>
+                          <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                          </label>
+                        </div>
+
+                        <div class="setting-item">
+                          <div class="setting-info">
+                            <i class="fas fa-lock"></i>
+                            <div>
+                              <h6>Two-Factor Authentication</h6>
+                              <p>Enhanced security with 2FA</p>
+                            </div>
+                          </div>
+                          <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                          </label>
+                        </div>
+
+                        <div class="setting-item">
+                          <div class="setting-info">
+                            <i class="fas fa-eye"></i>
+                            <div>
+                              <h6>Profile Visibility</h6>
+                              <p>Show profile to team members</p>
+                            </div>
+                          </div>
+                          <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                          </label>
+                        </div>
+
+                        <div class="setting-item">
+                          <div class="setting-info">
+                            <i class="fas fa-moon"></i>
+                            <div>
+                              <h6>Dark Mode</h6>
+                              <p>Use dark theme preference</p>
+                            </div>
+                          </div>
+                          <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                          </label>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div class="detail-actions">
-                    <button class="btn btn-primary" (click)="editUser(row)">
-                      <i class="fas fa-edit"></i> Edit User
-                    </button>
-                    <button class="btn btn-secondary" (click)="viewProfile(row)">
-                      <i class="fas fa-user"></i> View Profile
-                    </button>
-                    <button class="btn btn-warning" (click)="sendMessage(row)">
-                      <i class="fas fa-envelope"></i> Send Message
-                    </button>
-                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="detail-actions-bar">
+                  <button class="btn-action btn-primary-action" (click)="editUser(row)">
+                    <i class="fas fa-edit"></i>
+                    <span>Edit Profile</span>
+                  </button>
+                  <button class="btn-action btn-secondary-action" (click)="viewProfile(row)">
+                    <i class="fas fa-user"></i>
+                    <span>View Full Profile</span>
+                  </button>
+                  <button class="btn-action btn-success-action" (click)="sendMessage(row)">
+                    <i class="fas fa-envelope"></i>
+                    <span>Send Message</span>
+                  </button>
+                  <button class="btn-action btn-danger-action" (click)="deleteUser(row)">
+                    <i class="fas fa-trash"></i>
+                    <span>Delete User</span>
+                  </button>
                 </div>
               </div>
             </ng-template>
@@ -189,8 +444,9 @@ import { NgxsmkDatatableComponent, NgxsmkColumn, NgxsmkRow, PaginationConfig, Ro
               [virtualScrolling]="true"
               [selectionType]="selectionType"
               [pagination]="paginationConfig"
+              [externalPaging]="false"
+              [externalSorting]="false"
               [rowDetail]="getRowDetailConfig()"
-              [class]="getTableClass()"
               (select)="onSelect($event)"
               (sort)="onSort($event)"
               (page)="onPage($event)"
@@ -719,15 +975,817 @@ import { NgxsmkDatatableComponent, NgxsmkColumn, NgxsmkRow, PaginationConfig, Ro
     .theme-dark {
       background: #1e1e1e;
       color: #ffffff;
+      border-color: #404040;
+    }
+
+    .theme-dark.datatable-container {
+      background: #1e1e1e;
+      border-color: #404040;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable {
+      background: #1e1e1e !important;
+      border-color: #404040 !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable__header {
+      background: #2d2d2d !important;
+      border-bottom-color: #404040 !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable__header-cell {
+      background: #2d2d2d !important;
+      color: #64b5f6 !important;
+      border-right-color: #404040 !important;
+      border-bottom-color: #404040 !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable__header-cell--frozen-left,
+    .theme-dark ::ng-deep .ngxsmk-datatable__header-cell--frozen-right {
+      background: #2d2d2d !important;
+      border-color: #404040 !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable__header-cell-content {
+      color: #64b5f6 !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable__header-cell-text {
+      color: #64b5f6 !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable__header-cell--checkbox {
+      background: #2d2d2d !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable__header-cell-sort-icon {
+      color: #64b5f6 !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable__header-cell--sortable:hover {
+      background: #3d3d3d !important;
+      color: #82c7ff !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable__header-cell--sorted {
+      background: #3d3d3d !important;
+      color: #82c7ff !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable__header-cell--resizing {
+      background: #4d4d4d !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable__resize-handle:hover {
+      background: rgba(100, 181, 246, 0.3) !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable__body {
+      background: #1e1e1e !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable__row {
+      background: #1e1e1e !important;
+      border-bottom-color: #333 !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable__row:nth-child(even) {
+      background: #252525 !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable__row:hover {
+      background: #2d2d2d !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable__cell {
+      color: #e0e0e0 !important;
+      border-bottom-color: #333 !important;
+      border-right-color: #404040 !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable__cell--frozen-left,
+    .theme-dark ::ng-deep .ngxsmk-datatable__cell--frozen-right {
+      background: #1e1e1e !important;
+      border-color: #404040 !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable__cell--checkbox {
+      background: transparent !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-datatable__row:nth-child(even) .ngxsmk-datatable__cell--frozen-left,
+    .theme-dark ::ng-deep .ngxsmk-datatable__row:nth-child(even) .ngxsmk-datatable__cell--frozen-right {
+      background: #252525 !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-pager {
+      background: #2d2d2d !important;
+      border-top-color: #404040 !important;
+      color: #e0e0e0 !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-pager__button {
+      background: #3d3d3d !important;
+      color: #e0e0e0 !important;
+      border-color: #404040 !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-pager__button:hover:not(:disabled) {
+      background: #4d4d4d !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-pager__button--active {
+      background: #64b5f6 !important;
+      color: #1e1e1e !important;
+    }
+
+    .theme-dark ::ng-deep .ngxsmk-pager__button:disabled {
+      background: #2d2d2d !important;
+      color: #666 !important;
+    }
+
+    /* ==========================================
+       NEW MODERN ROW DETAIL STYLES
+       ========================================== */
+    
+    /* Main Wrapper */
+    .row-detail-wrapper {
+      padding: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    /* Profile Header */
+    .detail-profile-header {
+      background: white;
+      padding: 30px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 24px;
+      align-items: center;
+      border-bottom: 3px solid #f3f4f6;
+    }
+
+    .profile-avatar-section {
+      position: relative;
+    }
+
+    .detail-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 4px solid white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      object-fit: cover;
+    }
+
+    .profile-status-indicator {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 3px solid white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .profile-info-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .profile-name {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .profile-email {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #6b7280;
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .profile-email i {
+      color: #9ca3af;
+    }
+
+    .profile-badges {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .status-badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .profile-id-section {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    }
+
+    .profile-id {
+      font-size: 13px;
+      color: #6b7280;
+      background: #f3f4f6;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-family: 'Courier New', monospace;
+    }
+
+    .btn-close-detail {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: #fee2e2;
+      color: #dc2626;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-close-detail:hover {
+      background: #dc2626;
+      color: white;
+      transform: rotate(90deg);
+    }
+
+    /* Stats Grid */
+    .detail-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      gap: 16px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: currentColor;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-card-blue { color: #3b82f6; }
+    .stat-card-green { color: #10b981; }
+    .stat-card-purple { color: #8b5cf6; }
+    .stat-card-orange { color: #f59e0b; }
+
+    .stat-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .stat-card-blue .stat-icon {
+      background: #dbeafe;
+      color: #3b82f6;
+    }
+
+    .stat-card-green .stat-icon {
+      background: #d1fae5;
+      color: #10b981;
+    }
+
+    .stat-card-purple .stat-icon {
+      background: #ede9fe;
+      color: #8b5cf6;
+    }
+
+    .stat-card-orange .stat-icon {
+      background: #fef3c7;
+      color: #f59e0b;
+    }
+
+    .stat-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1f2937;
+      line-height: 1;
+    }
+
+    .stat-value-small {
+      font-size: 16px;
+    }
+
+    .stat-sub {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .stat-mini-progress {
+      height: 4px;
+      background: #e5e7eb;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .stat-progress-bar {
+      height: 100%;
+      background: currentColor;
+      transition: width 0.5s ease;
+    }
+
+    .stat-trend {
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stat-trend-up {
+      color: #10b981;
+    }
+
+    .stat-rating {
+      display: flex;
+      gap: 2px;
+      font-size: 12px;
+      color: #fbbf24;
+    }
+
+    /* Tabs */
+    .detail-tabs-container {
+      background: white;
+      margin: 0 20px 20px 20px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .detail-tabs {
+      display: flex;
+      border-bottom: 2px solid #f3f4f6;
+      background: #fafafa;
+    }
+
+    .detail-tab {
+      flex: 1;
+      padding: 16px 24px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      color: #6b7280;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      position: relative;
+    }
+
+    .detail-tab:hover {
+      color: #3b82f6;
+      background: white;
+    }
+
+    .detail-tab-active {
+      color: #3b82f6;
+      background: white;
+    }
+
+    .detail-tab-active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #3b82f6;
+    }
+
+    .detail-tab-content {
+      padding: 24px;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane-active {
+      display: block;
+    }
+
+    /* Info Cards */
+    .info-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .info-card {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .info-card-header {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .info-card-header i {
+      font-size: 18px;
+    }
+
+    .info-card-header h5 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .info-card-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      border-left: 3px solid #3b82f6;
+    }
+
+    .info-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+    }
+
+    .info-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .mini-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* Timeline */
+    .activity-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      position: relative;
+      padding-left: 40px;
+    }
+
+    .activity-timeline::before {
+      content: '';
+      position: absolute;
+      left: 17px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, #3b82f6, #dbeafe);
+    }
+
+    .timeline-item {
+      position: relative;
+      display: flex;
+      gap: 16px;
+    }
+
+    .timeline-marker {
+      position: absolute;
+      left: -40px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      z-index: 1;
+    }
+
+    .timeline-marker-green { background: linear-gradient(135deg, #10b981, #059669); }
+    .timeline-marker-blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+    .timeline-marker-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+    .timeline-marker-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+    .timeline-content {
+      flex: 1;
+      background: #f9fafb;
+      padding: 16px;
+      border-radius: 8px;
+      border-left: 3px solid #e5e7eb;
+    }
+
+    .timeline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .timeline-header h6 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .timeline-time {
+      font-size: 12px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .timeline-content p {
+      margin: 0;
+      font-size: 13px;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+
+    /* Settings */
+    .settings-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background: #f9fafb;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      transition: all 0.2s;
+    }
+
+    .setting-item:hover {
+      background: white;
+      border-color: #3b82f6;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+    }
+
+    .setting-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .setting-info i {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: #dbeafe;
+      color: #3b82f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .setting-info h6 {
+      margin: 0 0 4px 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .setting-info p {
+      margin: 0;
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    /* Toggle Switch */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 28px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #cbd5e1;
+      transition: 0.3s;
+      border-radius: 28px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      background-color: #3b82f6;
+    }
+
+    .toggle-switch input:checked + .toggle-slider:before {
+      transform: translateX(24px);
+    }
+
+    /* Action Buttons */
+    .detail-actions-bar {
+      display: flex;
+      gap: 12px;
+      padding: 20px;
+      background: white;
+      border-top: 2px solid #f3f4f6;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      flex: 1;
+      min-width: 140px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-action:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary-action {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+    }
+
+    .btn-primary-action:hover {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    }
+
+    .btn-secondary-action {
+      background: linear-gradient(135deg, #6b7280, #4b5563);
+      color: white;
+    }
+
+    .btn-secondary-action:hover {
+      background: linear-gradient(135deg, #4b5563, #374151);
+    }
+
+    .btn-success-action {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
+
+    .btn-success-action:hover {
+      background: linear-gradient(135deg, #059669, #047857);
+    }
+
+    .btn-danger-action {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+    }
+
+    .btn-danger-action:hover {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
     }
 
     @media (max-width: 768px) {
-      .detail-grid {
+      .detail-profile-header {
+        grid-template-columns: auto 1fr;
+      }
+
+      .profile-id-section {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+
+      .detail-stats-grid {
         grid-template-columns: 1fr;
       }
 
-      .detail-actions {
+      .info-cards-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-tabs {
+        flex-wrap: wrap;
+      }
+
+      .detail-tab {
+        flex: 1 1 auto;
+        min-width: 100px;
+      }
+
+      .detail-actions-bar {
         flex-direction: column;
+      }
+
+      .btn-action {
+        width: 100%;
       }
     }
   `]
@@ -772,21 +1830,10 @@ export class AdvancedDemoComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    console.log('AdvancedDemo - AfterViewInit called');
-    console.log('Templates:', {
-      avatar: this.avatarTemplate,
-      status: this.statusTemplate,
-      progress: this.progressTemplate,
-      actions: this.actionsTemplate,
-      rowDetail: this.rowDetailTemplate
-    });
-    setTimeout(() => {
-      this.initializeColumns();
-      this.loadData();
-      this.templatesReady = true;
-      console.log('AdvancedDemo - Initialized, columns:', this.columns.length, 'rows:', this.rows.length);
-      this.cdr.detectChanges();
-    });
+    this.initializeColumns();
+    this.loadData();
+    this.templatesReady = true;
+    this.cdr.detectChanges();
   }
 
   private initializeColumns() {
@@ -859,20 +1906,12 @@ export class AdvancedDemoComponent implements OnInit, AfterViewInit {
   getRowDetailConfig(): RowDetailView | null {
     if (!this.enableRowDetails) return null;
 
-    const config = {
+    return {
       template: this.rowDetailTemplate,
-      rowHeight: 200,
+      rowHeight: 450, // Increased height for new modern design
       toggleOnClick: true,
       expandOnInit: false
     };
-    
-    console.log('Row Detail Config:', {
-      enabled: this.enableRowDetails,
-      hasTemplate: !!this.rowDetailTemplate,
-      config
-    });
-    
-    return config;
   }
 
   getTableClass(): string {
@@ -901,13 +1940,6 @@ export class AdvancedDemoComponent implements OnInit, AfterViewInit {
       this.paginationConfig.totalItems = this.rows.length;
       this.loading = false;
       this.logEvent('Data Loaded', `${this.rows.length} users loaded`);
-      console.log('AdvancedDemo - Data loaded:', {
-        rowsCount: this.rows.length,
-        columnsCount: this.columns.length,
-        firstRow: this.rows[0],
-        templatesReady: this.templatesReady,
-        enableRowDetails: this.enableRowDetails
-      });
     }, 1000);
   }
 
@@ -1007,11 +2039,41 @@ export class AdvancedDemoComponent implements OnInit, AfterViewInit {
   toggleTheme() {
     this.isDarkTheme = !this.isDarkTheme;
     this.logEvent('Theme Toggled', `Switched to ${this.isDarkTheme ? 'dark' : 'light'} theme`);
+    this.cdr.detectChanges();
   }
 
   clearEvents() {
     this.events = [];
   }
+
+  // Helper method for template - calculate days ago
+  getDaysAgo(dateString: string): string {
+    try {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffTime = Math.abs(now.getTime() - date.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 0) return 'Today';
+      if (diffDays === 1) return 'Yesterday';
+      if (diffDays < 7) return `${diffDays} days ago`;
+      if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+      return `${Math.floor(diffDays / 30)} months ago`;
+    } catch {
+      return 'Recently';
+    }
+  }
+
+  // Close detail row
+  closeDetail(row: NgxsmkRow) {
+    // Toggle row detail closed
+    row['$$expanded'] = false;
+    this.logEvent('Row Detail Closed', `Closed details for ${row['name']}`);
+    this.cdr.detectChanges();
+  }
+
+  // Expose Math to template
+  Math = Math;
 
   private generateMockData(count: number): NgxsmkRow[] {
     const roles = ['Admin', 'User', 'Manager', 'Guest'];

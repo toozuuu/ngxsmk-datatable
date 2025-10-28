@@ -89,31 +89,29 @@ export class NgxsmkPagerComponent implements OnInit, OnChanges {
 
   onPageChange(page: number): void {
     if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
-      this.currentPage = page;
-      this.calculatePagination();
+      const previousPage = this.currentPage;
       
       this.pageChange.emit({
         page,
         pageSize: this.pageSize,
         length: this.totalItems,
         pageIndex: page - 1,
-        previousPageIndex: this.currentPage - 1
+        previousPageIndex: previousPage - 1
       });
     }
   }
 
-  onPageSizeChange(newPageSize: number): void {
-    if (newPageSize !== this.pageSize) {
-      this.pageSize = newPageSize;
-      this.currentPage = 1; // Reset to first page
-      this.calculatePagination();
+  onPageSizeChange(newPageSize: number | string): void {
+    const pageSizeNum = Number(newPageSize);
+    if (pageSizeNum !== this.pageSize) {
+      const previousPage = this.currentPage;
       
       this.pageChange.emit({
         page: 1,
-        pageSize: newPageSize,
+        pageSize: pageSizeNum,
         length: this.totalItems,
         pageIndex: 0,
-        previousPageIndex: 0
+        previousPageIndex: previousPage - 1
       });
     }
   }
@@ -151,7 +149,7 @@ export class NgxsmkPagerComponent implements OnInit, OnChanges {
     if (this.totalItems === 0) {
       return '0 of 0';
     }
-    return `${this.startIndex + 1}-${this.endIndex + 1} of ${this.totalItems}`;
+    return `${this.startIndex}-${this.endIndex} of ${this.totalItems}`;
   }
 
   getTotalItemsLabel(): string {

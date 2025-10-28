@@ -27,7 +27,14 @@ npm install ngxsmk-datatable
 
 ```typescript
 import { Component } from '@angular/core';
-import { NgxsmkDatatableComponent } from 'ngxsmk-datatable';
+import { NgxsmkDatatableComponent, NgxsmkColumn, NgxsmkRow } from 'ngxsmk-datatable';
+
+// Define your data model for full type safety (NEW in v1.1.0!)
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
 
 @Component({
   standalone: true,
@@ -42,12 +49,14 @@ import { NgxsmkDatatableComponent } from 'ngxsmk-datatable';
   `
 })
 export class AppComponent {
-  columns = [
+  // Strongly-typed columns with IntelliSense support
+  columns: NgxsmkColumn<User>[] = [
     { id: 'name', name: 'Name', prop: 'name', sortable: true },
     { id: 'email', name: 'Email', prop: 'email', sortable: true }
   ];
 
-  rows = [
+  // Strongly-typed rows with compile-time validation
+  rows: NgxsmkRow<User>[] = [
     { id: 1, name: 'Alice', email: 'alice@example.com' },
     { id: 2, name: 'Bob', email: 'bob@example.com' }
   ];
@@ -58,6 +67,7 @@ export class AppComponent {
 
 ## ✨ Key Features
 
+✅ **🎯 Strongly-typed rows** - Full type safety in templates (NEW in v1.1.0!)  
 ✅ **Lightning fast** rendering with optimized virtual scrolling  
 ✅ **Small bundle size** using modern Angular patterns  
 ✅ **Zero memory leaks** with proper cleanup and OnDestroy  
@@ -75,6 +85,7 @@ export class AppComponent {
 ## 📦 What's Included
 
 ### Core Features
+- 🎯 Strongly-typed rows with compile-time safety (NEW in v1.1.0!)
 - ⚡ Virtual scrolling (10,000+ rows at 60fps)
 - 🔄 Client & server-side sorting
 - 📄 Client & server-side pagination
@@ -99,6 +110,7 @@ export class AppComponent {
 For full documentation, see the [main README](../../README.md).
 
 ### Quick Links
+- 🎯 [Type Safety Guide](../../docs/TYPED-ROWS.md) - Strongly-typed rows (NEW!)
 - 📦 [Installation Guide](../../docs/INSTALLATION.md) - Setup and configuration
 - 📖 [API Reference](../../docs/API.md) - Complete API documentation
 - 🎨 [Customization Guide](../../docs/CUSTOMIZATION.md) - Styling and theming
@@ -214,8 +226,11 @@ The library exports the following:
 - `RowDetailTemplateDirective` - Row detail template directive
 
 ### Interfaces
-- `NgxsmkColumn` - Column configuration
-- `NgxsmkRow` - Row data
+- `NgxsmkColumn<T>` - Column configuration (now with generic types!)
+- `NgxsmkRow<T>` - Row data (now with generic types!)
+- `NgxsmkCellTemplateContext<T, V>` - Typed cell template context (NEW!)
+- `NgxsmkHeaderTemplateContext<T>` - Typed header template context (NEW!)
+- `NgxsmkRowDetailTemplateContext<T>` - Typed row detail template context (NEW!)
 - `PaginationConfig` - Pagination configuration
 - `SelectionEvent` - Selection event
 - `SortEvent` - Sort event

@@ -100,7 +100,11 @@ import { NgxsmkDatatableComponent, NgxsmkColumn, NgxsmkRow, PaginationConfig } f
             <ngxsmk-datatable
               [columns]="columns"
               [rows]="filteredRows"
-              [pagination]="paginationConfig">
+              [pagination]="paginationConfig"
+              [virtualScrolling]="false"
+              [externalPaging]="false"
+              [externalSorting]="false"
+              (page)="onPageChange($event)">
               
               <ng-template #departmentTemplate let-row="row" let-value="value">
                 <span [class]="'dept-badge dept-' + value.toLowerCase()">
@@ -394,6 +398,9 @@ export class SearchFilterDemoComponent implements OnInit, AfterViewInit {
     showTotalItems: true
   };
 
+  currentPageSize = 10;
+  currentPageNumber = 1;
+
   constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {}
@@ -442,7 +449,7 @@ export class SearchFilterDemoComponent implements OnInit, AfterViewInit {
   loadData() {
     this.allRows = this.generateMockData(200);
     this.filteredRows = [...this.allRows];
-    this.paginationConfig.totalItems = this.filteredRows.length;
+    this.cdr.detectChanges();
   }
 
   generateMockData(count: number): NgxsmkRow[] {
@@ -465,57 +472,81 @@ export class SearchFilterDemoComponent implements OnInit, AfterViewInit {
     this.applyFilters();
   }
 
-  applyFilters() {
+  applyFilters(): void {
+    const searchTerm = (this.searchTerm ?? '').toString().trim().toLowerCase();
+    const departmentFilter = this.filters?.department ?? '';
+    const roleFilter = this.filters?.role ?? '';
+    const statusFilter = this.filters?.status ?? '';
+    const salaryRangeFilter = this.filters?.salaryRange ?? '';
+
     const filtered = this.allRows.filter(row => {
-      // Search term filter
-      if (this.searchTerm) {
-        const searchLower = this.searchTerm.toLowerCase();
-        const matchesSearch = 
-          row['name'].toString().toLowerCase().includes(searchLower) ||
-          row['email'].toString().toLowerCase().includes(searchLower) ||
-          row['department'].toString().toLowerCase().includes(searchLower);
-        
-        if (!matchesSearch) return false;
-      }
-
-      // Department filter
-      if (this.filters.department && row['department'] !== this.filters.department) {
+      const name = (row?.['name'] ?? '').toString().toLowerCase();
+      const email = (row?.['email'] ?? '').toString().toLowerCase();
+      const department = (row?.['department'] ?? '').toString();
+      const role = (row?.['role'] ?? '').toString();
+      const status = (row?.['status'] ?? '').toString();
+  
+      if (searchTerm && !name.includes(searchTerm) && !email.includes(searchTerm) && !department.toLowerCase().includes(searchTerm)) {
         return false;
       }
-
-      // Role filter
-      if (this.filters.role && row['role'] !== this.filters.role) {
+  
+      if (departmentFilter && department !== departmentFilter) {
         return false;
       }
-
-      // Status filter
-      if (this.filters.status && row['status'] !== this.filters.status) {
+  
+      if (roleFilter && role !== roleFilter) {
         return false;
       }
-
-      // Salary range filter
-      if (this.filters.salaryRange) {
-        const salary = row['salary'] as number;
-        if (this.filters.salaryRange === '0-50000' && salary >= 50000) return false;
-        if (this.filters.salaryRange === '50000-100000' && (salary < 50000 || salary >= 100000)) return false;
-        if (this.filters.salaryRange === '100000+' && salary < 100000) return false;
+  
+      if (statusFilter && status !== statusFilter) {
+        return false;
       }
-
+  
+      if (salaryRangeFilter) {
+        const salaryNum = parseFloat(String(row?.['salary'] ?? NaN));
+        if (Number.isNaN(salaryNum)) return false;
+  
+        switch (salaryRangeFilter) {
+          case '0-50000':
+            if (salaryNum >= 50000) return false;
+            break;
+          case '50000-100000':
+            if (salaryNum < 50000 || salaryNum >= 100000) return false;
+            break;
+          case '100000+':
+            if (salaryNum < 100000) return false;
+            break;
+        }
+      }
+  
       return true;
     });
 
-    // Create a new array reference to trigger change detection
-    this.filteredRows = [...filtered];
+    this.filteredRows = [];
+    this.cdr.detectChanges();
     
-    // Update pagination config
+    this.filteredRows = filtered;
+    
     this.paginationConfig = {
-      ...this.paginationConfig,
-      totalItems: this.filteredRows.length,
-      currentPage: 1
+      pageSize: this.currentPageSize,
+      totalItems: filtered.length,
+      currentPage: 1,
+      maxSize: 5,
+      pageSizeOptions: [10, 25, 50, 100],
+      showPageSizeOptions: true,
+      showFirstLastButtons: true,
+      showRangeLabels: true,
+      showTotalItems: true
     };
-    
+
     this.cdr.detectChanges();
   }
+
+  onPageChange(event: any): void {
+    this.currentPageSize = event.pageSize;
+    this.currentPageNumber = event.page;
+  }
+  
 
   clearSearch() {
     this.searchTerm = '';

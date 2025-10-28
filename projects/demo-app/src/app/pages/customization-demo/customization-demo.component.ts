@@ -122,7 +122,10 @@ interface CustomTheme {
                 [columns]="columns"
                 [rows]="rows"
                 [pagination]="paginationConfig"
-                [selectionType]="'checkbox'">
+                [virtualScrolling]="false"
+                [selectionType]="'checkbox'"
+                [externalPaging]="false"
+                [externalSorting]="false">
                 
                 <ng-template #statusTemplate let-row="row" let-value="value">
                   <span [class]="'status-badge status-' + value.toLowerCase()">
@@ -385,6 +388,8 @@ export class CustomizationDemoComponent implements OnInit, AfterViewInit {
   @ViewChild('statusTemplate') statusTemplate!: TemplateRef<any>;
   @ViewChild('tableWrapper') tableWrapper!: ElementRef<HTMLDivElement>;
   @ViewChild(NgxsmkDatatableComponent, { read: ElementRef }) datatableElement!: ElementRef<HTMLElement>;
+  
+  private styleElement?: HTMLStyleElement;
 
   columns: NgxsmkColumn[] = [];
   rows: NgxsmkRow[] = [];
@@ -505,11 +510,13 @@ export class CustomizationDemoComponent implements OnInit, AfterViewInit {
       this.loadData();
       this.isReady = true;
       this.updateCSS();
+      this.createStyleElement();
       this.cdr.detectChanges(); // Ensure the table is rendered
       
       // Apply initial CSS variables after table is rendered
       setTimeout(() => {
         this.applyCSSVariables();
+        this.injectDynamicStyles();
       }, 50);
     });
   }
@@ -553,8 +560,10 @@ export class CustomizationDemoComponent implements OnInit, AfterViewInit {
   }
 
   applyTheme(theme: CustomTheme) {
-    console.log('Applying theme:', theme.name);
+    console.log('🎨 Applying theme:', theme.name, theme.variables);
     this.selectedTheme = theme.name;
+    
+    // Update all properties from theme
     this.primaryColor = theme.variables['primaryColor'];
     this.bgColor = theme.variables['bgColor'];
     this.hoverColor = theme.variables['hoverColor'];
@@ -563,28 +572,163 @@ export class CustomizationDemoComponent implements OnInit, AfterViewInit {
     this.padding = parseInt(theme.variables['padding']);
     this.borderRadius = parseInt(theme.variables['borderRadius']);
     
+    console.log('📊 Theme values set:', {
+      primaryColor: this.primaryColor,
+      bgColor: this.bgColor,
+      hoverColor: this.hoverColor,
+      rowHeight: this.rowHeight,
+      fontSize: this.fontSize,
+      padding: this.padding,
+      borderRadius: this.borderRadius
+    });
+    
+    // Update CSS and apply to DOM
     this.updateAll();
     this.cdr.detectChanges();
   }
 
   updateColors() {
+    this.selectedTheme = 'custom'; // User customized, no longer a preset theme
     this.updateCSS();
     this.applyCSSVariables();
+    this.injectDynamicStyles(); // IMPORTANT: Inject styles when manually changing colors
   }
 
   updateSizes() {
+    this.selectedTheme = 'custom'; // User customized, no longer a preset theme
     this.updateCSS();
     this.applyCSSVariables();
+    this.injectDynamicStyles(); // IMPORTANT: Inject styles when manually changing sizes
   }
 
   updateBorders() {
+    this.selectedTheme = 'custom'; // User customized, no longer a preset theme
     this.updateCSS();
     this.applyCSSVariables();
+    this.injectDynamicStyles(); // IMPORTANT: Inject styles when manually changing borders
   }
 
   updateAll() {
     this.updateCSS();
     this.applyCSSVariables();
+    this.injectDynamicStyles();
+  }
+  
+  private createStyleElement() {
+    // Create a style element for dynamic styles
+    if (!this.styleElement) {
+      this.styleElement = document.createElement('style');
+      this.styleElement.id = 'ngxsmk-customization-styles';
+      document.head.appendChild(this.styleElement);
+      console.log('📝 Created style element for dynamic CSS');
+    }
+  }
+  
+  private injectDynamicStyles() {
+    if (this.styleElement) {
+      const primaryLight = this.hexToRgba(this.primaryColor, 0.08);
+      const primaryLighter = this.hexToRgba(this.primaryColor, 0.04);
+      const bgLight = this.hexToRgba(this.primaryColor, 0.03); // Very light version for header
+      
+      // Inject CSS directly that will override the defaults with HIGH specificity
+      this.styleElement.textContent = `
+        /* Dynamically injected customization styles - High Specificity */
+        :root {
+          --ngxsmk-dt-primary-color: ${this.primaryColor} !important;
+          --ngxsmk-dt-primary-hover: ${this.primaryColor} !important;
+          --ngxsmk-dt-primary-light: ${primaryLight} !important;
+          --ngxsmk-dt-primary-lighter: ${primaryLighter} !important;
+          --ngxsmk-dt-bg-white: ${this.bgColor} !important;
+          --ngxsmk-dt-bg-light: ${bgLight} !important;
+          --ngxsmk-dt-bg-lighter: ${this.bgColor} !important;
+          --ngxsmk-dt-bg-hover: ${this.hoverColor} !important;
+          --ngxsmk-dt-bg-selected: ${primaryLight} !important;
+          --ngxsmk-dt-row-height: ${this.rowHeight}px !important;
+          --ngxsmk-dt-font-size: ${this.fontSize}px !important;
+          --ngxsmk-dt-padding: ${this.padding}px !important;
+          --ngxsmk-dt-radius-lg: ${this.borderRadius}px !important;
+        }
+        
+        /* Apply to all datatables */
+        .ngxsmk-datatable,
+        ngxsmk-datatable {
+          --ngxsmk-dt-primary-color: ${this.primaryColor} !important;
+          --ngxsmk-dt-primary-hover: ${this.primaryColor} !important;
+          --ngxsmk-dt-primary-light: ${primaryLight} !important;
+          --ngxsmk-dt-primary-lighter: ${primaryLighter} !important;
+          --ngxsmk-dt-bg-white: ${this.bgColor} !important;
+          --ngxsmk-dt-bg-light: ${bgLight} !important;
+          --ngxsmk-dt-bg-lighter: ${this.bgColor} !important;
+          --ngxsmk-dt-bg-hover: ${this.hoverColor} !important;
+          --ngxsmk-dt-bg-selected: ${primaryLight} !important;
+        }
+        
+        /* DIRECT Header Background Override */
+        .ngxsmk-datatable__header {
+          background: ${bgLight} !important;
+        }
+        
+        .ngxsmk-datatable__body {
+          background: ${this.bgColor} !important;
+        }
+        
+        /* Direct style overrides */
+        .ngxsmk-datatable__header-cell--sorted {
+          background: ${primaryLight} !important;
+          color: ${this.primaryColor} !important;
+        }
+        
+        .ngxsmk-datatable__header-cell:hover {
+          background: ${primaryLight} !important;
+        }
+        
+        .ngxsmk-datatable__header-cell--resizing {
+          background: ${primaryLight} !important;
+        }
+        
+        .ngxsmk-datatable__resize-handle:hover {
+          background: ${this.primaryColor} !important;
+        }
+        
+        .ngxsmk-datatable__resize-handle:hover::after {
+          background: ${this.primaryColor} !important;
+        }
+        
+        .ngxsmk-datatable__checkbox:checked,
+        .ngxsmk-datatable__checkbox[checked] {
+          background-color: ${this.primaryColor} !important;
+          border-color: ${this.primaryColor} !important;
+        }
+        
+        .ngxsmk-datatable__row:hover {
+          background-color: ${this.hoverColor} !important;
+        }
+        
+        .ngxsmk-datatable__row {
+          height: ${this.rowHeight}px !important;
+          font-size: ${this.fontSize}px !important;
+        }
+        
+        .ngxsmk-datatable__cell {
+          padding: ${this.padding}px !important;
+          font-size: ${this.fontSize}px !important;
+        }
+        
+        .ngxsmk-datatable__header-cell {
+          padding: ${this.padding}px !important;
+        }
+        
+        .ngxsmk-datatable__detail-toggle-button--expanded {
+          background: ${this.primaryColor} !important;
+          border-color: ${this.primaryColor} !important;
+        }
+      `;
+      
+      console.log('💉 Injected dynamic styles with high specificity');
+      console.log('   Primary Color:', this.primaryColor);
+      console.log('   Primary Light:', primaryLight);
+      console.log('   BG Hover:', this.hoverColor);
+    }
   }
 
   updateCSS() {
@@ -602,16 +746,77 @@ export class CustomizationDemoComponent implements OnInit, AfterViewInit {
   applyCSSVariables() {
     if (this.tableWrapper?.nativeElement) {
       const wrapper = this.tableWrapper.nativeElement;
+      
+      // Convert hex to rgba for primary light (with alpha)
+      const primaryLight = this.hexToRgba(this.primaryColor, 0.08);
+      
+      // Apply to wrapper
       wrapper.style.setProperty('--ngxsmk-dt-primary-color', this.primaryColor);
       wrapper.style.setProperty('--ngxsmk-dt-primary-hover', this.primaryColor);
-      wrapper.style.setProperty('--ngxsmk-dt-primary-light', this.primaryColor + '14'); // Add alpha
+      wrapper.style.setProperty('--ngxsmk-dt-primary-light', primaryLight);
       wrapper.style.setProperty('--ngxsmk-dt-bg-white', this.bgColor);
       wrapper.style.setProperty('--ngxsmk-dt-bg-hover', this.hoverColor);
       wrapper.style.setProperty('--ngxsmk-dt-row-height', `${this.rowHeight}px`);
       wrapper.style.setProperty('--ngxsmk-dt-font-size', `${this.fontSize}px`);
       wrapper.style.setProperty('--ngxsmk-dt-padding', `${this.padding}px`);
       wrapper.style.setProperty('--ngxsmk-dt-radius-lg', `${this.borderRadius}px`);
+      
+      // Also apply to document root for global access
+      document.documentElement.style.setProperty('--ngxsmk-dt-primary-color', this.primaryColor);
+      document.documentElement.style.setProperty('--ngxsmk-dt-primary-hover', this.primaryColor);
+      document.documentElement.style.setProperty('--ngxsmk-dt-primary-light', primaryLight);
+      document.documentElement.style.setProperty('--ngxsmk-dt-bg-white', this.bgColor);
+      document.documentElement.style.setProperty('--ngxsmk-dt-bg-hover', this.hoverColor);
+      document.documentElement.style.setProperty('--ngxsmk-dt-row-height', `${this.rowHeight}px`);
+      document.documentElement.style.setProperty('--ngxsmk-dt-font-size', `${this.fontSize}px`);
+      document.documentElement.style.setProperty('--ngxsmk-dt-padding', `${this.padding}px`);
+      document.documentElement.style.setProperty('--ngxsmk-dt-radius-lg', `${this.borderRadius}px`);
+      
+      // Verify the variables are actually set
+      const computedStyle = getComputedStyle(wrapper);
+      const actualPrimaryColor = computedStyle.getPropertyValue('--ngxsmk-dt-primary-color');
+      const datatableElement = wrapper.querySelector('ngxsmk-datatable');
+      
+      console.log('✅ CSS Variables applied:', {
+        set: {
+          primaryColor: this.primaryColor,
+          primaryLight,
+          bgColor: this.bgColor,
+          hoverColor: this.hoverColor
+        },
+        computed: {
+          primaryColor: actualPrimaryColor.trim()
+        },
+        elements: {
+          wrapper: wrapper,
+          datatableElement: datatableElement,
+          datatableExists: !!datatableElement
+        }
+      });
+      
+      // Try to directly style the datatable element if it exists
+      if (datatableElement) {
+        const dtElement = datatableElement as HTMLElement;
+        dtElement.style.setProperty('--ngxsmk-dt-primary-color', this.primaryColor);
+        dtElement.style.setProperty('--ngxsmk-dt-primary-hover', this.primaryColor);
+        dtElement.style.setProperty('--ngxsmk-dt-primary-light', primaryLight);
+        console.log('🎯 Also applied directly to datatable element');
+      }
+    } else {
+      console.warn('⚠️ Table wrapper not found, cannot apply CSS variables');
     }
+  }
+  
+  private hexToRgba(hex: string, alpha: number): string {
+    // Remove # if present
+    hex = hex.replace('#', '');
+    
+    // Convert to RGB
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 
   resetToDefaults() {

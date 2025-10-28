@@ -48,6 +48,9 @@ import type { NgxsmkColumn } from 'ngxsmk-datatable';
           <ngxsmk-datatable
             [columns]="visibleColumns"
             [rows]="employees"
+            [virtualScrolling]="false"
+            [externalPaging]="false"
+            [externalSorting]="false"
             [pagination]="{
               pageSize: 10,
               totalItems: employees.length,

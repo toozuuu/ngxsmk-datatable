@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![ngxsmk-datatable](https://img.shields.io/badge/ngxsmk--datatable-v1.0.1-blue.svg)
+![ngxsmk-datatable](https://img.shields.io/badge/ngxsmk--datatable-v1.1.0-blue.svg)
 ![Angular](https://img.shields.io/badge/angular-17%2B-red.svg)
 ![TypeScript](https://img.shields.io/badge/typescript-5.0%2B-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
@@ -27,6 +27,7 @@ A modern, feature-rich Angular datatable component built from the ground up for 
 
 ### 🎯 Key Advantages
 
+✅ **🎯 Strongly-Typed Rows** - Full TypeScript type safety in templates (better than Angular Material!)  
 ✅ **Lightning Fast** - Optimized rendering for datasets with 10,000+ rows  
 ✅ **Fully Reactive** - CSS variables update in real-time  
 ✅ **100% Customizable** - Every aspect can be styled via CSS variables, classes, or templates  
@@ -51,7 +52,15 @@ npm install ngxsmk-datatable
 
 ```typescript
 import { Component } from '@angular/core';
-import { NgxsmkDatatableComponent } from 'ngxsmk-datatable';
+import { NgxsmkDatatableComponent, NgxsmkColumn, NgxsmkRow } from 'ngxsmk-datatable';
+
+// Define your data model for full type safety
+interface User {
+  id: number;
+  name: string;
+  age: number;
+  email: string;
+}
 
 @Component({
   standalone: true,
@@ -68,13 +77,15 @@ import { NgxsmkDatatableComponent } from 'ngxsmk-datatable';
   `
 })
 export class AppComponent {
-  columns = [
+  // Strongly-typed columns with IntelliSense support
+  columns: NgxsmkColumn<User>[] = [
     { id: 'name', name: 'Name', prop: 'name', sortable: true, resizable: true },
     { id: 'age', name: 'Age', prop: 'age', sortable: true, flexGrow: 1 },
     { id: 'email', name: 'Email', prop: 'email', sortable: true, width: 250 }
   ];
 
-  rows = [
+  // Strongly-typed rows with compile-time validation
+  rows: NgxsmkRow<User>[] = [
     { id: 1, name: 'Alice', age: 28, email: 'alice@example.com' },
     { id: 2, name: 'Bob', age: 32, email: 'bob@example.com' }
   ];
@@ -98,6 +109,7 @@ You can edit the code, experiment with features, and see changes in real-time!
 ## 🌟 Features
 
 ### Core Features
+- 🎯 **Strongly-Typed Rows** - Full TypeScript type safety in templates (NEW in v1.1.0!)
 - ⚡ **Virtual Scrolling** - Smooth handling of 10,000+ rows with 60fps
 - 🔄 **Sorting** - Single & multi-column sorting (client & server-side)
 - 📄 **Pagination** - Flexible pagination with customizable page sizes
@@ -124,6 +136,7 @@ You can edit the code, experiment with features, and see changes in real-time!
 
 ### Complete Documentation
 
+- 🎯 **[Type Safety Guide](./docs/TYPED-ROWS.md)** - Strongly-typed rows and templates (NEW!)
 - 📦 **[Installation Guide](./docs/INSTALLATION.md)** - Setup, dependencies, and troubleshooting
 - 📖 **[API Reference](./docs/API.md)** - All inputs, outputs, and interfaces
 - 🎨 **[Customization Guide](./docs/CUSTOMIZATION.md)** - CSS variables, themes, and templates
@@ -510,7 +523,26 @@ ngxsmk-datatable/
 
 ## 📋 Changelog
 
-### Version 1.0.0 (Latest)
+### Version 1.1.0 (Latest) 🎉
+
+#### 🎯 Major Features
+- **Strongly-Typed Rows** - Full TypeScript type safety in templates!
+  - Generic type support: `NgxsmkRow<T>`, `NgxsmkColumn<T>`
+  - Type-safe template contexts with IntelliSense
+  - Compile-time error detection
+  - Better developer experience than Angular Material
+
+#### ✨ New Features  
+- Template context interfaces with full type checking
+- Professional JSDoc documentation throughout
+- Enhanced type safety guide and examples
+
+#### 🐛 Bug Fixes
+- Fixed checkbox selection not updating count
+- Fixed row click interfering with checkbox selection
+- Improved change detection for selection events
+
+### Version 1.0.1
 
 #### ✨ Features
 - Production-ready Angular 17+ datatable component

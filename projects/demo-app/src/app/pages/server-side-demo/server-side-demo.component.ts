@@ -106,21 +106,23 @@ import { NgxsmkDatatableComponent, NgxsmkColumn, NgxsmkRow, PaginationConfig, So
 
         <div class="datatable-container">
           @if (templatesReady && columns.length > 0) {
-          <ngxsmk-datatable
-            [columns]="columns"
-            [rows]="rows"
-            [virtualScrolling]="false"
-            [selectionType]="'multi'"
-            [pagination]="paginationConfig"
-            [externalPaging]="true"
-            [externalSorting]="true"
-            [loadingIndicator]="loading"
-            [emptyMessage]="'No data available'"
-            (select)="onSelect($event)"
-            (sort)="onSort($event)"
-            (page)="onPage($event)"
-          >
-          </ngxsmk-datatable>
+            <div class="datatable-wrapper">
+              <ngxsmk-datatable
+                [columns]="columns"
+                [rows]="rows"
+                [virtualScrolling]="false"
+                [selectionType]="'multi'"
+                [pagination]="paginationConfig"
+                [externalPaging]="true"
+                [externalSorting]="true"
+                [loadingIndicator]="loading"
+                [emptyMessage]="'No data available'"
+                (select)="onSelect($event)"
+                (sort)="onSort($event)"
+                (page)="onPage($event)"
+              >
+              </ngxsmk-datatable>
+            </div>
           }
           @else {
             <div style="padding: 20px; text-align: center;">
@@ -201,6 +203,27 @@ import { NgxsmkDatatableComponent, NgxsmkColumn, NgxsmkRow, PaginationConfig, So
       border-radius: 8px;
       overflow: hidden;
       margin-bottom: 20px;
+      height: 600px;
+      display: block;
+    }
+
+    .datatable-wrapper {
+      height: 100%;
+      display: block;
+    }
+
+    .datatable-container ::ng-deep ngxsmk-datatable {
+      height: 100%;
+      display: block;
+    }
+
+    .datatable-container ::ng-deep .ngxsmk-datatable {
+      height: 100%;
+    }
+
+    .datatable-container ::ng-deep .ngxsmk-datatable__body {
+      height: calc(100% - 100px) !important;
+      overflow-y: auto !important;
     }
 
     .status-high {
@@ -375,13 +398,10 @@ export class ServerSideDemoComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    // Wrap initialization in setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
-    setTimeout(() => {
-      this.initializeColumns();
-      this.templatesReady = true;
-      this.loadData();
-      this.cdr.detectChanges();
-    }, 0);
+    this.initializeColumns();
+    this.templatesReady = true;
+    this.loadData();
+    this.cdr.detectChanges();
   }
 
   private initializeColumns() {
@@ -593,7 +613,7 @@ export class ServerSideDemoComponent implements OnInit, AfterViewInit {
   }
 
   private logEvent(type: string, message: string) {
-    console.log(`[${type}] ${message}`);
+    // Event logging (can be replaced with actual logging service)
   }
 
   clearLog() {

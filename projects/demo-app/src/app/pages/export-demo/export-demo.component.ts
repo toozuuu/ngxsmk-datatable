@@ -67,7 +67,7 @@ interface Employee extends NgxsmkRow {
         <div class="option-group">
           <label>
             Date Format:
-            <select [(ngModel)]="exportOptions.dateFormat" class="format-select">
+            <select [(ngModel)]="exportOptions.dateFormat" (ngModelChange)="onFormatChange()" class="format-select">
               <option value="iso">ISO (2024-10-25)</option>
               <option value="us">US (10/25/2024)</option>
               <option value="eu">EU (25/10/2024)</option>
@@ -77,7 +77,7 @@ interface Employee extends NgxsmkRow {
           
           <label>
             Number Format:
-            <select [(ngModel)]="exportOptions.numberFormat" class="format-select">
+            <select [(ngModel)]="exportOptions.numberFormat" (ngModelChange)="onFormatChange()" class="format-select">
               <option value="default">Default (123456.78)</option>
               <option value="comma">Comma (123,456.78)</option>
               <option value="currency">Currency ($123,456.78)</option>
@@ -114,7 +114,13 @@ interface Employee extends NgxsmkRow {
 
       <ng-template #salaryTemplate let-row="row" let-value="value">
         <span class="salary">
-          {{ '$' + formatNumber(value) }}
+          {{ formatNumberForExport(value) }}
+        </span>
+      </ng-template>
+
+      <ng-template #dateTemplate let-row="row" let-value="value">
+        <span class="date">
+          {{ formatDate(value) }}
         </span>
       </ng-template>
 
@@ -138,6 +144,8 @@ interface Employee extends NgxsmkRow {
             [pagination]="paginationConfig"
             [selectionType]="'checkbox'"
             [virtualScrolling]="false"
+            [externalPaging]="false"
+            [externalSorting]="false"
             (select)="onSelect($event)"
             (sort)="onSort($event)"
             (page)="onPage($event)">
@@ -407,6 +415,12 @@ interface Employee extends NgxsmkRow {
       color: #059669;
     }
 
+    /* Date */
+    .date {
+      font-weight: 500;
+      color: #4b5563;
+    }
+
     /* Performance bar */
     .performance-bar {
       position: relative;
@@ -565,6 +579,7 @@ interface Employee extends NgxsmkRow {
 export class ExportDemoComponent implements OnInit, AfterViewInit {
   @ViewChild('statusTemplate', { static: false }) statusTemplate!: TemplateRef<any>;
   @ViewChild('salaryTemplate', { static: false }) salaryTemplate!: TemplateRef<any>;
+  @ViewChild('dateTemplate', { static: false }) dateTemplate!: TemplateRef<any>;
   @ViewChild('performanceTemplate', { static: false }) performanceTemplate!: TemplateRef<any>;
 
   columns: NgxsmkColumn[] = [];
@@ -665,7 +680,8 @@ export class ExportDemoComponent implements OnInit, AfterViewInit {
         prop: 'joinDate',
         width: 140,
         sortable: true,
-        resizable: true
+        resizable: true,
+        cellTemplate: this.dateTemplate
       },
       {
         id: 'status',
@@ -727,6 +743,11 @@ export class ExportDemoComponent implements OnInit, AfterViewInit {
 
   onPage(event: any): void {
     console.log('Page event:', event);
+  }
+
+  onFormatChange(): void {
+    // Trigger change detection to update templates with new format
+    this.cdr.detectChanges();
   }
 
   formatNumber(value: number): string {

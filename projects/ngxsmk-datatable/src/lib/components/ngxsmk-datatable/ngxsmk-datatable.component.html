@@ -193,16 +193,17 @@
             ></div>
           }
 
-          <!-- Rows -->
-        @for (row of visibleRows; track rowIdentity(row); let i = $index) {
+          <!-- Rows with inline detail views -->
+        @for (row of visibleRows; track trackByIndex(i, row); let i = $index) {
+          <!-- Row -->
           <div 
             class="ngxsmk-datatable__row"
-            [class]="getRowClass(row, visibleStartIndex + i)"
+            [class]="getRowClass(row, getActualRowIndex(i))"
             [class.ngxsmk-datatable__row--selected]="selectionModel.isSelected(row)"
-            [class.ngxsmk-datatable__row--odd]="(visibleStartIndex + i) % 2 === 1"
-            [class.ngxsmk-datatable__row--even]="(visibleStartIndex + i) % 2 === 0"
+            [class.ngxsmk-datatable__row--odd]="getActualRowIndex(i) % 2 === 1"
+            [class.ngxsmk-datatable__row--even]="getActualRowIndex(i) % 2 === 0"
             [style.height.px]="rowHeight"
-            (click)="onRowClick($event, row, visibleStartIndex + i)"
+            (click)="onRowClick($event, row, getActualRowIndex(i))"
           >
             
             <!-- Row detail toggle cell -->
@@ -210,7 +211,7 @@
               <div 
                 class="ngxsmk-datatable__cell ngxsmk-datatable__cell--detail-toggle"
                 [style.width.px]="40"
-                (click)="toggleRowDetail($event, row, visibleStartIndex + i)"
+                (click)="toggleRowDetail($event, row, getActualRowIndex(i))"
               >
                 <button 
                   class="ngxsmk-datatable__detail-toggle-button"
@@ -240,14 +241,14 @@
             @for (column of frozenLeftColumns; track column.id) {
               <div 
                 class="ngxsmk-datatable__cell ngxsmk-datatable__cell--frozen-left"
-                [class]="getCellClass(row, column, row[column.prop || column.id], visibleStartIndex + i)"
+                [class]="getCellClass(row, column, row[column.prop || column.id], getActualRowIndex(i))"
                 [style.width.px]="columnWidths[column.id]"
                 (click)="onCellClick($event, row, column, row[column.prop || column.id])"
               >
                 <div class="ngxsmk-datatable__cell-content">
                   @if (column.cellTemplate) {
                     <ng-container 
-                      *ngTemplateOutlet="column.cellTemplate; context: { $implicit: row, row: row, column: column, value: row[column.prop || column.id], rowIndex: visibleStartIndex + i }"
+                      *ngTemplateOutlet="column.cellTemplate; context: { $implicit: row, row: row, column: column, value: row[column.prop || column.id], rowIndex: getActualRowIndex(i) }"
                     ></ng-container>
                   } @else {
                     <span [innerHTML]="row[column.prop || column.id] | safeHtml"></span>
@@ -260,14 +261,14 @@
             @for (column of scrollableColumns; track column.id) {
               <div 
                 class="ngxsmk-datatable__cell"
-                [class]="getCellClass(row, column, row[column.prop || column.id], visibleStartIndex + i)"
+                [class]="getCellClass(row, column, row[column.prop || column.id], getActualRowIndex(i))"
                 [style.width.px]="columnWidths[column.id]"
                 (click)="onCellClick($event, row, column, row[column.prop || column.id])"
               >
                 <div class="ngxsmk-datatable__cell-content">
                   @if (column.cellTemplate) {
                     <ng-container 
-                      *ngTemplateOutlet="column.cellTemplate; context: { $implicit: row, row: row, column: column, value: row[column.prop || column.id], rowIndex: visibleStartIndex + i }"
+                      *ngTemplateOutlet="column.cellTemplate; context: { $implicit: row, row: row, column: column, value: row[column.prop || column.id], rowIndex: getActualRowIndex(i) }"
                     ></ng-container>
                   } @else {
                     <span [innerHTML]="row[column.prop || column.id] | safeHtml"></span>
@@ -280,14 +281,14 @@
             @for (column of frozenRightColumns; track column.id) {
               <div 
                 class="ngxsmk-datatable__cell ngxsmk-datatable__cell--frozen-right"
-                [class]="getCellClass(row, column, row[column.prop || column.id], visibleStartIndex + i)"
+                [class]="getCellClass(row, column, row[column.prop || column.id], getActualRowIndex(i))"
                 [style.width.px]="columnWidths[column.id]"
                 (click)="onCellClick($event, row, column, row[column.prop || column.id])"
               >
                 <div class="ngxsmk-datatable__cell-content">
                   @if (column.cellTemplate) {
                     <ng-container 
-                      *ngTemplateOutlet="column.cellTemplate; context: { $implicit: row, row: row, column: column, value: row[column.prop || column.id], rowIndex: visibleStartIndex + i }"
+                      *ngTemplateOutlet="column.cellTemplate; context: { $implicit: row, row: row, column: column, value: row[column.prop || column.id], rowIndex: getActualRowIndex(i) }"
                     ></ng-container>
                   } @else {
                     <span [innerHTML]="row[column.prop || column.id] | safeHtml"></span>
@@ -312,31 +313,29 @@
             }
 
           </div>
-        }
 
-        <!-- Row detail views -->
-        @for (row of visibleRows; track rowIdentity(row); let i = $index) {
-          <div 
-            class="ngxsmk-datatable__row-detail"
-            [class.ngxsmk-datatable__row-detail--expanded]="row.$$expanded"
-            [style.height.px]="row.$$expanded ? (rowDetail?.rowHeight || 100) : 0"
-            [style.margin-top.px]="row.$$expanded ? 0 : -(rowDetail?.rowHeight || 100)"
-          >
-            @if (row.$$expanded && (rowDetail?.template || rowDetailTemplate)) {
-              <div class="ngxsmk-datatable__row-detail-content">
-                <ng-container 
-                  *ngTemplateOutlet="rowDetail?.template || rowDetailTemplate; context: { $implicit: row, row: row, rowIndex: visibleStartIndex + i }"
-                ></ng-container>
-              </div>
-            }
-          </div>
+          <!-- Row detail view - Appears immediately after the row -->
+          @if (rowDetail) {
+            <div 
+              class="ngxsmk-datatable__row-detail"
+              [class.ngxsmk-datatable__row-detail--expanded]="row.$$expanded"
+            >
+              @if (row.$$expanded && (rowDetail.template || rowDetailTemplate)) {
+                <div class="ngxsmk-datatable__row-detail-content">
+                  <ng-container 
+                    *ngTemplateOutlet="rowDetail.template || rowDetailTemplate; context: { $implicit: row, row: row, rowIndex: getActualRowIndex(i) }"
+                  ></ng-container>
+                </div>
+              }
+            </div>
+          }
         }
 
           <!-- Virtual scrolling spacer -->
           @if (virtualScrolling) {
             <div 
               class="ngxsmk-datatable__virtual-spacer"
-              [style.height.px]="(rows.length - visibleEndIndex - 1) * rowHeight"
+              [style.height.px]="getBottomSpacerHeight()"
             ></div>
           }
         </div>

@@ -1,6 +1,59 @@
 import { TemplateRef } from '@angular/core';
+import type { NgxsmkRow } from './row.interface';
 
-export interface NgxsmkColumn {
+/**
+ * Template context for cell templates
+ * @template T - The type of the row data
+ * @template V - The type of the cell value (defaults to any)
+ * 
+ * Note: The row is typed as NgxsmkRow<T> which includes both your data properties
+ * and internal metadata ($$expanded, $$selected, etc.)
+ */
+export interface NgxsmkCellTemplateContext<T = any, V = any> {
+  /** The row data (implicit context, can be used with let-row) */
+  $implicit: NgxsmkRow<T>;
+  /** The row data */
+  row: NgxsmkRow<T>;
+  /** The column definition */
+  column: NgxsmkColumn<T>;
+  /** The cell value */
+  value: V;
+  /** The row index */
+  rowIndex: number;
+}
+
+/**
+ * Template context for header templates
+ * @template T - The type of the row data
+ */
+export interface NgxsmkHeaderTemplateContext<T = any> {
+  /** The column definition */
+  $implicit: NgxsmkColumn<T>;
+  /** The column definition */
+  column: NgxsmkColumn<T>;
+}
+
+/**
+ * Template context for row detail templates
+ * @template T - The type of the row data
+ * 
+ * Note: The row is typed as NgxsmkRow<T> which includes both your data properties
+ * and internal metadata ($$expanded, $$selected, etc.)
+ */
+export interface NgxsmkRowDetailTemplateContext<T = any> {
+  /** The row data (implicit context) */
+  $implicit: NgxsmkRow<T>;
+  /** The row data */
+  row: NgxsmkRow<T>;
+  /** The row index */
+  rowIndex: number;
+}
+
+/**
+ * Column configuration with strongly-typed templates
+ * @template T - The type of the row data (for type-safe templates)
+ */
+export interface NgxsmkColumn<T = any> {
   id: string;
   name: string;
   prop?: string;
@@ -12,7 +65,7 @@ export interface NgxsmkColumn {
   minWidth?: number;
   maxWidth?: number;
   flexGrow?: number;
-  cellClass?: string | ((row: any, column: NgxsmkColumn, value: any, rowIndex: number) => string);
+  cellClass?: string | ((row: NgxsmkRow<T>, column: NgxsmkColumn<T>, value: any, rowIndex: number) => string);
   headerClass?: string;
   sortProp?: string;
   comparator?: (propA: any, propB: any) => number;
@@ -27,10 +80,13 @@ export interface NgxsmkColumn {
   isTreeColumn?: boolean;
   treeLevelIndent?: number;
   summaryFunc?: (cells: any[]) => any;
-  summaryTemplate?: TemplateRef<any>;
-  cellTemplate?: TemplateRef<any>;
-  headerTemplate?: TemplateRef<any>;
-  footerTemplate?: TemplateRef<any>;
+  summaryTemplate?: TemplateRef<NgxsmkCellTemplateContext<T>>;
+  /** Strongly-typed cell template */
+  cellTemplate?: TemplateRef<NgxsmkCellTemplateContext<T>>;
+  /** Strongly-typed header template */
+  headerTemplate?: TemplateRef<NgxsmkHeaderTemplateContext<T>>;
+  /** Strongly-typed footer template */
+  footerTemplate?: TemplateRef<NgxsmkCellTemplateContext<T>>;
 }
 
 export interface ColumnWidth {

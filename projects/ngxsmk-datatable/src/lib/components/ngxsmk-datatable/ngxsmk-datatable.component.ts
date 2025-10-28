@@ -43,89 +43,233 @@ import { SelectionService } from '../../services/selection.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None
 })
-export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
-  @Input() columns: NgxsmkColumn[] = [];
-  @Input() rows: NgxsmkRow[] = [];
+/**
+ * High-performance datatable component with virtual scrolling and strongly-typed rows.
+ * 
+ * @template T - The type of your row data for full type safety in templates
+ * 
+ * @remarks
+ * This component provides a feature-rich datatable with support for:
+ * - Virtual scrolling for large datasets
+ * - Client-side and server-side pagination
+ * - Client-side and server-side sorting
+ * - Row selection (single, multi, checkbox)
+ * - Column resizing and freezing
+ * - Row details expansion
+ * - Strongly-typed templates for enhanced developer experience
+ * 
+ * @example
+ * ```typescript
+ * interface User {
+ *   id: number;
+ *   name: string;
+ *   email: string;
+ *   status: 'Active' | 'Inactive';
+ * }
+ * 
+ * columns: NgxsmkColumn<User>[] = [
+ *   { id: 'name', name: 'Name', prop: 'name', sortable: true },
+ *   { id: 'email', name: 'Email', prop: 'email', sortable: true }
+ * ];
+ * 
+ * rows: NgxsmkRow<User>[] = [
+ *   { id: 1, name: 'John', email: 'john@example.com', status: 'Active' }
+ * ];
+ * ```
+ */
+export class NgxsmkDatatableComponent<T = any> implements OnInit, OnChanges, OnDestroy, AfterViewInit {
+  /** Column definitions for the datatable */
+  @Input() columns: NgxsmkColumn<T>[] = [];
+  
+  /** Row data for the datatable */
+  @Input() rows: NgxsmkRow<T>[] = [];
+  
+  /** Enable virtual scrolling for better performance with large datasets */
   @Input() virtualScrolling = true;
-  @Input() rowHeight: number = 50; // PR #2133: Support for 'auto' height (simplified to number for now)
+  
+  /** Height of each row in pixels */
+  @Input() rowHeight: number = 50;
+  
+  /** Height of the header in pixels */
   @Input() headerHeight: number = 50;
+  
+  /** Height of the footer in pixels */
   @Input() footerHeight: number = 50;
+  
+  /** Enable horizontal scrollbar */
   @Input() scrollbarH = true;
+  
+  /** Enable vertical scrollbar */
   @Input() scrollbarV = true;
+  
+  /** Enable horizontal scrolling */
   @Input() scrollX = false;
+  
+  /** Enable vertical scrolling */
   @Input() scrollY = false;
+  
+  /** Type of row selection: 'single', 'multi', 'multiClick', 'checkbox', or 'none' */
   @Input() selectionType: SelectionType = 'single';
-  @Input() selected: NgxsmkRow[] = [];
+  
+  /** Array of currently selected rows */
+  @Input() selected: NgxsmkRow<T>[] = [];
+  
+  /** Position of selection checkbox: 'left' or 'right' */
   @Input() selectCheckboxPosition: 'left' | 'right' = 'left';
+  
+  /** Configuration for pagination */
   @Input() pagination: PaginationConfig | null = null;
+  
+  /** Use external pagination (server-side) */
   @Input() externalPaging = false;
+  
+  /** Use external sorting (server-side) */
   @Input() externalSorting = false;
+  
+  /** Show loading indicator overlay */
   @Input() loadingIndicator = false;
+  
+  /** Message to display when table is empty */
   @Input() emptyMessage = 'No data available';
+  
+  /** CSS class for empty state icon */
   @Input() emptyIconClass = 'icon-empty';
-  @Input() showRefreshButton = false; // PR #2184: Add refresh button feature
-  @Input() columnVisibilityEnabled = false; // PR #2152: Column visibility control
+  
+  /** Show refresh button in footer */
+  @Input() showRefreshButton = false;
+  
+  /** Enable column visibility controls */
+  @Input() columnVisibilityEnabled = false;
+  
+  /** Additional CSS class for the datatable container */
   @Input() class = '';
+  
+  /** Additional CSS class for the header */
   @Input() headerClass = '';
+  
+  /** Additional CSS class for the footer */
   @Input() footerClass = '';
-  @Input() rowClass: string | ((row: NgxsmkRow, index: number) => string) = '';
+  
+  /** CSS class or function to apply to rows */
+  @Input() rowClass: string | ((row: NgxsmkRow<T>, index: number) => string) = '';
+  
+  /** Property name to use for tracking rows (default: 'id') */
   @Input() trackByProp = 'id';
-  @Input() rowIdentity: (row: NgxsmkRow) => any = (row: NgxsmkRow) => {
-    // Enhanced trackBy implementation - Issue #2234 fix
+  
+  /** Function to identify unique rows for change detection */
+  @Input() rowIdentity: (row: NgxsmkRow<T>) => any = (row: NgxsmkRow<T>) => {
     if (this.trackByProp && row && typeof row === 'object') {
       return row[this.trackByProp];
     }
     return row;
   };
+  
+  /** Configuration for expandable row details */
   @Input() rowDetail: RowDetailView | null = null;
-  @Input() frozenRowsTop: NgxsmkRow[] = []; // PR #2149: Rows frozen at top
-  @Input() frozenRowsBottom: NgxsmkRow[] = []; // PR #2149: Rows frozen at bottom
+  
+  /** Rows to freeze at the top of the table */
+  @Input() frozenRowsTop: NgxsmkRow<T>[] = [];
+  
+  /** Rows to freeze at the bottom of the table */
+  @Input() frozenRowsBottom: NgxsmkRow<T>[] = [];
 
+  /** Emitted when a row or cell is activated (clicked) */
   @Output() activate = new EventEmitter<any>();
+  
+  /** Emitted when row selection changes */
   @Output() select = new EventEmitter<SelectionEvent>();
+  
+  /** Emitted when column sorting changes */
   @Output() sort = new EventEmitter<SortEvent>();
+  
+  /** Emitted when page changes */
   @Output() page = new EventEmitter<PageEvent>();
+  
+  /** Emitted when a column is resized */
   @Output() columnResize = new EventEmitter<any>();
+  
+  /** Emitted when columns are reordered */
   @Output() columnReorder = new EventEmitter<any>();
+  
+  /** Emitted when row detail is expanded or collapsed */
   @Output() rowDetailToggle = new EventEmitter<any>();
-  @Output() refreshData = new EventEmitter<void>(); // PR #2184: Refresh event (renamed to avoid conflict)
-  @Output() columnVisibilityChange = new EventEmitter<{ column: NgxsmkColumn; visible: boolean }>(); // PR #2152
+  
+  /** Emitted when refresh button is clicked */
+  @Output() refreshData = new EventEmitter<void>();
+  
+  /** Emitted when column visibility changes */
+  @Output() columnVisibilityChange = new EventEmitter<{ column: NgxsmkColumn; visible: boolean }>();
 
   @ViewChild('datatableContainer', { static: true }) container!: ElementRef;
-  @ViewChild('headerElement', { static: true }) headerElement!: ElementRef;
-  @ViewChild('bodyElement', { static: true }) bodyElement!: ElementRef;
-  @ViewChild('footerElement', { static: true }) footerElement!: ElementRef;
+  @ViewChild('headerElement', { static: false }) headerElement!: ElementRef;
+  @ViewChild('bodyElement', { static: false }) bodyElement!: ElementRef;
+  @ViewChild('footerElement', { static: false }) footerElement!: ElementRef;
 
   @ContentChild('headerTemplate') headerTemplate!: TemplateRef<any>;
   @ContentChild('cellTemplate') cellTemplate!: TemplateRef<any>;
   @ContentChild('rowDetailTemplate') rowDetailTemplate!: TemplateRef<any>;
 
-  // Internal state
+  /** Observable for component cleanup */
   private destroy$ = new Subject<void>();
+  
+  /** ResizeObserver instance for responsive behavior */
   private resizeObserver?: ResizeObserver;
+  
+  /** Subject for scroll events with debouncing */
   private scrollSubject = new Subject<{ scrollTop: number; scrollLeft: number }>();
-  private resizingColumn: NgxsmkColumn | null = null;
+  
+  /** Currently resizing column */
+  private resizingColumn: NgxsmkColumn<T> | null = null;
+  
+  /** X position when resize started */
   private resizeStartX = 0;
+  
+  /** Column width when resize started */
   private resizeStartWidth = 0;
-  private isSorting = false; // Prevent pagination callbacks during sort - Issue #2235 fix
+  
+  /** Flag to prevent pagination events during sorting */
+  private isSorting = false;
 
-  // Virtual scrolling state
-  visibleRows: NgxsmkRow[] = [];
+  /** Rows currently visible in viewport (for virtual scrolling) */
+  visibleRows: NgxsmkRow<T>[] = [];
+  
+  /** Index of first visible row */
   visibleStartIndex = 0;
+  
+  /** Index of last visible row */
   visibleEndIndex = 0;
+  
+  /** Total height of all rows */
   totalHeight = 0;
+  
+  /** Current vertical scroll position */
   scrollTop = 0;
+  
+  /** Current horizontal scroll position */
   scrollLeft = 0;
+  
+  /** Flag indicating if scroll listener is attached */
+  private scrollListenerAttached = false;
 
-  // Column state
+  /** Map of column IDs to their widths */
   columnWidths: { [key: string]: number } = {};
-  columnVisibility: { [key: string]: boolean } = {}; // PR #2152: Track column visibility
-  frozenLeftColumns: NgxsmkColumn[] = [];
-  frozenRightColumns: NgxsmkColumn[] = [];
-  scrollableColumns: NgxsmkColumn[] = [];
-  visibleColumns: NgxsmkColumn[] = []; // PR #2152: Filtered visible columns
+  
+  /** Map of column IDs to their visibility state */
+  columnVisibility: { [key: string]: boolean } = {};
+  
+  /** Columns frozen to the left side */
+  frozenLeftColumns: NgxsmkColumn<T>[] = [];
+  
+  /** Columns frozen to the right side */
+  frozenRightColumns: NgxsmkColumn<T>[] = [];
+  
+  /** Scrollable (non-frozen) columns */
+  scrollableColumns: NgxsmkColumn<T>[] = [];
+  
+  /** Currently visible columns (after filtering) */
+  visibleColumns: NgxsmkColumn<T>[] = [];
 
-  // Selection state
+  /** Selection model for managing row selection */
   selectionModel: any = {
     selected: [],
     isSelected: () => false,
@@ -137,12 +281,16 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
     isIndeterminate: () => false
   };
 
-  // Sorting state
+  /** Current sort configuration */
   sorts: { prop: string; dir: SortDirection }[] = [];
 
-  // Pagination state
+  /** Current page number (1-based) */
   currentPage = 1;
+  
+  /** Number of rows per page */
   pageSize = 10;
+  
+  /** Total number of items across all pages */
   totalItems = 0;
 
   constructor(
@@ -151,7 +299,6 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
     private columnResizeService: ColumnResizeService,
     private selectionService: SelectionService
   ) {
-    // Initialize selection model immediately
     this.selectionModel = this.selectionService.createSelectionModel();
   }
 
@@ -164,54 +311,68 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
   ngOnChanges(changes: SimpleChanges): void {
     let needsUpdate = false;
 
-    if (changes['pagination']) {
-      this.initializePagination();
-      this.updateVirtualScrolling();
+    if (changes['rows']) {
+      this.processRows();
       needsUpdate = true;
+      
+      if (!this.scrollListenerAttached && this.rows.length > 0) {
+        setTimeout(() => {
+          if (!this.scrollListenerAttached) {
+            this.setupScrollListener();
+            this.setupResizeObserver();
+          }
+        }, 0);
+      }
     }
+    
     if (changes['columns']) {
       this.processColumns();
       needsUpdate = true;
     }
-    if (changes['rows']) {
-      this.processRows();
+    
+    if (changes['pagination']) {
+      this.initializePagination();
       needsUpdate = true;
     }
+    
+    if (changes['rows'] || changes['pagination']) {
+      this.updateVirtualScrolling();
+    }
+    
     if (changes['selected']) {
       this.updateSelection();
       needsUpdate = true;
     }
 
-    // Single change detection cycle for all changes
     if (needsUpdate) {
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
     }
   }
 
   ngAfterViewInit(): void {
-    this.setupResizeObserver();
-    this.setupScrollListener();
-    this.calculateDimensions();
+    setTimeout(() => {
+      this.setupResizeObserver();
+      this.setupScrollListener();
+      this.calculateDimensions();
+      this.updateVirtualScrolling();
+      this.cdr.detectChanges();
+    }, 0);
   }
 
   ngOnDestroy(): void {
-    // Clean up all subscriptions and observers
     this.destroy$.next();
     this.destroy$.complete();
     
-    // Disconnect resize observer
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
       this.resizeObserver = undefined;
     }
     
-    // Clean up event listeners
     if (this.resizingColumn) {
       document.removeEventListener('mousemove', this.onResizing.bind(this));
       document.removeEventListener('mouseup', this.onResizeEnd.bind(this));
     }
     
-    // Clear references
     this.visibleRows = [];
     this.rows = [];
     this.columns = [];
@@ -231,33 +392,51 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
     this.calculateColumnWidths();
   }
 
+  /**
+   * Processes row data and updates internal state
+   * @private
+   */
   private processRows(): void {
-    // For external paging, keep the totalItems from pagination config
-    // For client-side paging, use rows.length
     if (!this.externalPaging) {
       this.totalItems = this.rows.length;
     }
+    
+    if (!this.externalSorting && this.sorts && this.sorts.length > 0) {
+      this.sortRows();
+    }
+    
     this.updateVirtualScrolling();
   }
 
+  /**
+   * Initializes pagination configuration
+   * @private
+   */
   private initializePagination(): void {
     if (this.pagination) {
       this.pageSize = this.pagination.pageSize || 10;
       this.currentPage = this.pagination.currentPage || 1;
-      this.totalItems = this.pagination.totalItems || 0;
+      
+      if (this.externalPaging) {
+        this.totalItems = this.pagination.totalItems || 0;
+      } else {
+        this.totalItems = this.rows?.length || 0;
+      }
     }
   }
 
+  /**
+   * Calculates and stores column widths
+   * @private
+   */
   private calculateColumnWidths(): void {
     this.columns.forEach(column => {
-      // Set initial width - prioritize explicit width, then flexGrow, then default
       if (column.width) {
         this.columnWidths[column.id] = typeof column.width === 'number' 
           ? column.width 
           : parseInt(column.width.toString(), 10);
       } else if (!this.columnWidths[column.id]) {
-        // Set default width if not already set
-        this.columnWidths[column.id] = 150; // Default column width
+        this.columnWidths[column.id] = 150;
       }
     });
   }
@@ -273,50 +452,69 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
       displayRows = this.rows.slice(startIndex, endIndex);
     }
 
+    // Calculate total height including expanded row details
+    const detailHeight = this.rowDetail?.rowHeight || 0;
+    const expandedCount = displayRows.filter(row => row.$$expanded).length;
+    this.totalHeight = (displayRows.length * this.rowHeight) + (expandedCount * detailHeight);
+
     // Apply virtual scrolling if enabled
     if (!this.virtualScrolling) {
-      // Only update if changed
-      if (this.visibleRows !== displayRows || this.visibleRows.length !== displayRows.length) {
-        this.visibleRows = displayRows;
-        this.visibleStartIndex = 0;
-        this.visibleEndIndex = displayRows.length - 1;
-        this.totalHeight = displayRows.length * this.rowHeight;
-      }
+      this.visibleRows = displayRows;
+      this.visibleStartIndex = 0;
+      this.visibleEndIndex = displayRows.length - 1;
       return;
     }
 
+    // Use bodyElement height for virtual scrolling, not container height
+    const bodyHeight = this.bodyElement?.nativeElement?.clientHeight || 0;
     const containerHeight = this.container?.nativeElement?.clientHeight || 0;
-    const visibleRowCount = Math.ceil(containerHeight / this.rowHeight);
+    
+    // Prefer bodyElement height as it's the actual scrolling container
+    const effectiveHeight = bodyHeight || containerHeight;
+    
+    // If no height available, use a sensible default
+    if (effectiveHeight === 0) {
+      // Set some visible rows anyway
+      this.visibleStartIndex = 0;
+      this.visibleEndIndex = Math.min(19, displayRows.length - 1); // Show first 20 rows
+      this.visibleRows = [...displayRows.slice(0, 20)];
+      // Total height already calculated above
+      return;
+    }
+    
+    const visibleRowCount = Math.ceil(effectiveHeight / this.rowHeight);
     const bufferSize = Math.min(5, Math.floor(visibleRowCount / 2));
 
     const newStartIndex = Math.max(0, Math.floor(this.scrollTop / this.rowHeight) - bufferSize);
     const newEndIndex = Math.min(
       displayRows.length - 1,
-      newStartIndex + visibleRowCount + bufferSize
+      newStartIndex + visibleRowCount + bufferSize * 2
     );
 
-    // Only update if indices changed (performance optimization)
-    if (newStartIndex !== this.visibleStartIndex || newEndIndex !== this.visibleEndIndex) {
-      this.visibleStartIndex = newStartIndex;
-      this.visibleEndIndex = newEndIndex;
-      this.visibleRows = displayRows.slice(this.visibleStartIndex, this.visibleEndIndex + 1);
-    }
-
-    this.totalHeight = displayRows.length * this.rowHeight;
+    this.visibleStartIndex = newStartIndex;
+    this.visibleEndIndex = newEndIndex;
+    
+    // Create a NEW array reference to ensure change detection triggers
+    this.visibleRows = [...displayRows.slice(this.visibleStartIndex, this.visibleEndIndex + 1)];
+    // Total height already calculated above (includes expanded row details)
   }
 
   private setupEventListeners(): void {
     this.scrollSubject
       .pipe(
         debounceTime(16),
-        distinctUntilChanged(),
+        distinctUntilChanged((prev, curr) => {
+          // Compare by value, not reference
+          return prev.scrollTop === curr.scrollTop && prev.scrollLeft === curr.scrollLeft;
+        }),
         takeUntil(this.destroy$)
       )
       .subscribe(({ scrollTop, scrollLeft }) => {
         this.scrollTop = scrollTop;
         this.scrollLeft = scrollLeft;
         this.updateVirtualScrolling();
-        this.cdr.markForCheck();
+        // Force immediate change detection for OnPush strategy
+        this.cdr.detectChanges();
       });
   }
 
@@ -340,6 +538,7 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
           scrollLeft: target.scrollLeft
         });
       });
+      this.scrollListenerAttached = true;
     }
   }
 
@@ -355,46 +554,45 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
     }
   }
 
-  // Event handlers
-  onRowClick(event: Event, row: NgxsmkRow, rowIndex: number): void {
-    console.log('Row clicked:', { 
-      row, 
-      rowIndex, 
-      hasRowDetail: !!this.rowDetail, 
-      toggleOnClick: this.rowDetail?.toggleOnClick,
-      template: this.rowDetail?.template,
-      currentExpanded: row.$$expanded
-    });
-    
-    // Toggle row detail if toggleOnClick is enabled
+  /**
+   * Handles row click events
+   * @param event - The click event
+   * @param row - The clicked row
+   * @param rowIndex - Index of the clicked row
+   */
+  onRowClick(event: Event, row: NgxsmkRow<T>, rowIndex: number): void {
     if (this.rowDetail && this.rowDetail.toggleOnClick) {
       this.toggleRowDetail(event, row, rowIndex);
     }
     
-    if (this.selectionType !== 'none') {
+    // For checkbox selection, only handle selection from checkbox clicks, not row clicks
+    if (this.selectionType !== 'none' && this.selectionType !== 'checkbox') {
       this.handleRowSelection(event, row);
     }
+    
     this.activate.emit({ event, row, rowIndex });
   }
 
-  onCellClick(event: Event, row: NgxsmkRow, column: NgxsmkColumn, value: any): void {
+  onCellClick(event: Event, row: NgxsmkRow<T>, column: NgxsmkColumn<T>, value: any): void {
     if (this.selectionType === 'cell') {
       this.handleCellSelection(event, row, column, value);
     }
   }
 
-  onHeaderClick(event: Event, column: NgxsmkColumn): void {
-    // Prevent sorting when clicking on resize handle
+  /**
+   * Handles header column click events
+   * @param event - The click event
+   * @param column - The clicked column
+   */
+  onHeaderClick(event: Event, column: NgxsmkColumn<T>): void {
     const target = event.target as HTMLElement;
     if (target.classList.contains('ngxsmk-datatable__resize-handle')) {
       return;
     }
 
     if (column.sortable) {
-      // Issue #2235 fix: Set sorting flag to prevent pagination callbacks
       this.isSorting = true;
       this.handleSort(column);
-      // Reset sorting flag after a brief delay
       setTimeout(() => {
         this.isSorting = false;
       }, 100);
@@ -409,25 +607,31 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
     this.columnReorder.emit(event);
   }
 
+  /**
+   * Handles page change events
+   * @param event - The page change event
+   */
   onPageChange(event: PageEvent): void {
-    // Issue #2235 fix: Don't emit page event if we're sorting
     if (this.isSorting) {
       return;
     }
     
     this.currentPage = event.page;
     this.pageSize = event.pageSize;
-    this.page.emit(event);
     
-    // Update visible rows when page changes (for client-side pagination)
-    if (!this.externalPaging) {
-      this.updateVirtualScrolling();
-      this.cdr.detectChanges();
-    }
+    this.updateVirtualScrolling();
+    this.cdr.detectChanges();
+    
+    this.page.emit(event);
   }
 
-  toggleRowDetail(event: Event, row: NgxsmkRow, rowIndex: number): void {
-    // Only stop propagation if clicking on a detail toggle button, not the row itself
+  /**
+   * Toggles the expanded state of a row detail
+   * @param event - The click event
+   * @param row - The row to toggle
+   * @param rowIndex - Index of the row
+   */
+  toggleRowDetail(event: Event, row: NgxsmkRow<T>, rowIndex: number): void {
     const target = event.target as HTMLElement;
     if (target.closest('.ngxsmk-datatable__detail-toggle-button')) {
       event.stopPropagation();
@@ -436,15 +640,6 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
     const wasExpanded = row.$$expanded;
     row.$$expanded = !row.$$expanded;
     
-    console.log('Toggle row detail:', {
-      rowIndex,
-      wasExpanded,
-      nowExpanded: row.$$expanded,
-      hasTemplate: !!(this.rowDetail?.template),
-      rowDetailConfig: this.rowDetail
-    });
-    
-    // PR #2149: Handle frozen row detail state
     if (this.rowDetail?.frozen && row.$$expanded) {
       row.$$frozen = true;
     } else if (!row.$$expanded) {
@@ -458,28 +653,40 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
       frozen: row.$$frozen
     });
     
-    // Trigger change detection to update the view
+    this.updateVirtualScrolling();
     this.cdr.detectChanges();
   }
 
-  // PR #2149: Check if row is frozen
-  isRowFrozen(row: NgxsmkRow): boolean {
+  /**
+   * Checks if a row is frozen
+   * @param row - The row to check
+   * @returns True if the row is frozen
+   */
+  isRowFrozen(row: NgxsmkRow<T>): boolean {
     return row.$$frozen === true || 
            this.frozenRowsTop.includes(row) || 
            this.frozenRowsBottom.includes(row);
   }
 
-  // PR #2149: Get all frozen rows
-  getAllFrozenRows(): NgxsmkRow[] {
+  /**
+   * Gets all frozen rows including frozen expanded rows
+   * @returns Array of frozen rows
+   */
+  getAllFrozenRows(): NgxsmkRow<T>[] {
     const frozenExpanded = this.rows.filter(row => row.$$frozen && row.$$expanded);
     return [...this.frozenRowsTop, ...frozenExpanded, ...this.frozenRowsBottom];
   }
 
-  handleRowSelection(event: Event, row: NgxsmkRow): void {
+  /**
+   * Handles row selection for different selection types
+   * @param event - The selection event
+   * @param row - The row being selected
+   */
+  handleRowSelection(event: Event, row: NgxsmkRow<T>): void {
     if (this.selectionType === 'single') {
       this.selectionModel.clear();
       this.selectionModel.select(row);
-    } else if (this.selectionType === 'multi' || this.selectionType === 'multiClick') {
+    } else if (this.selectionType === 'multi' || this.selectionType === 'multiClick' || this.selectionType === 'checkbox') {
       this.selectionModel.toggle(row);
     }
 
@@ -487,9 +694,11 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
       selected: this.getSelectedRows(),
       event
     });
+    
+    this.cdr.markForCheck();
   }
 
-  private handleCellSelection(event: Event, row: NgxsmkRow, column: NgxsmkColumn, value: any): void {
+  private handleCellSelection(event: Event, row: NgxsmkRow<T>, column: NgxsmkColumn<T>, value: any): void {
     // Handle cell selection logic
     this.select.emit({
       selected: [row],
@@ -497,23 +706,40 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
     });
   }
 
-  private handleSort(column: NgxsmkColumn): void {
-    const existingSort = this.sorts.find(s => s.prop === column.prop);
+  /**
+   * Handles column sorting
+   * @param column - The column to sort
+   * @private
+   */
+  private handleSort(column: NgxsmkColumn<T>): void {
+    const columnKey = column.prop || column.id;
+    const existingSort = this.sorts.find(s => s.prop === columnKey);
+    
+    let newDir: SortDirection;
+    let prevValue: SortDirection | undefined;
     
     if (existingSort) {
-      existingSort.dir = existingSort.dir === 'asc' ? 'desc' : 'asc';
+      prevValue = existingSort.dir;
+      if (existingSort.dir === 'asc') {
+        existingSort.dir = 'desc';
+        newDir = 'desc';
+      } else {
+        this.sorts = this.sorts.filter(s => s.prop !== columnKey);
+        newDir = '' as SortDirection;
+      }
     } else {
-      this.sorts = [{ prop: column.prop || column.id, dir: 'asc' }];
+      this.sorts = [{ prop: columnKey, dir: 'asc' }];
+      newDir = 'asc';
+      prevValue = '' as SortDirection;
     }
 
     this.sort.emit({
       column,
-      prevValue: existingSort?.dir === 'asc' ? 'desc' : 'asc',
-      newValue: this.sorts[0].dir,
+      prevValue: prevValue,
+      newValue: newDir,
       sorts: this.sorts
     });
 
-    // Perform client-side sorting if not using external sorting
     if (!this.externalSorting) {
       this.sortRows();
       this.updateVirtualScrolling();
@@ -521,6 +747,10 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
     }
   }
 
+  /**
+   * Performs client-side sorting on rows
+   * @private
+   */
   private sortRows(): void {
     if (!this.sorts || this.sorts.length === 0) {
       return;
@@ -534,12 +764,10 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
       const aVal = this.getNestedValue(a, prop);
       const bVal = this.getNestedValue(b, prop);
 
-      // Handle null/undefined values
       if (aVal == null && bVal == null) return 0;
       if (aVal == null) return dir === 'asc' ? 1 : -1;
       if (bVal == null) return dir === 'asc' ? -1 : 1;
 
-      // Compare values
       let result = 0;
       if (typeof aVal === 'string' && typeof bVal === 'string') {
         result = aVal.localeCompare(bVal, undefined, { numeric: true, sensitivity: 'base' });
@@ -548,7 +776,6 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
       } else if (aVal instanceof Date && bVal instanceof Date) {
         result = aVal.getTime() - bVal.getTime();
       } else {
-        // Fallback to string comparison
         result = String(aVal).localeCompare(String(bVal), undefined, { numeric: true, sensitivity: 'base' });
       }
 
@@ -556,6 +783,13 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
     });
   }
 
+  /**
+   * Gets a nested property value from an object using dot notation
+   * @param obj - The object to get the value from
+   * @param path - The property path (e.g., 'address.city')
+   * @returns The nested property value
+   * @private
+   */
   private getNestedValue(obj: any, path: string): any {
     if (!path || !obj) return obj;
     
@@ -570,46 +804,64 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
     return value;
   }
 
-  // Utility methods
-  private getSelectedRows(): NgxsmkRow[] {
+  /**
+   * Gets all currently selected rows
+   * @returns Array of selected rows
+   * @private
+   */
+  private getSelectedRows(): NgxsmkRow<T>[] {
     return this.rows.filter(row => this.selectionModel.isSelected(row));
   }
 
-  getRowClass(row: NgxsmkRow, index: number): string {
+  getRowClass(row: NgxsmkRow<T>, index: number): string {
     if (typeof this.rowClass === 'function') {
       return this.rowClass(row, index);
     }
     return this.rowClass;
   }
 
-  getCellClass(row: NgxsmkRow, column: NgxsmkColumn, value: any, rowIndex: number): string {
+  /**
+   * Track by function for virtual scrolling that ensures proper DOM updates
+   * @param index - The index in the visible rows array
+   * @param row - The row data
+   * @returns A unique identifier for the row
+   */
+  trackByIndex(index: number, row: NgxsmkRow<T>): any {
+    const rowId = this.rowIdentity(row);
+    return `${this.visibleStartIndex + index}_${rowId}`;
+  }
+
+  getCellClass(row: NgxsmkRow<T>, column: NgxsmkColumn<T>, value: any, rowIndex: number): string {
     if (typeof column.cellClass === 'function') {
       return column.cellClass(row, column, value, rowIndex);
     }
     return column.cellClass || '';
   }
 
-  getHeaderClass(column: NgxsmkColumn): string {
+  getHeaderClass(column: NgxsmkColumn<T>): string {
     return column.headerClass || '';
   }
 
-  trackByRow(index: number, row: NgxsmkRow): any {
+  trackByRow(index: number, row: NgxsmkRow<T>): any {
     return this.rowIdentity(row);
   }
 
-  trackByColumn(index: number, column: NgxsmkColumn): string {
+  trackByColumn(index: number, column: NgxsmkColumn<T>): string {
     return column.id;
   }
 
-  // Column resizing methods
-  onResizeStart(event: MouseEvent, column: NgxsmkColumn): void {
+  /**
+   * Handles the start of a column resize operation
+   * @param event - The mouse event
+   * @param column - The column being resized
+   */
+  onResizeStart(event: MouseEvent, column: NgxsmkColumn<T>): void {
     event.preventDefault();
     event.stopPropagation();
 
     this.resizingColumn = column;
     this.resizeStartX = event.clientX;
     
-    // Ensure column has a width before resizing
     if (!this.columnWidths[column.id]) {
       this.columnWidths[column.id] = column.width ? 
         (typeof column.width === 'number' ? column.width : parseInt(column.width.toString(), 10)) : 
@@ -618,20 +870,17 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
     
     this.resizeStartWidth = this.columnWidths[column.id];
 
-    // Add document-level event listeners
     document.addEventListener('mousemove', this.onResizing);
     document.addEventListener('mouseup', this.onResizeEnd);
     
-    // Add body class to prevent text selection during resize
     document.body.classList.add('ngxsmk-resizing');
-    
-    console.log('Resize started:', {
-      column: column.name,
-      startWidth: this.resizeStartWidth,
-      startX: this.resizeStartX
-    });
   }
 
+  /**
+   * Handles column resizing as the mouse moves
+   * @param event - The mouse event
+   * @private
+   */
   private onResizing = (event: MouseEvent): void => {
     if (!this.resizingColumn) return;
 
@@ -644,21 +893,22 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
     
     this.columnWidths[this.resizingColumn.id] = newWidth;
     
-    // Force layout recalculation to prevent overlap
     this.cdr.detectChanges();
   };
 
+  /**
+   * Handles the end of a column resize operation
+   * @param event - The mouse event
+   * @private
+   */
   private onResizeEnd = (event: MouseEvent): void => {
     if (!this.resizingColumn) return;
 
-    // Remove document-level event listeners
     document.removeEventListener('mousemove', this.onResizing);
     document.removeEventListener('mouseup', this.onResizeEnd);
     
-    // Remove body class
     document.body.classList.remove('ngxsmk-resizing');
     
-    // Emit resize event
     const resizeEvent = {
       column: this.resizingColumn,
       newWidth: this.columnWidths[this.resizingColumn.id],
@@ -666,22 +916,26 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
     };
     this.columnResize.emit(resizeEvent);
     
-    // Reset resize state
     this.resizingColumn = null;
     this.cdr.detectChanges();
   };
 
-  isResizingColumn(column: NgxsmkColumn): boolean {
+  isResizingColumn(column: NgxsmkColumn<T>): boolean {
     return this.resizingColumn?.id === column.id;
   }
 
-  // PR #2184: Refresh button handler
+  /**
+   * Handles refresh button click
+   */
   onRefreshClick(): void {
     this.refreshData.emit();
   }
 
-  // PR #2152: Column visibility methods
-  toggleColumnVisibility(column: NgxsmkColumn): void {
+  /**
+   * Toggles the visibility of a column
+   * @param column - The column to toggle
+   */
+  toggleColumnVisibility(column: NgxsmkColumn<T>): void {
     const newVisibility = !this.columnVisibility[column.id];
     this.columnVisibility[column.id] = newVisibility;
     this.columnVisibilityChange.emit({ column, visible: newVisibility });
@@ -689,25 +943,41 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
     this.cdr.detectChanges();
   }
 
-  isColumnVisible(column: NgxsmkColumn): boolean {
+  /**
+   * Checks if a column is visible
+   * @param column - The column to check
+   * @returns True if the column is visible
+   */
+  isColumnVisible(column: NgxsmkColumn<T>): boolean {
     return this.columnVisibility[column.id] !== false;
   }
 
-  showColumn(column: NgxsmkColumn): void {
+  /**
+   * Shows a hidden column
+   * @param column - The column to show
+   */
+  showColumn(column: NgxsmkColumn<T>): void {
     this.columnVisibility[column.id] = true;
     this.columnVisibilityChange.emit({ column, visible: true });
     this.processColumns();
     this.cdr.detectChanges();
   }
 
-  hideColumn(column: NgxsmkColumn): void {
+  /**
+   * Hides a visible column
+   * @param column - The column to hide
+   */
+  hideColumn(column: NgxsmkColumn<T>): void {
     this.columnVisibility[column.id] = false;
     this.columnVisibilityChange.emit({ column, visible: false });
     this.processColumns();
     this.cdr.detectChanges();
   }
 
-  // Public API methods
+  /**
+   * Scrolls the table to a specific row
+   * @param rowIndex - The index of the row to scroll to
+   */
   scrollToRow(rowIndex: number): void {
     if (this.virtualScrolling && this.bodyElement?.nativeElement) {
       const scrollTop = rowIndex * this.rowHeight;
@@ -715,6 +985,10 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
     }
   }
 
+  /**
+   * Scrolls the table to a specific column
+   * @param columnIndex - The index of the column to scroll to
+   */
   scrollToColumn(columnIndex: number): void {
     if (this.bodyElement?.nativeElement) {
       const column = this.columns[columnIndex];
@@ -734,6 +1008,9 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
     return offset;
   }
 
+  /**
+   * Selects or deselects all rows
+   */
   selectAll(): void {
     if (this.selectionModel.isAllSelected(this.rows)) {
       this.selectionModel.deselectAll();
@@ -750,6 +1027,9 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
     }
   }
 
+  /**
+   * Deselects all currently selected rows
+   */
   deselectAll(): void {
     this.selectionModel.clear();
     this.select.emit({
@@ -758,21 +1038,74 @@ export class NgxsmkDatatableComponent implements OnInit, OnChanges, OnDestroy, A
     });
   }
 
+  /**
+   * Refreshes the table display
+   */
   refresh(): void {
     this.updateVirtualScrolling();
     this.cdr.detectChanges();
   }
 
-  // Helper methods for template bindings
-  isColumnSorted(column: NgxsmkColumn): boolean {
-    return this.sorts.some(s => s.prop === column.prop);
+  /**
+   * Checks if a column is currently sorted
+   * @param column - The column to check
+   * @returns True if the column is sorted
+   */
+  isColumnSorted(column: NgxsmkColumn<T>): boolean {
+    const columnKey = column.prop || column.id;
+    return this.sorts.some(s => s.prop === columnKey);
   }
 
-  isColumnSortedAsc(column: NgxsmkColumn): boolean {
-    return this.sorts.some(s => s.prop === column.prop && s.dir === 'asc');
+  /**
+   * Checks if a column is sorted in ascending order
+   * @param column - The column to check
+   * @returns True if the column is sorted ascending
+   */
+  isColumnSortedAsc(column: NgxsmkColumn<T>): boolean {
+    const columnKey = column.prop || column.id;
+    return this.sorts.some(s => s.prop === columnKey && s.dir === 'asc');
   }
 
-  isColumnSortedDesc(column: NgxsmkColumn): boolean {
-    return this.sorts.some(s => s.prop === column.prop && s.dir === 'desc');
+  /**
+   * Checks if a column is sorted in descending order
+   * @param column - The column to check
+   * @returns True if the column is sorted descending
+   */
+  isColumnSortedDesc(column: NgxsmkColumn<T>): boolean {
+    const columnKey = column.prop || column.id;
+    return this.sorts.some(s => s.prop === columnKey && s.dir === 'desc');
+  }
+
+  /**
+   * Calculates the height of the bottom spacer for virtual scrolling
+   * @returns Height in pixels
+   */
+  getBottomSpacerHeight(): number {
+    let displayRowCount = this.rows.length;
+    
+    if (this.pagination && !this.externalPaging) {
+      const startIndex = (this.currentPage - 1) * this.pageSize;
+      const endIndex = startIndex + this.pageSize;
+      displayRowCount = Math.min(this.pageSize, this.rows.length - startIndex);
+    }
+    
+    const bottomRows = Math.max(0, displayRowCount - this.visibleEndIndex - 1);
+    return bottomRows * this.rowHeight;
+  }
+
+  /**
+   * Gets the actual row index accounting for pagination
+   * @param visibleIndex - Index in the visible rows array
+   * @returns The actual row index in the full dataset
+   */
+  getActualRowIndex(visibleIndex: number): number {
+    let actualIndex = this.visibleStartIndex + visibleIndex;
+    
+    if (this.pagination && !this.externalPaging) {
+      const paginationOffset = (this.currentPage - 1) * this.pageSize;
+      actualIndex += paginationOffset;
+    }
+    
+    return actualIndex;
   }
 }

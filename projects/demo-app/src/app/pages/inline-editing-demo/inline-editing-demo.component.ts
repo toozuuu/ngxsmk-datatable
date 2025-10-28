@@ -35,75 +35,82 @@ import { NgxsmkDatatableComponent, NgxsmkColumn, NgxsmkRow, PaginationConfig } f
           </div>
         </div>
 
+        <!-- Templates defined here so @ViewChild can find them -->
+        <ng-template #editableNameTemplate let-row="row" let-value="value" let-rowIndex="rowIndex">
+          <div class="editable-cell" (click)="startEdit('name', row, $event)">
+            @if (editingCell.rowId === row['id'] && editingCell.column === 'name') {
+              <input 
+                type="text" 
+                [(ngModel)]="row['name']"
+                (blur)="saveEdit(row, 'name')"
+                (keyup.enter)="saveEdit(row, 'name')"
+                (keyup.escape)="cancelEdit()"
+                (click)="$event.stopPropagation()"
+                class="edit-input"
+                #nameInput>
+            } @else {
+              <span class="cell-value">{{ value }}</span>
+              <i class="fas fa-pen edit-icon"></i>
+            }
+          </div>
+        </ng-template>
+
+        <ng-template #editableEmailTemplate let-row="row" let-value="value" let-rowIndex="rowIndex">
+          <div class="editable-cell" (click)="startEdit('email', row, $event)">
+            @if (editingCell.rowId === row['id'] && editingCell.column === 'email') {
+              <input 
+                type="email" 
+                [(ngModel)]="row['email']"
+                (blur)="saveEdit(row, 'email')"
+                (keyup.enter)="saveEdit(row, 'email')"
+                (keyup.escape)="cancelEdit()"
+                (click)="$event.stopPropagation()"
+                class="edit-input">
+            } @else {
+              <span class="cell-value">{{ value }}</span>
+              <i class="fas fa-pen edit-icon"></i>
+            }
+          </div>
+        </ng-template>
+
+        <ng-template #editableRoleTemplate let-row="row" let-value="value" let-rowIndex="rowIndex">
+          <div class="editable-cell" (click)="startEdit('role', row, $event)">
+            @if (editingCell.rowId === row['id'] && editingCell.column === 'role') {
+              <select 
+                [(ngModel)]="row['role']"
+                (blur)="saveEdit(row, 'role')"
+                (change)="saveEdit(row, 'role')"
+                (click)="$event.stopPropagation()"
+                class="edit-select">
+                <option value="Admin">Admin</option>
+                <option value="User">User</option>
+                <option value="Manager">Manager</option>
+                <option value="Guest">Guest</option>
+              </select>
+            } @else {
+              <span class="cell-value">{{ value }}</span>
+              <i class="fas fa-pen edit-icon"></i>
+            }
+          </div>
+        </ng-template>
+
+        <ng-template #statusTemplate let-row="row" let-value="value" let-rowIndex="rowIndex">
+          <div class="status-cell" (click)="toggleStatus(row, rowIndex, $event)">
+            <span [class]="'status-badge status-' + value.toLowerCase()">
+              {{ value }}
+            </span>
+          </div>
+        </ng-template>
+
         <div class="datatable-container">
           @if (isReady) {
             <ngxsmk-datatable
               [columns]="columns"
               [rows]="rows"
-              [pagination]="paginationConfig">
-              
-              <ng-template #editableNameTemplate let-row="row" let-value="value" let-rowIndex="rowIndex">
-                <div class="editable-cell" (click)="startEdit('name', rowIndex)">
-                  @if (editingCell.row === rowIndex && editingCell.column === 'name') {
-                    <input 
-                      type="text" 
-                      [(ngModel)]="row['name']"
-                      (blur)="saveEdit(row, 'name', rowIndex)"
-                      (keyup.enter)="saveEdit(row, 'name', rowIndex)"
-                      (keyup.escape)="cancelEdit()"
-                      class="edit-input"
-                      #nameInput>
-                  } @else {
-                    <span class="cell-value">{{ value }}</span>
-                    <i class="fas fa-pen edit-icon"></i>
-                  }
-                </div>
-              </ng-template>
-
-              <ng-template #editableEmailTemplate let-row="row" let-value="value" let-rowIndex="rowIndex">
-                <div class="editable-cell" (click)="startEdit('email', rowIndex)">
-                  @if (editingCell.row === rowIndex && editingCell.column === 'email') {
-                    <input 
-                      type="email" 
-                      [(ngModel)]="row['email']"
-                      (blur)="saveEdit(row, 'email', rowIndex)"
-                      (keyup.enter)="saveEdit(row, 'email', rowIndex)"
-                      (keyup.escape)="cancelEdit()"
-                      class="edit-input">
-                  } @else {
-                    <span class="cell-value">{{ value }}</span>
-                    <i class="fas fa-pen edit-icon"></i>
-                  }
-                </div>
-              </ng-template>
-
-              <ng-template #editableRoleTemplate let-row="row" let-value="value" let-rowIndex="rowIndex">
-                <div class="editable-cell" (click)="startEdit('role', rowIndex)">
-                  @if (editingCell.row === rowIndex && editingCell.column === 'role') {
-                    <select 
-                      [(ngModel)]="row['role']"
-                      (blur)="saveEdit(row, 'role', rowIndex)"
-                      (change)="saveEdit(row, 'role', rowIndex)"
-                      class="edit-select">
-                      <option value="Admin">Admin</option>
-                      <option value="User">User</option>
-                      <option value="Manager">Manager</option>
-                      <option value="Guest">Guest</option>
-                    </select>
-                  } @else {
-                    <span class="cell-value">{{ value }}</span>
-                    <i class="fas fa-pen edit-icon"></i>
-                  }
-                </div>
-              </ng-template>
-
-              <ng-template #statusTemplate let-row="row" let-value="value" let-rowIndex="rowIndex">
-                <div class="status-cell" (click)="toggleStatus(row, rowIndex)">
-                  <span [class]="'status-badge status-' + value.toLowerCase()">
-                    {{ value }}
-                  </span>
-                </div>
-              </ng-template>
+              [pagination]="paginationConfig"
+              [virtualScrolling]="false"
+              [externalPaging]="false"
+              [externalSorting]="false">
             </ngxsmk-datatable>
           }
         </div>
@@ -372,7 +379,7 @@ export class InlineEditingDemoComponent implements OnInit, AfterViewInit {
   rows: NgxsmkRow[] = [];
   isReady = false;
 
-  editingCell = { row: -1, column: '' };
+  editingCell = { rowId: -1, column: '', originalValue: null };
   editCount = 0;
   changedRows = new Set<number>();
   changeLog: Array<{ timestamp: Date; message: string }> = [];
@@ -403,6 +410,7 @@ export class InlineEditingDemoComponent implements OnInit, AfterViewInit {
   }
 
   initializeColumns() {
+
     this.columns = [
       { id: 'id', name: 'ID', prop: 'id', width: 80, sortable: true },
       { 
@@ -438,6 +446,7 @@ export class InlineEditingDemoComponent implements OnInit, AfterViewInit {
         cellTemplate: this.statusTemplate
       }
     ];
+    
   }
 
   loadData() {
@@ -459,42 +468,76 @@ export class InlineEditingDemoComponent implements OnInit, AfterViewInit {
     }));
   }
 
-  startEdit(column: string, rowIndex: number) {
-    this.editingCell = { row: rowIndex, column };
+  startEdit(column: string, row: NgxsmkRow, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    
+    const rowId = row['id'] as number;
+    const originalValue = row[column];
+    
+    console.log('🔵 startEdit called:', { 
+      column, 
+      rowId, 
+      row,
+      originalValue,
+      previousEditingCell: this.editingCell
+    });
+    
+    this.editingCell = { rowId, column, originalValue };
+    
     this.cdr.detectChanges();
     
     setTimeout(() => {
       const input = document.querySelector('.edit-input, .edit-select') as HTMLInputElement;
+      console.log('🟣 Looking for input element, found:', input);
       if (input) {
         input.focus();
         if (input.type === 'text' || input.type === 'email') {
           input.select();
         }
+        console.log('✅ Input focused and selected');
+      } else {
+        console.error('❌ No input element found! Check if template is rendering.');
       }
-    });
+    }, 10);
   }
 
-  saveEdit(row: NgxsmkRow, column: string, rowIndex: number) {
-    if (this.editingCell.row === rowIndex && this.editingCell.column === column) {
-      this.editCount++;
-      this.changedRows.add(row['id'] as number);
+  saveEdit(row: NgxsmkRow, column: string) {
+    const rowId = row['id'] as number;
+    if (this.editingCell.rowId === rowId && this.editingCell.column === column) {
+      const newValue = row[column];
+      const originalValue = this.editingCell.originalValue;
       
-      this.changeLog.push({
-        timestamp: new Date(),
-        message: `Updated ${column} for ${row['name']} to "${row[column]}"`
-      });
+      if (newValue !== originalValue) {
+        this.editCount++;
+        this.changedRows.add(rowId);
+        
+        this.changeLog.push({
+          timestamp: new Date(),
+          message: `Updated ${column} for ${row['name']} from "${originalValue}" to "${newValue}"`
+        });
+        
+        console.log('💾 Value changed and saved:', { column, rowId, originalValue, newValue });
+      } else {
+        console.log('ℹ️ No change detected, skipping edit count');
+      }
       
-      this.editingCell = { row: -1, column: '' };
+      this.editingCell = { rowId: -1, column: '', originalValue: null };
       this.cdr.detectChanges();
     }
   }
 
   cancelEdit() {
-    this.editingCell = { row: -1, column: '' };
+    this.editingCell = { rowId: -1, column: '', originalValue: null };
     this.cdr.detectChanges();
   }
 
-  toggleStatus(row: NgxsmkRow, rowIndex: number) {
+  toggleStatus(row: NgxsmkRow, rowIndex: number, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    
     const statuses = ['Active', 'Inactive', 'Pending'];
     const currentIndex = statuses.indexOf(row['status'] as string);
     row['status'] = statuses[(currentIndex + 1) % statuses.length];

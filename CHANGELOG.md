@@ -1,9 +1,103 @@
+
+
 # Changelog
 
 All notable changes to the ngxsmk-datatable project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [1.1.0] - 2025-01-XX
+
+### 🎯 Major Feature: Strongly-Typed Rows
+
+This release introduces **full TypeScript type safety** for datatable templates, addressing a major pain point compared to Angular Material tables where row elements are typed as `any`.
+
+#### ✨ New Features
+
+- **Strongly-Typed Row Templates** 🎉
+  - Generic type support: `NgxsmkRow<T>`, `NgxsmkColumn<T>`
+  - Fully typed template contexts with IntelliSense support
+  - Type-safe `row` and `value` variables in cell templates
+  - Compile-time error detection for invalid property access
+  - Enhanced developer experience with autocomplete in templates
+  - Safe refactoring with IDE support
+
+- **Template Context Interfaces**
+  - `NgxsmkCellTemplateContext<T, V>` - Typed cell template context
+  - `NgxsmkHeaderTemplateContext<T>` - Typed header template context  
+  - `NgxsmkRowDetailTemplateContext<T>` - Typed row detail template context
+  - Type guards for Angular template type checking
+
+- **Professional Documentation**
+  - Comprehensive JSDoc comments throughout the codebase
+  - `docs/TYPED-ROWS.md` - Complete type safety guide
+  - Working typed demo component with examples
+  - Updated API documentation with generic types
+
+#### 🐛 Bug Fixes
+
+- **Checkbox Selection** - Fixed checkbox selection not updating selected count
+  - Row clicks no longer interfere with checkbox selection when `selectionType="checkbox"`
+  - Selection model properly toggles on checkbox change
+  - Selected count updates correctly in real-time
+  - Added change detection trigger for OnPush strategy
+
+#### 💅 Code Quality Improvements
+
+- Removed all debug `console.log` statements
+- Professional JSDoc documentation for all public APIs
+- Cleaned up informal comments throughout codebase
+- Enhanced interface documentation with examples
+- Improved directive documentation with usage examples
+- Better type annotations for internal methods
+
+#### 📚 Documentation Enhancements
+
+- New `TYPE-SAFETY-GUIDE.md` with comprehensive examples
+- Updated `docs/TYPED-ROWS.md` with advanced patterns
+- Added comparison with Angular Material showing type safety advantages
+- Included migration guide for existing codebases
+- FAQ section for common type safety questions
+
+#### 🔄 Breaking Changes
+
+None! This release is fully backward compatible. Type safety is opt-in.
+
+#### Example Usage
+
+```typescript
+// Define your data model
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  status: 'Active' | 'Inactive';
+}
+
+// Use typed columns and rows
+columns: NgxsmkColumn<User>[] = [
+  { id: 'name', name: 'Name', prop: 'name', sortable: true }
+];
+
+rows: NgxsmkRow<User>[] = [
+  { id: 1, name: 'John', email: 'john@example.com', status: 'Active' }
+];
+
+// Typed templates with IntelliSense
+@ViewChild('statusTemplate') 
+statusTemplate!: TemplateRef<NgxsmkCellTemplateContext<User, User['status']>>;
+```
+
+```html
+<ng-template #statusTemplate let-row="row" let-value="value">
+  <!-- row is typed as NgxsmkRow<User> -->
+  <!-- value is typed as 'Active' | 'Inactive' -->
+  <span>{{ value }}</span>
+</ng-template>
+```
 
 ---
 
