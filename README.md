@@ -661,7 +661,7 @@ If you find this project useful, please consider:
 - 💡 Suggesting new features
 - 📖 Contributing to documentation
 - 🔗 Sharing with others
-- ☕ [Buy me a coffee](https://www.buymeacoffee.com/yourusername)
+- ☕ [Buy me a coffee](https://www.buymeacoffee.com/toozuuu)
 
 ---
 
