@@ -71,7 +71,7 @@ npm run build:lib:prod
 
 ## 📚 More Info
 
-See [.github/workflows/README.md](.github/workflows/README.md) for detailed documentation.
+See [workflows/README.md](workflows/README.md) for detailed documentation.
 
 ---
 

@@ -2,9 +2,7 @@
 
 <div align="center">
 
-[![CI](https://github.com/toozuuu/ngxsmk-datatable/actions/workflows/ci.yml/badge.svg)](https://github.com/toozuuu/ngxsmk-datatable/actions/workflows/ci.yml)
 [![Publish to NPM](https://github.com/toozuuu/ngxsmk-datatable/actions/workflows/publish.yml/badge.svg)](https://github.com/toozuuu/ngxsmk-datatable/actions/workflows/publish.yml)
-[![CodeQL](https://github.com/toozuuu/ngxsmk-datatable/actions/workflows/codeql.yml/badge.svg)](https://github.com/toozuuu/ngxsmk-datatable/actions/workflows/codeql.yml)
 [![npm version](https://img.shields.io/npm/v/ngxsmk-datatable)](https://www.npmjs.com/package/ngxsmk-datatable)
 [![npm downloads](https://img.shields.io/npm/dm/ngxsmk-datatable)](https://www.npmjs.com/package/ngxsmk-datatable)
 ![Angular](https://img.shields.io/badge/angular-17%2B-red.svg)
