@@ -266,7 +266,8 @@ $dt-transition-normal: var(--ngxsmk-dt-transition-normal);
     &-cell {
       display: flex;
       align-items: center;
-      padding: var(--ngxsmk-dt-padding);
+      justify-content: center;
+      padding: 18px var(--ngxsmk-dt-padding);
       background: $dt-bg-light;
       font-weight: 600;
       font-size: 13px;
@@ -279,6 +280,7 @@ $dt-transition-normal: var(--ngxsmk-dt-transition-normal);
       flex-shrink: 0;
       position: relative;
       transition: background-color $dt-transition-fast, color $dt-transition-fast;
+      text-align: center;
 
       // Sortable
       &--sortable {
@@ -488,7 +490,8 @@ $dt-transition-normal: var(--ngxsmk-dt-transition-normal);
   &__cell {
     display: flex;
     align-items: center;
-    padding: var(--ngxsmk-dt-padding);
+    justify-content: center;
+    padding: 16px var(--ngxsmk-dt-padding);
     min-width: 0;
     flex-shrink: 0;
     box-sizing: border-box;
@@ -499,6 +502,7 @@ $dt-transition-normal: var(--ngxsmk-dt-transition-normal);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    text-align: center;
     
     // Multi-line cell support
     &--multiline {
@@ -532,13 +536,28 @@ $dt-transition-normal: var(--ngxsmk-dt-transition-normal);
       justify-content: center;
       padding: 0 8px;
     }
+    
+    // Action buttons in cells
+    .btn, button, a.btn {
+      margin: 0 4px;
+      
+      &:first-child {
+        margin-left: 0;
+      }
+      
+      &:last-child {
+        margin-right: 0;
+      }
+    }
 
     // Content
     &-content {
       display: flex;
       align-items: center;
+      justify-content: center;
       width: 100%;
       min-width: 0;
+      gap: 8px;
     }
   }
 
@@ -672,7 +691,7 @@ body.ngxsmk-resizing {
 
     &__header {
       &-cell {
-        padding: var(--ngxsmk-dt-padding-sm, 10px 12px);
+        padding: 14px var(--ngxsmk-dt-padding-sm, 12px);
         font-size: 12px;
         min-width: 80px;
 
@@ -683,7 +702,7 @@ body.ngxsmk-resizing {
     }
 
     &__cell {
-      padding: var(--ngxsmk-dt-padding-sm, 10px 12px);
+      padding: 12px var(--ngxsmk-dt-padding-sm, 12px);
       font-size: 13px;
       min-width: 80px;
     }
@@ -712,7 +731,7 @@ body.ngxsmk-resizing {
 
     &__header {
       &-cell {
-        padding: var(--ngxsmk-dt-padding-xs, 8px 10px);
+        padding: 12px var(--ngxsmk-dt-padding-xs, 8px);
         font-size: 11px;
         min-width: 60px;
         letter-spacing: 0.03em;
@@ -720,7 +739,7 @@ body.ngxsmk-resizing {
     }
 
     &__cell {
-      padding: var(--ngxsmk-dt-padding-xs, 8px 10px);
+      padding: 10px var(--ngxsmk-dt-padding-xs, 8px);
       font-size: 12px;
       min-width: 60px;
     }
@@ -771,7 +790,7 @@ body.ngxsmk-resizing {
   .ngxsmk-datatable {
     &__header-cell,
     &__cell {
-      padding: var(--ngxsmk-dt-padding-sm, 12px 14px);
+      padding: 14px var(--ngxsmk-dt-padding-sm, 12px);
     }
 
     &__checkbox {

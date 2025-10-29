@@ -1,6 +1,6 @@
 {
   "name": "ngxsmk-datatable",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "A powerful, feature-rich Angular datatable component with virtual scrolling, built for Angular 17+",
   "keywords": [
     "angular",
@@ -24,7 +24,19 @@
     "data-grid",
     "filtering",
     "export",
-    "customizable"
+    "customizable",
+    "enterprise",
+    "collaborative",
+    "websocket",
+    "realtime",
+    "pdf-export",
+    "charts",
+    "formulas",
+    "gantt",
+    "kanban",
+    "sheets",
+    "plugins",
+    "theming"
   ],
   "author": "Sachin Dilshan <sachindilshan040@gmail.com>",
   "license": "MIT",

@@ -19,8 +19,7 @@ import { PaginationConfig, PageEvent } from '../../interfaces/pagination.interfa
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './ngxsmk-pager.component.html',
-  styleUrls: ['./ngxsmk-pager.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./ngxsmk-pager.component.scss']
 })
 export class NgxsmkPagerComponent implements OnInit, OnChanges {
   @Input() config: PaginationConfig | null = null;

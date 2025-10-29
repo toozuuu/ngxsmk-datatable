@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![ngxsmk-datatable](https://img.shields.io/badge/ngxsmk--datatable-v1.6.0-blue.svg)
+![ngxsmk-datatable](https://img.shields.io/badge/ngxsmk--datatable-v1.7.0-blue.svg)
 ![Angular](https://img.shields.io/badge/angular-17%2B-red.svg)
 ![TypeScript](https://img.shields.io/badge/typescript-5.0%2B-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
@@ -122,16 +122,31 @@ You can edit the code, experiment with features, and see changes in real-time!
 - 👁️ **Column Visibility** - Dynamic show/hide columns with persistence
 - 🔄 **Refresh Button** - Built-in data refresh functionality
 - 📏 **Interactive Resizing** - Drag-and-drop column width adjustment
-- 🎨 **Theme System** - 5 beautiful built-in themes
+- 🎨 **Theme System** - 11 beautiful built-in themes with theme builder
 - 💾 **State Persistence** - Save user preferences and theme settings
 - ✏️ **Inline Editing** - Edit cells directly with validation & undo/redo
 - 🔍 **Advanced Filtering** - Multi-criteria search and custom filters
-- 📤 **Export Data** - Export to CSV, Excel, JSON, or print-friendly format
+- 📤 **Export Data** - Export to CSV, Excel, JSON, PDF, or print-friendly format
 - 🎯 **Performance Optimized** - Smart change detection and virtual DOM
 - 🌐 **Internationalization** - i18n ready with customizable labels
 - 🚀 **Headless Facade** - Reactive state management with OnPush (3x faster!)
 - ↔️ **Column Reordering** - Drag-and-drop column reordering
-- 📱 **Responsive Card View** - Auto-switches to mobile-friendly cards (NEW!)
+- 📱 **Responsive Card View** - Auto-switches to mobile-friendly cards
+
+### 🏢 Enterprise Features (v1.7.0)
+- 📄 **PDF Export** - Advanced PDF generation with templates, watermarks, and custom styling
+- 👥 **Collaborative Editing** - Real-time multi-user editing with WebSocket support
+- 📊 **Advanced Charting** - Sparklines, bar charts, gauges, and progress bars in cells
+- 🧮 **Custom Formulas** - Excel-like calculations with 30+ built-in functions
+- 📅 **View Modes** - Gantt chart, Calendar, Timeline, and Kanban board views
+- 🔌 **Plugin System** - Extensible architecture with hooks and custom extensions
+- 📦 **Batch Operations** - Bulk edit, delete, and custom mass operations
+- ✅ **Data Validation** - 15+ validators with custom rules and async validation
+- 🎯 **Conditional Formatting** - Dynamic styling, data bars, and color scales
+- 📌 **Frozen Rows** - Sticky headers, footers, and columns
+- 📑 **Multiple Sheets** - Excel-like tabs with sheet management
+- 📥 **Data Import** - Import wizard for CSV, Excel, and JSON files
+- 📱 **Mobile Integration** - Ionic and Capacitor support with native features
 
 ---
 
@@ -354,21 +369,38 @@ Available themes:
 
 ## 🎯 Live Demo Examples
 
-The demo application includes 13 comprehensive examples:
+The demo application includes 27 comprehensive examples:
 
+### Core Features (1-14)
 1. **Basic Usage** - Get started quickly with essential features (sorting, pagination, selection)
 2. **Advanced Features** - Selection modes, custom templates, row details, and column pinning
 3. **Virtual Scrolling** - Handle 10,000+ rows with smooth 60fps performance
 4. **Server-Side** - External pagination, sorting, and async data loading
 5. **Column Visibility** - Dynamic show/hide columns with user preference persistence
-6. **Themes & Styling** - 5 built-in themes (Default, Material, Dark, Minimal, Colorful) with instant switching
+6. **Themes & Styling** - 11 built-in themes with instant switching
 7. **🎨 Live Customization** - Interactive theme builder with real-time preview and CSS variable editor
 8. **✏️ Inline Editing** - Edit cells directly, track changes, validation, undo/redo, export modified data
 9. **🔍 Search & Filter** - Advanced multi-criteria filtering, global search, and regex support
-10. **📤 Export Data** - Export to CSV, Excel, JSON, or print-friendly format with custom formatting
+10. **📤 Export Data** - Export to CSV, Excel, JSON, PDF, or print-friendly format
 11. **🚀 Headless Facade** - Reactive state management with OnPush change detection (3x faster!)
 12. **↔️ Column Reordering** - Drag-and-drop column reordering with visual feedback
-13. **📱 Responsive Cards** - Auto-switching mobile card view with device simulator (NEW!)
+13. **📱 Responsive Cards** - Auto-switching mobile card view with device simulator
+14. **🏢 Enterprise Demo** - Overview of all 14 enterprise features
+
+### Enterprise Features (15-27)
+15. **📄 PDF Export** - Advanced PDF generation with templates and watermarks
+16. **👥 Collaborative Editing** - Real-time multi-user editing with live cursors
+17. **📊 Charting** - Sparklines, bar charts, and gauges in table cells
+18. **🧮 Formula** - Excel-like calculations with 30+ functions
+19. **📅 View Modes** - Gantt, Calendar, Timeline, and Kanban views
+20. **🔌 Plugin System** - Custom extensions and hooks
+21. **📦 Batch Operations** - Bulk edit and delete operations
+22. **✅ Validation** - Data validation with custom rules
+23. **🎯 Conditional Formatting** - Dynamic styling based on values
+24. **📌 Frozen Rows** - Sticky headers and footers
+25. **📑 Multiple Sheets** - Excel-like tab management ✅
+26. **📥 Data Import** - CSV, Excel, JSON import wizard
+27. **📱 Mobile Integration** - Ionic and Capacitor support
 
 **Run the demo:**
 ```bash
@@ -553,7 +585,26 @@ ngxsmk-datatable/
 
 ## 📋 Changelog
 
-### Version 1.6.0 (Latest) 🎉
+### Version 1.7.0 (Latest) 🎉
+
+#### 🏢 **ENTERPRISE EDITION!**
+- **14 Enterprise Features** - Professional-grade functionality for business applications
+- **PDF Export** - Advanced PDF generation with templates, watermarks, and custom styling
+- **Collaborative Editing** - Real-time multi-user editing with WebSocket support ✅
+- **Advanced Charting** - Sparklines, bar charts, gauges, and progress bars in cells
+- **Custom Formulas** - Excel-like calculations with 30+ built-in functions
+- **View Modes** - Gantt chart, Calendar, Timeline, and Kanban board views
+- **Advanced Theming** - Theme builder with 11 presets and custom color schemes
+- **Plugin System** - Extensible architecture with hooks and API
+- **Batch Operations** - Bulk edit, delete, and custom mass operations
+- **Data Validation** - 15+ validators with custom rules and async validation
+- **Conditional Formatting** - Dynamic styling, data bars, and color scales
+- **Frozen Rows** - Sticky headers, footers, and columns
+- **Multiple Sheets** - Excel-like tabs with sheet management and protection ✅
+- **Data Import** - Import wizard for CSV, Excel, and JSON files
+- **Mobile Integration** - Ionic and Capacitor support with native features
+
+### Version 1.6.0
 
 #### 📱 **RESPONSIVE CARD VIEW!**
 - **Auto-Switching Card View** - Automatically transforms to mobile-friendly cards on small screens
@@ -652,24 +703,37 @@ ngxsmk-datatable/
 - [x] OnPush change detection ✅
 - [x] Immutable state management ✅
 
-### 🎯 Upcoming Features
+### ✅ Latest Implementation (v1.7.0)
 
-- [ ] PDF export support
-- [ ] Real-time collaborative editing
-- [ ] Advanced charting integration (sparklines, mini charts)
-- [ ] Custom formula support (Excel-like calculations)
-- [ ] Gantt chart view mode
-- [ ] Calendar/Timeline view mode
-- [ ] Kanban board view mode
-- [ ] Advanced theming system with theme builder
-- [ ] Plugin system for custom extensions
-- [ ] Batch operations (bulk edit, bulk delete)
-- [ ] Advanced data validation rules
-- [ ] Conditional formatting
-- [ ] Frozen rows (header and footer)
-- [ ] Multiple sheet support (tabs)
-- [ ] Data import wizard (CSV, Excel, JSON)
-- [ ] Mobile app integration (Ionic, Capacitor)
+- [x] PDF export support ✅
+- [x] Real-time collaborative editing ✅
+- [x] Advanced charting integration (sparklines, mini charts) ✅
+- [x] Custom formula support (Excel-like calculations) ✅
+- [x] Gantt chart view mode ✅
+- [x] Calendar/Timeline view mode ✅
+- [x] Kanban board view mode ✅
+- [x] Advanced theming system with theme builder ✅
+- [x] Plugin system for custom extensions ✅
+- [x] Batch operations (bulk edit, bulk delete) ✅
+- [x] Advanced data validation rules ✅
+- [x] Conditional formatting ✅
+- [x] Frozen rows (header and footer) ✅
+- [x] Multiple sheet support (tabs) ✅
+- [x] Data import wizard (CSV, Excel, JSON) ✅
+- [x] Mobile app integration (Ionic, Capacitor) ✅
+
+### 🎯 Future Enhancements
+
+- [ ] Real WebSocket server for collaborative editing
+- [ ] Advanced AI-powered features (auto-complete, suggestions)
+- [ ] Advanced data transformation pipelines
+- [ ] Custom report builder
+- [ ] Scheduled exports and automation
+- [ ] Advanced caching strategies
+- [ ] GraphQL subscription support
+- [ ] Offline mode with sync
+- [ ] Multi-language content support
+- [ ] Advanced security features (encryption, audit logs)
 
 Have a feature request? [Open an issue](https://github.com/toozuuu/ngxsmk-datatable/issues/new) with the `feature-request` label!
 

@@ -55,10 +55,22 @@ import { CommonModule } from '@angular/common';
         <aside class="sidebar">
           <div class="sidebar-header">
             <h3>Demos</h3>
-            <span class="badge">13 Examples</span>
+            <span class="badge">14+ Examples</span>
           </div>
           
           <nav class="sidebar-nav">
+            <a routerLink="/enterprise" routerLinkActive="active" class="nav-link featured">
+              <div class="nav-icon">
+                <i class="fas fa-star"></i>
+              </div>
+              <div class="nav-content">
+                <span class="nav-title">🚀 Enterprise Features (NEW!)</span>
+                <span class="nav-desc">16 powerful features</span>
+              </div>
+            </a>
+            
+            <div class="nav-divider"></div>
+            
             <a routerLink="/basic" routerLinkActive="active" class="nav-link">
               <div class="nav-icon">
                 <i class="fas fa-play-circle"></i>
@@ -398,6 +410,55 @@ import { CommonModule } from '@angular/common';
 
     .nav-link.active .nav-icon {
       background: rgba(255,255,255,0.2);
+    }
+
+    .nav-link.featured {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+      border: 2px solid #667eea;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-link.featured::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+      0% { left: -100%; }
+      50%, 100% { left: 100%; }
+    }
+
+    .nav-link.featured .nav-icon {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+
+    .nav-link.featured.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white !important;
+    }
+
+    .nav-link.featured.active .nav-content {
+      color: white;
+    }
+
+    .nav-link.featured.active .nav-title,
+    .nav-link.featured.active .nav-desc {
+      color: white;
+      opacity: 1;
+    }
+
+    .nav-divider {
+      height: 1px;
+      background: #e5e7eb;
+      margin: 16px 0;
     }
 
     .nav-content {

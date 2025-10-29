@@ -1,6 +1,6 @@
 {
   "name": "ngxsmk-datatable",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "A powerful, feature-rich Angular datatable component with virtual scrolling, built for Angular 17+",
   "keywords": [
     "angular",
@@ -86,14 +86,19 @@
     "build:demo": "ng build demo-app",
     "build:demo:prod": "ng build demo-app --configuration production",
     "build:all": "npm run build:lib && npm run build:demo",
+    "build:optimized": "npm run clean && npm run build:lib:prod && node scripts/optimize-build.js",
+    "analyze": "npm run build:lib:prod && node scripts/analyze-bundle.js",
     "test": "ng test",
     "test:lib": "ng test ngxsmk-datatable",
     "test:demo": "ng test demo-app",
     "lint": "ng lint",
-    "pack": "npm run build:lib && cd dist/ngxsmk-datatable && npm pack",
-    "publish:lib": "npm run build:lib:prod && cd dist/ngxsmk-datatable && npm publish",
+    "pack": "npm run build:optimized && cd dist/ngxsmk-datatable && npm pack",
+    "publish:lib": "npm run build:optimized && cd dist/ngxsmk-datatable && npm publish",
     "clean": "rimraf dist out-tsc node_modules/.cache",
+    "clean:all": "npm run clean && rimraf node_modules package-lock.json",
     "dev": "npm run build:lib:watch",
-    "demo": "npm start"
+    "demo": "npm start",
+    "size": "node scripts/analyze-bundle.js",
+    "optimize": "node scripts/optimize-build.js"
   }
 }

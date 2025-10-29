@@ -19,6 +19,22 @@ export * from './lib/interfaces/undo-redo.interface';
 export * from './lib/interfaces/export.interface';
 export * from './lib/interfaces/drag-drop.interface';
 
+// New v1.7.0 Interfaces
+export * from './lib/interfaces/pdf-export.interface';
+export * from './lib/interfaces/collaborative-editing.interface';
+export * from './lib/interfaces/charting.interface';
+export * from './lib/interfaces/formula.interface';
+export * from './lib/interfaces/view-modes.interface';
+export * from './lib/interfaces/theming.interface';
+export * from './lib/interfaces/plugin.interface';
+export * from './lib/interfaces/batch-operations.interface';
+export * from './lib/interfaces/validation.interface';
+export * from './lib/interfaces/conditional-formatting.interface';
+export * from './lib/interfaces/frozen-rows.interface';
+export * from './lib/interfaces/sheets.interface';
+export * from './lib/interfaces/data-import.interface';
+export * from './lib/interfaces/mobile-integration.interface';
+
 // Services
 export * from './lib/services/virtual-scroll.service';
 export * from './lib/services/column-resize.service';
@@ -37,6 +53,21 @@ export * from './lib/services/cell-merge.service';
 export * from './lib/services/column-group.service';
 export * from './lib/services/responsive.service';
 
+// New v1.7.0 Services
+export * from './lib/services/pdf-export.service';
+export * from './lib/services/collaborative-editing.service';
+export * from './lib/services/charting.service';
+export * from './lib/services/formula.service';
+export * from './lib/services/view-modes.service';
+export * from './lib/services/theming.service';
+export * from './lib/services/plugin.service';
+export * from './lib/services/batch-operations.service';
+export * from './lib/services/validation.service';
+export * from './lib/services/conditional-formatting.service';
+export * from './lib/services/data-import.service';
+export * from './lib/services/sheets.service';
+export * from './lib/services/mobile-integration.service';
+
 // Core - Headless Architecture
 export * from './lib/core/state/datatable.state';
 export * from './lib/core/state/datatable.store';
@@ -53,5 +84,5 @@ export * from './lib/directives/row-detail-template.directive';
 // Pipes
 export * from './lib/pipes/safe-html.pipe';
 
-// Module
-export * from './lib/ngxsmk-datatable.module';
+// Note: All components are standalone. Import them directly for better tree-shaking.
+// For NgModule-based apps, import the standalone components in your module's imports array.

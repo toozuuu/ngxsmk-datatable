@@ -3,6 +3,9 @@
   "dest": "../../dist/ngxsmk-datatable",
   "lib": {
     "entryFile": "src/public-api.ts"
-  }
+  },
+  "allowedNonPeerDependencies": [
+    "tslib"
+  ]
 }
 

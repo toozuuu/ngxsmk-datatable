@@ -107,6 +107,8 @@ export interface NgxsmkColumn<T = any> {
   cardPriority?: number;
   /** Hide this column in card view */
   hideInCardView?: boolean;
+  /** Text alignment for cell content: 'left' | 'center' | 'right' (default: 'center') */
+  align?: 'left' | 'center' | 'right';
 }
 
 export interface ColumnWidth {

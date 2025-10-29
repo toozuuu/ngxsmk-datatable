@@ -3,8 +3,12 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: '/basic',
+    redirectTo: '/enterprise',
     pathMatch: 'full'
+  },
+  {
+    path: 'enterprise',
+    loadComponent: () => import('./pages/enterprise-demo/enterprise-demo.component').then(m => m.EnterpriseDemoComponent)
   },
   {
     path: 'basic',
@@ -57,5 +61,45 @@ export const routes: Routes = [
   {
     path: 'responsive',
     loadComponent: () => import('./pages/responsive-demo/responsive-demo.component').then(m => m.ResponsiveDemoComponent)
+  },
+  {
+    path: 'collaborative',
+    loadComponent: () => import('./pages/collaborative-demo/collaborative-demo.component').then(m => m.CollaborativeDemoComponent)
+  },
+  {
+    path: 'charting',
+    loadComponent: () => import('./pages/charting-demo/charting-demo.component').then(m => m.ChartingDemoComponent)
+  },
+  {
+    path: 'formula',
+    loadComponent: () => import('./pages/formula-demo/formula-demo.component').then(m => m.FormulaDemoComponent)
+  },
+  {
+    path: 'view-modes',
+    loadComponent: () => import('./pages/view-modes-demo/view-modes-demo.component').then(m => m.ViewModesDemoComponent)
+  },
+  {
+    path: 'plugin',
+    loadComponent: () => import('./pages/plugin-demo/plugin-demo.component').then(m => m.PluginDemoComponent)
+  },
+  {
+    path: 'batch-operations',
+    loadComponent: () => import('./pages/batch-operations-demo/batch-operations-demo.component').then(m => m.BatchOperationsDemoComponent)
+  },
+  {
+    path: 'conditional-formatting',
+    loadComponent: () => import('./pages/conditional-formatting-demo/conditional-formatting-demo.component').then(m => m.ConditionalFormattingDemoComponent)
+  },
+  {
+    path: 'frozen-rows',
+    loadComponent: () => import('./pages/frozen-rows-demo/frozen-rows-demo.component').then(m => m.FrozenRowsDemoComponent)
+  },
+  {
+    path: 'sheets',
+    loadComponent: () => import('./pages/sheets-demo/sheets-demo.component').then(m => m.SheetsDemoComponent)
+  },
+  {
+    path: 'data-import',
+    loadComponent: () => import('./pages/data-import-demo/data-import-demo.component').then(m => m.DataImportDemoComponent)
   }
 ];

@@ -9,6 +9,253 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.7.0] - 2025-10-29
+
+### 🚀 **ENTERPRISE EDITION!** Professional Features Suite
+
+This is a MASSIVE release adding 16 enterprise-level features that transform ngxsmk-datatable into a complete business application platform!
+
+#### 🆕 New Features (v1.7.0)
+
+##### 📄 PDF Export Support
+- **PdfExportService**: Advanced PDF generation with jsPDF integration
+- Customizable templates (minimal, professional, colorful)
+- Page orientation (portrait/landscape) and size options (A4, A3, letter, legal, tabloid)
+- Custom headers and footers with templates
+- Watermark support with opacity and rotation
+- Logo embedding and branding
+- Table styling with borders, alternating rows, and custom colors
+- Auto-pagination with page numbers
+- Compression support for smaller file sizes
+- Print and download functionality
+
+##### 👥 Real-time Collaborative Editing
+- **CollaborativeEditingService**: Multi-user editing with WebSocket
+- Live cursor tracking and user presence
+- Real-time operation broadcasting
+- Conflict detection and resolution strategies
+- Operational transformation (OT) support
+- User avatars and color-coded cursors
+- Auto-reconnect with exponential backoff
+- Session management with user permissions
+- Presence broadcasting with configurable intervals
+- Sync and conflict resolution
+
+##### 📊 Advanced Charting Integration
+- **ChartingService**: Inline visualizations and sparklines
+- Sparkline charts (line, smooth, step)
+- Bar charts with custom colors
+- Bullet charts for KPI tracking
+- Progress bars with status indicators
+- Gauge charts (full, semi, arch)
+- Mini charts in table cells
+- Customizable colors, sizes, and animations
+- Tooltips and value labels
+- Theme support (light, dark, auto)
+
+##### 🧮 Custom Formula Support
+- **FormulaService**: Excel-like calculations
+- 30+ built-in functions (SUM, AVERAGE, IF, VLOOKUP, etc.)
+- Math functions (ROUND, ABS, SQRT, POW, MIN, MAX)
+- String functions (CONCAT, UPPER, LOWER, TRIM, LEFT, RIGHT)
+- Date functions (NOW, TODAY, YEAR, MONTH, DAY, DATEDIFF)
+- Logical functions (IF, AND, OR, NOT, ISNULL)
+- Statistical functions (MEDIAN, MODE, STDEV, VAR, PERCENTILE)
+- Computed columns with dependencies
+- Circular reference detection
+- Formula caching for performance
+- Custom function registration
+- Row and aggregate calculations
+
+##### 📅 Alternative View Modes
+- **ViewModesService**: Gantt, Calendar/Timeline, and Kanban views
+- **Gantt Chart**: Project timeline visualization with task dependencies
+- **Calendar View**: Event scheduling with month/week/day/agenda views
+- **Kanban Board**: Drag-and-drop task management with columns
+- **Timeline View**: Chronological event display
+- Seamless switching between table and alternative views
+- View-specific configurations and customizations
+- Data transformation for each view mode
+- Touch-friendly mobile interactions
+
+##### 🎨 Advanced Theming System
+- **ThemingService**: Complete visual customization
+- Theme builder with live preview
+- 11 predefined themes (Material, Bootstrap, Fluent, etc.)
+- Custom color schemes and palettes
+- Typography customization (fonts, sizes, weights)
+- Spacing and layout controls
+- Border and shadow customization
+- CSS variable generation
+- Theme import/export functionality
+- Auto dark mode support
+- Component-specific overrides
+
+##### 🔌 Plugin System
+- **PluginService**: Extensible architecture
+- Plugin lifecycle management (register, initialize, destroy)
+- Hook system for extending functionality
+- Before/after hooks for data, render, sort, filter, edit, export
+- Plugin API for custom methods
+- Event emitter for plugin communication
+- Plugin storage API with localStorage
+- Dependency management
+- Plugin validation and error handling
+- Sandbox mode for security
+- Plugin metadata and statistics
+
+##### 📦 Batch Operations
+- **BatchOperationsService**: Bulk editing and mass operations
+- Bulk edit with multiple field updates
+- Bulk delete with soft delete support
+- Find and replace operations
+- Mathematical operations (increment, decrement)
+- String operations (append, prepend)
+- Progress tracking for large operations
+- Confirmation dialogs
+- Undo/redo support with history
+- Custom batch operations
+- Error handling and reporting
+- Operation throttling for performance
+
+##### ✅ Advanced Data Validation
+- **ValidationService**: Comprehensive validation rules
+- 15+ built-in validators (required, email, URL, numeric, etc.)
+- Pattern matching with regex
+- Min/max value and length validation
+- Phone number and date validation
+- Unique value checking
+- Custom validation functions
+- Async validation support
+- Field and row-level validation
+- Real-time validation (immediate, onBlur, onSubmit)
+- Inline error messages
+- Validation summary
+- Prevent invalid data save
+
+##### 🎯 Conditional Formatting
+- **ConditionalFormattingService**: Dynamic cell styling
+- Value-based formatting rules
+- Range and threshold conditions
+- Top/bottom N and percentile formatting
+- Above/below average highlighting
+- Duplicate and unique value detection
+- Data bars with gradients
+- Color scales (2-color and 3-color)
+- Icon sets (arrows, traffic lights, ratings)
+- Custom CSS and classes
+- Rule priority system
+- Format caching for performance
+- Column statistics calculation
+
+##### 📌 Frozen Rows & Columns
+- Freeze header rows (sticky header)
+- Freeze footer rows (sticky footer)
+- Freeze left columns
+- Freeze right columns
+- Custom frozen row positions
+- Configurable z-index and shadows
+- Separator lines for frozen sections
+- Allow/prevent unfreezing
+- Smooth scrolling with frozen elements
+
+##### 📑 Multiple Sheet Support
+- **SheetsService**: Excel-like multi-sheet functionality
+- Tab-based sheet navigation
+- Add, delete, rename, duplicate sheets
+- Sheet reordering with drag-and-drop
+- Sheet protection and visibility
+- Active sheet management
+- Sheet templates
+- Cross-sheet references
+- Sheet-specific configurations
+- Context menu for sheet operations
+- Modified sheet tracking
+- Maximum sheet limits
+
+##### 📥 Data Import Wizard
+- **DataImportService**: Import from CSV, Excel, JSON
+- Multi-step import wizard
+- File format auto-detection
+- CSV parsing with custom delimiters
+- JSON path extraction
+- Excel sheet selection (requires xlsx library)
+- Column mapping interface
+- Data preview before import
+- Transform functions
+- Data validation on import
+- Error and warning reporting
+- Progress tracking
+- Import templates
+- Multiple import modes (replace, append, merge)
+
+##### 📱 Mobile App Integration
+- **MobileIntegrationService**: Ionic and Capacitor support
+- Platform detection (iOS, Android, Web)
+- Touch gesture support (swipe, long-press, pinch-zoom, pull-to-refresh)
+- Native camera integration
+- Share API integration
+- Clipboard API
+- Haptic feedback
+- Toast notifications
+- Network status monitoring
+- App state management
+- Offline mode support
+- Touch-optimized UI
+- Status bar configuration
+- Safe area handling
+- Performance optimizations for mobile
+
+#### 📝 API Changes
+
+##### New Services
+- `PdfExportService`
+- `CollaborativeEditingService`
+- `ChartingService`
+- `FormulaService`
+- `ViewModesService`
+- `ThemingService`
+- `PluginService`
+- `BatchOperationsService`
+- `ValidationService`
+- `ConditionalFormattingService`
+- `DataImportService`
+- `SheetsService`
+- `MobileIntegrationService`
+
+##### New Interfaces
+- PDF Export: `PdfExportOptions`, `PdfExportResult`, `PdfTemplate`
+- Collaboration: `CollaborativeEditingConfig`, `CollaborativeUser`, `CollaborativeOperation`
+- Charting: `ChartingConfig`, `ColumnChartConfig`, `SparklineOptions`
+- Formulas: `FormulaConfig`, `FormulaExpression`, `ComputedColumn`
+- View Modes: `GanttConfig`, `CalendarConfig`, `KanbanConfig`
+- Theming: `ThemeConfig`, `ThemeColors`, `ThemeExport`
+- Plugins: `Plugin`, `PluginContext`, `PluginHooks`
+- Batch Ops: `BatchOperation`, `BatchOperationResult`, `BulkEditOperation`
+- Validation: `ValidationRule`, `ValidationResult`, `ValidationContext`
+- Formatting: `ConditionalFormattingRule`, `CellFormat`, `FormattingContext`
+- Frozen: `FrozenRowsConfig`, `FrozenColumnsConfig`
+- Sheets: `Sheet`, `SheetTemplate`, `SheetOperation`
+- Import: `ImportOptions`, `ImportResult`, `ColumnMapping`
+- Mobile: `MobileIntegrationConfig`, `TouchGestureConfig`, `OfflineModeConfig`
+
+#### 🔧 Dependencies
+
+##### Peer Dependencies (Optional)
+- `jspdf` and `jspdf-autotable` for PDF export
+- `xlsx` or `exceljs` for Excel import
+- `@capacitor/camera`, `@capacitor/share`, `@capacitor/clipboard` for mobile features
+- WebSocket server for collaborative editing
+
+#### 💡 Usage Examples
+
+See updated documentation for complete examples of all new features.
+
+#### 🎯 Breaking Changes
+None - All new features are opt-in and backward compatible.
+
+---
+
 ## [1.6.0] - 2025-10-29
 
 ### 📱 **RESPONSIVE CARD VIEW!** Mobile-First Design

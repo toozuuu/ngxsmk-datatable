@@ -42,9 +42,7 @@ import { ResponsiveService, ResponsiveState } from '../../services/responsive.se
   imports: [CommonModule, FormsModule, SafeHtmlPipe, NgxsmkPagerComponent],
   providers: [VirtualScrollService, ColumnResizeService, SelectionService, DragDropService],
   templateUrl: './ngxsmk-datatable.component.html',
-  styleUrls: ['./ngxsmk-datatable.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./ngxsmk-datatable.component.scss']
 })
 /**
  * High-performance datatable component with virtual scrolling and strongly-typed rows.
