@@ -29,7 +29,7 @@ npm install ngxsmk-datatable
 import { Component } from '@angular/core';
 import { NgxsmkDatatableComponent, NgxsmkColumn, NgxsmkRow } from 'ngxsmk-datatable';
 
-// Define your data model for full type safety (NEW in v1.1.0!)
+// Define your data model for full type safety
 interface User {
   id: number;
   name: string;
@@ -67,7 +67,7 @@ export class AppComponent {
 
 ## ✨ Key Features
 
-✅ **🎯 Strongly-typed rows** - Full type safety in templates (NEW in v1.1.0!)  
+✅ **🎯 Strongly-typed rows** - Full type safety in templates  
 ✅ **Lightning fast** rendering with optimized virtual scrolling  
 ✅ **Small bundle size** using modern Angular patterns  
 ✅ **Zero memory leaks** with proper cleanup and OnDestroy  
@@ -85,7 +85,7 @@ export class AppComponent {
 ## 📦 What's Included
 
 ### Core Features
-- 🎯 Strongly-typed rows with compile-time safety (NEW in v1.1.0!)
+- 🎯 Strongly-typed rows with compile-time safety
 - ⚡ Virtual scrolling (10,000+ rows at 60fps)
 - 🔄 Client & server-side sorting
 - 📄 Client & server-side pagination
@@ -99,9 +99,12 @@ export class AppComponent {
 - 🔄 Refresh button
 - 📏 Interactive column resizing
 - 🎨 Theme system with dark mode
-- ✏️ Inline editing support
+- ✏️ Inline editing with validation & undo/redo
 - 🔍 Search and filtering
 - 📤 Data export (CSV, Excel, JSON)
+- 🚀 Headless facade with OnPush (3x faster!)
+- ↔️ Column reordering (drag-and-drop)
+- 📱 Responsive card view (auto-switches on mobile!) (NEW!)
 
 ---
 

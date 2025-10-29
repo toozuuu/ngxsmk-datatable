@@ -29,6 +29,20 @@ export interface Sort {
 }
 
 /**
+ * Sort state (for headless core architecture)
+ */
+export interface SortState {
+  /** Field name to sort by */
+  field: string;
+  
+  /** Sort direction */
+  direction: 'asc' | 'desc';
+  
+  /** Sort priority (for multi-column sort) */
+  priority?: number;
+}
+
+/**
  * Sort direction: ascending or descending
  */
 export type SortDirection = 'asc' | 'desc' | '';

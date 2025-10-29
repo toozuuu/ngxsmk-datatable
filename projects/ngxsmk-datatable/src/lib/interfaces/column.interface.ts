@@ -87,6 +87,26 @@ export interface NgxsmkColumn<T = any> {
   headerTemplate?: TemplateRef<NgxsmkHeaderTemplateContext<T>>;
   /** Strongly-typed footer template */
   footerTemplate?: TemplateRef<NgxsmkCellTemplateContext<T>>;
+  /** Enable multi-line text wrapping for this column */
+  multiLine?: boolean;
+  /** Enable filtering for this column */
+  filterable?: boolean;
+  /** Filter type for advanced filtering */
+  filterType?: 'text' | 'number' | 'date' | 'select' | 'multiselect' | 'boolean';
+  /** Filter options for select/multiselect filters */
+  filterOptions?: any[];
+  /** Enable column grouping in header */
+  group?: string;
+  /** Enable cell merging for this column */
+  mergeable?: boolean;
+  /** Custom merge function for cell merging */
+  mergeFunction?: (currentRow: NgxsmkRow<T>, previousRow: NgxsmkRow<T>) => boolean;
+  /** Card view role (title, subtitle, description, image, badge, meta) */
+  cardRole?: 'title' | 'subtitle' | 'description' | 'image' | 'badge' | 'meta' | 'hidden';
+  /** Card view priority (1-10, higher = more prominent) */
+  cardPriority?: number;
+  /** Hide this column in card view */
+  hideInCardView?: boolean;
 }
 
 export interface ColumnWidth {

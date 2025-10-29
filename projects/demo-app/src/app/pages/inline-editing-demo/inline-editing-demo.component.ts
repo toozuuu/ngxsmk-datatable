@@ -1,586 +1,821 @@
-import { Component, OnInit, AfterViewInit, ViewChild, TemplateRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChildren, QueryList, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NgxsmkDatatableComponent, NgxsmkColumn, NgxsmkRow, PaginationConfig } from 'ngxsmk-datatable';
+import {
+  NgxsmkDatatableComponent,
+  NgxsmkColumn,
+  NgxsmkRow,
+  InlineEditingService,
+  UndoRedoService,
+  ValidationRule,
+  CellEditEvent,
+  PaginationConfig
+} from 'ngxsmk-datatable';
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  age: number;
+  salary: number;
+  department: string;
+  phone: string;
+  status: 'Active' | 'Inactive';
+}
 
 @Component({
   selector: 'app-inline-editing-demo',
   standalone: true,
   imports: [CommonModule, FormsModule, NgxsmkDatatableComponent],
+  providers: [InlineEditingService, UndoRedoService],
   template: `
     <div class="demo-section">
       <h2 class="demo-header">
         <i class="fas fa-edit"></i>
-        Inline Editing Demo
+        Inline Editing with Validation & Undo/Redo
       </h2>
-      
+
       <div class="demo-content">
         <div class="alert alert-info">
           <i class="fas fa-info-circle"></i>
-          Click on any cell to edit inline. Changes are saved automatically.
-        </div>
-
-        <div class="demo-stats">
-          <div class="stat-card">
-            <div class="stat-value">{{ editCount }}</div>
-            <div class="stat-label">Total Edits</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value">{{ rows.length }}</div>
-            <div class="stat-label">Total Records</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value">{{ changedRows.size }}</div>
-            <div class="stat-label">Modified Rows</div>
+          <div>
+            <strong>Performance:</strong> Only ONE input field exists at a time! Double-click to edit cells.
+            <br><strong>Validation:</strong> Try entering invalid values (empty name, invalid email, age < 18, etc.)
+            <br><strong>Undo/Redo:</strong> Use Ctrl+Z / Ctrl+Y or the buttons below
           </div>
         </div>
 
-        <!-- Templates defined here so @ViewChild can find them -->
-        <ng-template #editableNameTemplate let-row="row" let-value="value" let-rowIndex="rowIndex">
-          <div class="editable-cell" (click)="startEdit('name', row, $event)">
-            @if (editingCell.rowId === row['id'] && editingCell.column === 'name') {
-              <input 
-                type="text" 
-                [(ngModel)]="row['name']"
-                (blur)="saveEdit(row, 'name')"
-                (keyup.enter)="saveEdit(row, 'name')"
-                (keyup.escape)="cancelEdit()"
-                (click)="$event.stopPropagation()"
-                class="edit-input"
-                #nameInput>
-            } @else {
-              <span class="cell-value">{{ value }}</span>
-              <i class="fas fa-pen edit-icon"></i>
-            }
+        <!-- Controls -->
+        <div class="controls-bar">
+          <div class="undo-redo-controls">
+            <button 
+              class="btn btn-secondary" 
+              [disabled]="!canUndo"
+              (click)="undo()"
+              title="Undo (Ctrl+Z)">
+              <i class="fas fa-undo"></i>
+              Undo
+              @if (lastActionDesc) {
+                <span class="action-desc">{{ lastActionDesc }}</span>
+              }
+            </button>
+            <button 
+              class="btn btn-secondary" 
+              [disabled]="!canRedo"
+              (click)="redo()"
+              title="Redo (Ctrl+Y)">
+              <i class="fas fa-redo"></i>
+              Redo
+              @if (nextRedoDesc) {
+                <span class="action-desc">{{ nextRedoDesc }}</span>
+              }
+            </button>
           </div>
-        </ng-template>
 
-        <ng-template #editableEmailTemplate let-row="row" let-value="value" let-rowIndex="rowIndex">
-          <div class="editable-cell" (click)="startEdit('email', row, $event)">
-            @if (editingCell.rowId === row['id'] && editingCell.column === 'email') {
-              <input 
-                type="email" 
-                [(ngModel)]="row['email']"
-                (blur)="saveEdit(row, 'email')"
-                (keyup.enter)="saveEdit(row, 'email')"
-                (keyup.escape)="cancelEdit()"
-                (click)="$event.stopPropagation()"
-                class="edit-input">
-            } @else {
-              <span class="cell-value">{{ value }}</span>
-              <i class="fas fa-pen edit-icon"></i>
-            }
-          </div>
-        </ng-template>
-
-        <ng-template #editableRoleTemplate let-row="row" let-value="value" let-rowIndex="rowIndex">
-          <div class="editable-cell" (click)="startEdit('role', row, $event)">
-            @if (editingCell.rowId === row['id'] && editingCell.column === 'role') {
-              <select 
-                [(ngModel)]="row['role']"
-                (blur)="saveEdit(row, 'role')"
-                (change)="saveEdit(row, 'role')"
-                (click)="$event.stopPropagation()"
-                class="edit-select">
-                <option value="Admin">Admin</option>
-                <option value="User">User</option>
-                <option value="Manager">Manager</option>
-                <option value="Guest">Guest</option>
-              </select>
-            } @else {
-              <span class="cell-value">{{ value }}</span>
-              <i class="fas fa-pen edit-icon"></i>
-            }
-          </div>
-        </ng-template>
-
-        <ng-template #statusTemplate let-row="row" let-value="value" let-rowIndex="rowIndex">
-          <div class="status-cell" (click)="toggleStatus(row, rowIndex, $event)">
-            <span [class]="'status-badge status-' + value.toLowerCase()">
-              {{ value }}
+          <div class="info-badges">
+            <span class="badge badge-info">
+              <i class="fas fa-edit"></i>
+              Total Edits: {{ totalEdits }}
+            </span>
+            <span class="badge badge-warning">
+              <i class="fas fa-exclamation-triangle"></i>
+              Validation Errors: {{ validationErrors }}
+            </span>
+            <span class="badge badge-success" *ngIf="editingService.isAnyEditing()">
+              <i class="fas fa-pencil-alt"></i>
+              Editing in progress...
             </span>
           </div>
-        </ng-template>
+        </div>
 
-        <div class="datatable-container">
-          @if (isReady) {
-            <ngxsmk-datatable
-              [columns]="columns"
-              [rows]="rows"
-              [pagination]="paginationConfig"
-              [virtualScrolling]="false"
-              [externalPaging]="false"
-              [externalSorting]="false">
-            </ngxsmk-datatable>
+        <!-- Validation Errors Display -->
+        @if (currentErrors.length > 0) {
+          <div class="alert alert-danger validation-alert">
+            <i class="fas fa-times-circle"></i>
+            <div>
+              <strong>Validation Errors:</strong>
+              <ul>
+                @for (error of currentErrors; track error) {
+                  <li>{{ error }}</li>
+                }
+              </ul>
+            </div>
+          </div>
+        }
+
+        <!-- DataTable -->
+        <div class="datatable-container" #tableContainer>
+          <ngxsmk-datatable
+            [columns]="columns"
+            [rows]="rows"
+            [virtualScrolling]="true"
+            [rowHeight]="50"
+            [headerHeight]="50"
+            [pagination]="paginationConfig"
+            (cellDblClick)="onCellDblClick($event)">
+          </ngxsmk-datatable>
+
+          <!-- Inline Editing Input (Only ONE!) -->
+          @if (editingService.getCurrentEdit(); as editState) {
+            <div class="edit-overlay" 
+                 [style.top.px]="getEditPosition().top"
+                 [style.left.px]="getEditPosition().left"
+                 [style.width.px]="getEditPosition().width"
+                 [style.height.px]="getEditPosition().height">
+              <input
+                #editInput
+                type="text"
+                class="edit-input"
+                [class.error]="currentErrors.length > 0"
+                [(ngModel)]="editValue"
+                (keydown.enter)="commitEdit(true)"
+                (keydown.escape)="cancelEdit()"
+                (blur)="commitEdit(false)"
+                [placeholder]="editState.column.name"
+              />
+            </div>
           }
         </div>
 
-        <div class="actions-panel">
-          <button class="btn btn-primary" (click)="saveAll()">
-            <i class="fas fa-save"></i> Save All Changes
-          </button>
-          <button class="btn btn-secondary" (click)="resetChanges()">
-            <i class="fas fa-undo"></i> Reset Changes
-          </button>
-          <button class="btn btn-success" (click)="exportChanges()">
-            <i class="fas fa-download"></i> Export Modified Rows
-          </button>
+        <!-- Event Log -->
+        <div class="card">
+          <div class="card-header">
+            <h4><i class="fas fa-history"></i> Edit History (Last 10)</h4>
+            <button class="btn btn-sm btn-secondary" (click)="clearHistory()">
+              <i class="fas fa-trash"></i> Clear
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="event-log">
+              @for (event of events.slice(-10); track event.time) {
+                <div class="event-item" [class.event-item-error]="event.type === 'error'">
+                  <span class="event-time">{{ event.time | date:'HH:mm:ss' }}</span>
+                  <span class="event-type" [class.type-error]="event.type === 'error'">
+                    <i [class]="getEventIcon(event.type)"></i>
+                    {{ event.type }}
+                  </span>
+                  <span class="event-message">{{ event.message }}</span>
+                </div>
+              }
+              @if (events.length === 0) {
+                <div class="no-events">No events yet. Start editing!</div>
+              }
+            </div>
+          </div>
         </div>
 
-        <div class="changes-log" *ngIf="changeLog.length > 0">
-          <h4>Recent Changes</h4>
-          <div class="log-items">
-            @for (log of changeLog.slice(-5).reverse(); track log.timestamp) {
-              <div class="log-item">
-                <span class="log-time">{{ log.timestamp | date:'HH:mm:ss' }}</span>
-                <span class="log-message">{{ log.message }}</span>
-              </div>
-            }
+        <!-- Statistics -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value">{{ rows.length }}</div>
+            <div class="stat-label">Total Rows</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">{{ columns.length }}</div>
+            <div class="stat-label">Total Columns</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">{{ rows.length * columns.length }}</div>
+            <div class="stat-label">Total Cells</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">1</div>
+            <div class="stat-label">Input Fields</div>
+            <div class="stat-note">Only one at a time!</div>
           </div>
         </div>
       </div>
     </div>
   `,
   styles: [`
-
-    .demo-header {
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
+    .demo-section {
+      padding: 20px;
     }
 
-    .alert {
+    .controls-bar {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      justify-content: space-between;
       padding: 16px;
-      background: #eff6ff;
-      border-left: 4px solid #3b82f6;
+      background: #f8f9fa;
       border-radius: 8px;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      color: #1e40af;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
-    .demo-stats {
+    .undo-redo-controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .action-desc {
+      font-size: 11px;
+      opacity: 0.8;
+      margin-left: 8px;
+    }
+
+    .info-badges {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-info {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .badge-warning {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+
+    .badge-success {
+      background: #e8f5e9;
+      color: #388e3c;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .validation-alert {
+      animation: slideDown 0.3s ease-out;
+    }
+
+    .validation-alert ul {
+      margin: 8px 0 0 20px;
+    }
+
+    .validation-alert li {
+      margin: 4px 0;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .datatable-container {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      margin-bottom: 20px;
+      min-height: 500px;
+      position: relative;
+    }
+
+    .datatable-container ::ng-deep ngxsmk-datatable {
+      height: 500px;
+    }
+
+    /* Editable cell styling */
+    .datatable-container ::ng-deep .ngxsmk-datatable__cell {
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .datatable-container ::ng-deep .ngxsmk-datatable__cell:hover {
+      background: rgba(59, 130, 246, 0.05);
+    }
+
+    /* Edit Overlay - Only ONE exists! */
+    .edit-overlay {
+      position: absolute;
+      z-index: 1000;
+      padding: 0;
+    }
+
+    .edit-input {
+      width: 100%;
+      height: 100%;
+      border: 2px solid #3b82f6;
+      border-radius: 4px;
+      padding: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+      background: white;
+      transition: border-color 0.2s;
+    }
+
+    .edit-input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .edit-input.error {
+      border-color: #dc2626;
+      box-shadow: 0 4px 6px rgba(220, 38, 38, 0.2);
+    }
+
+    .edit-input.error:focus {
+      border-color: #b91c1c;
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
+    .event-log {
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .event-item {
+      display: flex;
+      gap: 10px;
+      padding: 8px;
+      border-bottom: 1px solid #f0f0f0;
+      transition: background 0.2s;
+    }
+
+    .event-item:hover {
+      background: #f8f9fa;
+    }
+
+    .event-item-error {
+      background: #fff5f5;
+    }
+
+    .event-time {
+      font-size: 11px;
+      color: #666;
+      min-width: 70px;
+      font-family: 'Courier New', monospace;
+    }
+
+    .event-type {
+      font-weight: 600;
+      min-width: 100px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .type-error {
+      color: #dc2626;
+    }
+
+    .event-message {
+      color: #374151;
+      font-size: 13px;
+      flex: 1;
+    }
+
+    .no-events {
+      text-align: center;
+      padding: 30px;
+      color: #9ca3af;
+      font-style: italic;
+    }
+
+    .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      margin-bottom: 24px;
+      gap: 15px;
+      margin-top: 20px;
     }
 
     .stat-card {
       background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
       padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       text-align: center;
     }
 
     .stat-value {
       font-size: 32px;
       font-weight: 700;
-      color: #3b82f6;
-      margin-bottom: 8px;
+      color: #2196f3;
+      margin-bottom: 5px;
     }
 
     .stat-label {
-      font-size: 14px;
+      font-size: 13px;
       color: #6b7280;
-      font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-    }
-
-    .datatable-container {
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      overflow: hidden;
-      margin-bottom: 24px;
-      height: 600px;
-    }
-
-    .editable-cell {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 4px;
-      transition: all 0.2s ease;
-      min-height: 32px;
-    }
-
-    .editable-cell:hover {
-      background: #f3f4f6;
-    }
-
-    .cell-value {
-      flex: 1;
-    }
-
-    .edit-icon {
-      opacity: 0;
-      color: #3b82f6;
-      font-size: 12px;
-      transition: opacity 0.2s ease;
-    }
-
-    .editable-cell:hover .edit-icon {
-      opacity: 1;
-    }
-
-    .edit-input,
-    .edit-select {
-      width: 100%;
-      padding: 6px 10px;
-      border: 2px solid #3b82f6;
-      border-radius: 4px;
-      font-size: 14px;
-      outline: none;
-      background: white;
-    }
-
-    .edit-input:focus,
-    .edit-select:focus {
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    .status-cell {
-      cursor: pointer;
-      display: inline-block;
-    }
-
-    .status-badge {
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 12px;
       font-weight: 600;
-      transition: all 0.2s ease;
     }
 
-    .status-badge:hover {
-      transform: scale(1.05);
-    }
-
-    .status-active {
-      background: #d1fae5;
-      color: #065f46;
-    }
-
-    .status-inactive {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .status-pending {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .actions-panel {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 24px;
-    }
-
-    .btn {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 6px;
-      font-size: 14px;
+    .stat-note {
+      font-size: 11px;
+      color: #10b981;
+      margin-top: 4px;
       font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s ease;
-    }
-
-    .btn-primary {
-      background: #3b82f6;
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: #2563eb;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
-    }
-
-    .btn-secondary {
-      background: #6b7280;
-      color: white;
-    }
-
-    .btn-secondary:hover {
-      background: #4b5563;
-    }
-
-    .btn-success {
-      background: #10b981;
-      color: white;
-    }
-
-    .btn-success:hover {
-      background: #059669;
-    }
-
-    .changes-log {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 20px;
-    }
-
-    .changes-log h4 {
-      margin: 0 0 16px;
-      font-size: 16px;
-      font-weight: 600;
-      color: #1f2937;
-    }
-
-    .log-items {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .log-item {
-      display: flex;
-      gap: 12px;
-      padding: 8px 12px;
-      background: #f9fafb;
-      border-radius: 6px;
-      font-size: 13px;
-    }
-
-    .log-time {
-      color: #6b7280;
-      font-weight: 600;
-      min-width: 70px;
-    }
-
-    .log-message {
-      color: #374151;
     }
   `]
 })
 export class InlineEditingDemoComponent implements OnInit, AfterViewInit {
-  @ViewChild('editableNameTemplate') editableNameTemplate!: TemplateRef<any>;
-  @ViewChild('editableEmailTemplate') editableEmailTemplate!: TemplateRef<any>;
-  @ViewChild('editableRoleTemplate') editableRoleTemplate!: TemplateRef<any>;
-  @ViewChild('statusTemplate') statusTemplate!: TemplateRef<any>;
+  @ViewChildren('editInput') editInputs!: QueryList<ElementRef>;
 
-  columns: NgxsmkColumn[] = [];
-  rows: NgxsmkRow[] = [];
-  isReady = false;
-
-  editingCell = { rowId: -1, column: '', originalValue: null };
-  editCount = 0;
-  changedRows = new Set<number>();
-  changeLog: Array<{ timestamp: Date; message: string }> = [];
-  originalData: NgxsmkRow[] = [];
+  columns: NgxsmkColumn<User>[] = [];
+  rows: NgxsmkRow<User>[] = [];
 
   paginationConfig: PaginationConfig = {
     pageSize: 10,
-    totalItems: 0,
-    currentPage: 1,
-    maxSize: 5,
     pageSizeOptions: [10, 25, 50],
     showPageSizeOptions: true,
     showFirstLastButtons: true,
     showRangeLabels: true,
-    showTotalItems: true
+    showTotalItems: true,
+    totalItems: 100,
+    currentPage: 1,
+    maxSize: 5
   };
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  events: Array<{ time: Date, type: string, message: string }> = [];
+  totalEdits = 0;
+  validationErrors = 0;
+  currentErrors: string[] = [];
 
-  ngOnInit() {}
+  canUndo = false;
+  canRedo = false;
+  lastActionDesc = '';
+  nextRedoDesc = '';
+
+  // Inline editing state
+  editValue: any = '';
+  lastClickedCell: { element: HTMLElement, rowIndex: number, colIndex: number } | null = null;
+
+  constructor(
+    public editingService: InlineEditingService,
+    private undoRedoService: UndoRedoService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit() {
+    this.initializeColumns();
+    this.generateData();
+    this.setupValidation();
+    this.setupUndoRedo();
+    this.setupEventListeners();
+    this.setupKeyboardShortcuts();
+  }
 
   ngAfterViewInit() {
-    setTimeout(() => {
-      this.initializeColumns();
-      this.loadData();
-      this.isReady = true;
+    // Auto-focus input when edit starts
+    this.editingService.editing$.subscribe(state => {
+      if (state?.isEditing) {
+        setTimeout(() => {
+          const input = this.editInputs.first?.nativeElement;
+          if (input) {
+            input.focus();
+            input.select();
+          }
+        }, 10);
+      } else {
+        // Clear edit state when editing stops
+        this.lastClickedCell = null;
+        this.editValue = '';
+      }
+      this.cdr.detectChanges();
     });
   }
 
-  initializeColumns() {
-
+  private initializeColumns() {
     this.columns = [
-      { id: 'id', name: 'ID', prop: 'id', width: 80, sortable: true },
-      { 
-        id: 'name', 
-        name: 'Name', 
-        prop: 'name', 
-        width: 200, 
-        sortable: true,
-        cellTemplate: this.editableNameTemplate
+      {
+        id: 'id',
+        name: 'ID',
+        prop: 'id',
+        width: 80,
+        sortable: true
       },
-      { 
-        id: 'email', 
-        name: 'Email', 
-        prop: 'email', 
-        width: 250, 
+      {
+        id: 'name',
+        name: 'Name',
+        prop: 'name',
+        width: 180,
         sortable: true,
-        cellTemplate: this.editableEmailTemplate
+        cellTemplate: undefined // We'll add edit functionality
       },
-      { 
-        id: 'role', 
-        name: 'Role', 
-        prop: 'role', 
-        width: 150, 
-        sortable: true,
-        cellTemplate: this.editableRoleTemplate
+      {
+        id: 'email',
+        name: 'Email',
+        prop: 'email',
+        width: 220,
+        sortable: true
       },
-      { 
-        id: 'status', 
-        name: 'Status', 
-        prop: 'status', 
-        width: 120, 
-        sortable: true,
-        cellTemplate: this.statusTemplate
+      {
+        id: 'age',
+        name: 'Age',
+        prop: 'age',
+        width: 100,
+        sortable: true
+      },
+      {
+        id: 'salary',
+        name: 'Salary',
+        prop: 'salary',
+        width: 130,
+        sortable: true
+      },
+      {
+        id: 'department',
+        name: 'Department',
+        prop: 'department',
+        width: 150,
+        sortable: true
+      },
+      {
+        id: 'phone',
+        name: 'Phone',
+        prop: 'phone',
+        width: 140
+      },
+      {
+        id: 'status',
+        name: 'Status',
+        prop: 'status',
+        width: 120,
+        sortable: true
       }
     ];
-    
   }
 
-  loadData() {
-    this.rows = this.generateMockData(50);
-    this.originalData = JSON.parse(JSON.stringify(this.rows));
-    this.paginationConfig.totalItems = this.rows.length;
-  }
+  private generateData() {
+    const departments = ['Engineering', 'Marketing', 'Sales', 'HR', 'Finance'];
+    const statuses: Array<'Active' | 'Inactive'> = ['Active', 'Inactive'];
 
-  generateMockData(count: number): NgxsmkRow[] {
-    const roles = ['Admin', 'User', 'Manager', 'Guest'];
-    const statuses = ['Active', 'Inactive', 'Pending'];
-    
-    return Array.from({ length: count }, (_, i) => ({
+    this.rows = Array.from({ length: 100 }, (_, i) => ({
       id: i + 1,
       name: `User ${i + 1}`,
       email: `user${i + 1}@example.com`,
-      role: roles[i % roles.length],
-      status: statuses[i % statuses.length]
+      age: 20 + Math.floor(Math.random() * 40),
+      salary: 30000 + Math.floor(Math.random() * 100000),
+      department: departments[Math.floor(Math.random() * departments.length)],
+      phone: `+1-555-${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`,
+      status: statuses[Math.floor(Math.random() * statuses.length)]
     }));
   }
 
-  startEdit(column: string, row: NgxsmkRow, event?: Event) {
-    if (event) {
-      event.stopPropagation();
-    }
-    
-    const rowId = row['id'] as number;
-    const originalValue = row[column];
-    
-    console.log('🔵 startEdit called:', { 
-      column, 
-      rowId, 
-      row,
-      originalValue,
-      previousEditingCell: this.editingCell
-    });
-    
-    this.editingCell = { rowId, column, originalValue };
-    
-    this.cdr.detectChanges();
-    
-    setTimeout(() => {
-      const input = document.querySelector('.edit-input, .edit-select') as HTMLInputElement;
-      console.log('🟣 Looking for input element, found:', input);
-      if (input) {
-        input.focus();
-        if (input.type === 'text' || input.type === 'email') {
-          input.select();
-        }
-        console.log('✅ Input focused and selected');
-      } else {
-        console.error('❌ No input element found! Check if template is rendering.');
+  private setupValidation() {
+    // Name validation
+    this.editingService.setValidationRules('name', [
+      { type: 'required', message: 'Name is required' },
+      { type: 'minLength', value: 3, message: 'Name must be at least 3 characters' },
+      { type: 'maxLength', value: 50, message: 'Name cannot exceed 50 characters' }
+    ]);
+
+    // Email validation
+    this.editingService.setValidationRules('email', [
+      { type: 'required', message: 'Email is required' },
+      { type: 'email', message: 'Invalid email format' }
+    ]);
+
+    // Age validation
+    this.editingService.setValidationRules('age', [
+      { type: 'required', message: 'Age is required' },
+      { type: 'min', value: 18, message: 'Age must be at least 18' },
+      { type: 'max', value: 100, message: 'Age cannot exceed 100' }
+    ]);
+
+    // Salary validation
+    this.editingService.setValidationRules('salary', [
+      { type: 'required', message: 'Salary is required' },
+      { type: 'min', value: 0, message: 'Salary cannot be negative' },
+      { type: 'max', value: 1000000, message: 'Salary cannot exceed $1,000,000' }
+    ]);
+
+    // Phone validation
+    this.editingService.setValidationRules('phone', [
+      { 
+        type: 'pattern', 
+        value: '^\\+?[0-9\\-\\s()]+$',
+        message: 'Invalid phone format'
       }
-    }, 10);
+    ]);
   }
 
-  saveEdit(row: NgxsmkRow, column: string) {
-    const rowId = row['id'] as number;
-    if (this.editingCell.rowId === rowId && this.editingCell.column === column) {
-      const newValue = row[column];
-      const originalValue = this.editingCell.originalValue;
-      
-      if (newValue !== originalValue) {
-        this.editCount++;
-        this.changedRows.add(rowId);
-        
-        this.changeLog.push({
-          timestamp: new Date(),
-          message: `Updated ${column} for ${row['name']} from "${originalValue}" to "${newValue}"`
-        });
-        
-        console.log('💾 Value changed and saved:', { column, rowId, originalValue, newValue });
-      } else {
-        console.log('ℹ️ No change detected, skipping edit count');
-      }
-      
-      this.editingCell = { rowId: -1, column: '', originalValue: null };
+  private setupUndoRedo() {
+    this.undoRedoService.setConfig({
+      enabled: true,
+      maxUndoStackSize: 50,
+      undoInlineEdit: true
+    });
+
+    // Subscribe to undo/redo state changes
+    this.undoRedoService.canUndo$.subscribe(can => {
+      this.canUndo = can;
+      this.lastActionDesc = this.undoRedoService.getLastActionDescription() || '';
       this.cdr.detectChanges();
+    });
+
+    this.undoRedoService.canRedo$.subscribe(can => {
+      this.canRedo = can;
+      this.nextRedoDesc = this.undoRedoService.getNextRedoDescription() || '';
+      this.cdr.detectChanges();
+    });
+  }
+
+  private setupEventListeners() {
+    // Listen to successful edits
+    this.editingService.cellEdit$.subscribe(edit => {
+      this.totalEdits++;
+      this.logEvent('edit', `Edited ${edit.column.name}: "${edit.oldValue}" → "${edit.newValue}"`);
+
+      // Add to undo stack
+      this.undoRedoService.addAction({
+        type: 'edit',
+        data: edit,
+        undo: () => {
+          const prop = edit.column.prop || edit.column.id;
+          (edit.row as any)[prop] = edit.oldValue;
+          this.logEvent('undo', `Undid edit of ${edit.column.name}`);
+          // Force change detection by creating new array reference
+          this.rows = [...this.rows];
+          this.cdr.detectChanges();
+        },
+        redo: () => {
+          const prop = edit.column.prop || edit.column.id;
+          (edit.row as any)[prop] = edit.newValue;
+          this.logEvent('redo', `Redid edit of ${edit.column.name}`);
+          // Force change detection by creating new array reference
+          this.rows = [...this.rows];
+          this.cdr.detectChanges();
+        },
+        description: `Edit ${edit.column.name}`
+      });
+    });
+
+    // Listen to validation errors
+    this.editingService.validationError$.subscribe(({ errors, state }) => {
+      this.validationErrors++;
+      this.currentErrors = errors;
+      this.logEvent('error', `Validation failed: ${errors.join(', ')}`);
+      this.cdr.detectChanges();
+    });
+
+    // Listen to edit cancel
+    this.editingService.cellEditCancel$.subscribe(state => {
+      this.logEvent('cancel', `Cancelled edit of ${state.column.name}`);
+      this.currentErrors = [];
+      this.cdr.detectChanges();
+    });
+
+    // Clear errors when starting new edit
+    this.editingService.editing$.subscribe(state => {
+      if (state?.isEditing) {
+        this.currentErrors = [];
+      }
+    });
+  }
+
+  private setupKeyboardShortcuts() {
+    document.addEventListener('keydown', (e) => {
+      // Ctrl+Z for undo
+      if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        this.undo();
+      }
+      // Ctrl+Y or Ctrl+Shift+Z for redo
+      if ((e.ctrlKey && e.key === 'y') || (e.ctrlKey && e.shiftKey && e.key === 'z')) {
+        e.preventDefault();
+        this.redo();
+      }
+    });
+  }
+
+  onCellDblClick(event: { event: Event; row: any; column: any; value: any; rowIndex: number; cellElement: HTMLElement }) {
+    const column = event.column;
+    const row = event.row;
+    const rowIndex = event.rowIndex;
+    const colIndex = this.columns.findIndex(c => c.id === column.id);
+
+    // Don't edit ID column
+    if (column.id === 'id') return;
+
+    // Store the clicked cell element for positioning
+    this.lastClickedCell = {
+      element: event.cellElement,
+      rowIndex,
+      colIndex
+    };
+
+    // Get the current value
+    const prop = column.prop || column.id;
+    this.editValue = event.value;
+
+    this.editingService.startEdit(row, column, rowIndex, colIndex);
+    
+    // Log the double-click
+    this.logEvent('dblclick', `Double-clicked ${column.name} on row ${rowIndex + 1}`);
+  }
+
+  getEditPosition(): { top: number; left: number; width: number; height: number } {
+    if (!this.lastClickedCell) {
+      return { top: 0, left: 0, width: 0, height: 0 };
+    }
+
+    const cellElement = this.lastClickedCell.element;
+    const rect = cellElement.getBoundingClientRect();
+    const container = cellElement.closest('.datatable-container');
+    
+    if (!container) {
+      return { top: 0, left: 0, width: 0, height: 0 };
+    }
+
+    const containerRect = container.getBoundingClientRect();
+
+    return {
+      top: rect.top - containerRect.top,
+      left: rect.left - containerRect.left,
+      width: rect.width,
+      height: rect.height
+    };
+  }
+
+  commitEdit(moveToNextRow: boolean = false) {
+    const success = this.editingService.commitEdit(this.editValue);
+    if (success) {
+      const lastCell = this.lastClickedCell;
+      this.lastClickedCell = null;
+      this.editValue = '';
+      // Force change detection to update the table immediately
+      this.rows = [...this.rows];
+      this.cdr.detectChanges();
+      
+      // Move to next row if requested (Enter key behavior)
+      if (moveToNextRow && lastCell) {
+        const nextRowIndex = lastCell.rowIndex + 1;
+        if (nextRowIndex < this.rows.length) {
+          setTimeout(() => {
+            // Find the same column in the next row
+            const column = this.columns[lastCell.colIndex];
+            const nextRow = this.rows[nextRowIndex];
+            
+            // Auto-focus next cell (requires manual click for now, but shows the row)
+            this.logEvent('navigate', `Auto-navigated to row ${nextRowIndex + 1} after Enter`);
+          }, 100);
+        }
+      }
     }
   }
 
   cancelEdit() {
-    this.editingCell = { rowId: -1, column: '', originalValue: null };
-    this.cdr.detectChanges();
+    this.editingService.cancelEdit();
+    this.lastClickedCell = null;
+    this.editValue = '';
+    this.currentErrors = [];
   }
 
-  toggleStatus(row: NgxsmkRow, rowIndex: number, event?: Event) {
-    if (event) {
-      event.stopPropagation();
+  undo() {
+    if (this.undoRedoService.undo()) {
+      this.cdr.detectChanges();
     }
-    
-    const statuses = ['Active', 'Inactive', 'Pending'];
-    const currentIndex = statuses.indexOf(row['status'] as string);
-    row['status'] = statuses[(currentIndex + 1) % statuses.length];
-    
-    this.editCount++;
-    this.changedRows.add(row['id'] as number);
-    
-    this.changeLog.push({
-      timestamp: new Date(),
-      message: `Changed status for ${row['name']} to ${row['status']}`
-    });
-    
-    this.cdr.detectChanges();
   }
 
-  saveAll() {
-    alert(`Saving ${this.changedRows.size} modified rows to server...`);
-    this.changeLog.push({
-      timestamp: new Date(),
-      message: `Saved all changes (${this.changedRows.size} rows modified)`
-    });
+  redo() {
+    if (this.undoRedoService.redo()) {
+      this.cdr.detectChanges();
+    }
   }
 
-  resetChanges() {
-    this.rows = JSON.parse(JSON.stringify(this.originalData));
-    this.changedRows.clear();
-    this.editCount = 0;
-    this.changeLog.push({
-      timestamp: new Date(),
-      message: 'Reset all changes to original data'
-    });
-    this.cdr.detectChanges();
+  clearHistory() {
+    this.events = [];
+    this.totalEdits = 0;
+    this.validationErrors = 0;
+    this.undoRedoService.clear();
   }
 
-  exportChanges() {
-    const modifiedRows = this.rows.filter(row => this.changedRows.has(row['id'] as number));
-    console.log('Modified rows:', modifiedRows);
-    alert(`Exporting ${modifiedRows.length} modified rows...`);
-    
-    this.changeLog.push({
-      timestamp: new Date(),
-      message: `Exported ${modifiedRows.length} modified rows`
+  getEventIcon(type: string): string {
+    const icons: { [key: string]: string } = {
+      'edit': 'fas fa-edit',
+      'error': 'fas fa-exclamation-circle',
+      'cancel': 'fas fa-times',
+      'undo': 'fas fa-undo',
+      'redo': 'fas fa-redo'
+    };
+    return icons[type] || 'fas fa-info-circle';
+  }
+
+  private logEvent(type: string, message: string) {
+    this.events.push({
+      time: new Date(),
+      type,
+      message
     });
   }
 }
-

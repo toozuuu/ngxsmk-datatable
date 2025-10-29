@@ -23,8 +23,75 @@
     </div>
   }
 
-  <!-- Data table content -->
-  @if (!loadingIndicator && rows.length > 0) {
+  <!-- Card View (Mobile) -->
+  @if (!loadingIndicator && rows.length > 0 && isCardView) {
+    <div class="ngxsmk-datatable__card-view">
+      @for (row of visibleRows; track row['id'] || row; let i = $index) {
+        <div 
+          class="ngxsmk-datatable__card"
+          [class.ngxsmk-datatable__card--selected]="selectionModel.isSelected(row)"
+          (click)="handleRowSelection($event, row)"
+        >
+          <!-- Selection checkbox -->
+          @if (selectionType === 'checkbox') {
+            <div class="ngxsmk-datatable__card-checkbox">
+              <input
+                type="checkbox"
+                [checked]="selectionModel.isSelected(row)"
+                (click)="$event.stopPropagation()"
+                (change)="handleRowSelection($event, row)"
+              />
+            </div>
+          }
+
+          <!-- Card image -->
+          @if (getCardImage(row)) {
+            <div class="ngxsmk-datatable__card-image">
+              <img [src]="getCardImage(row)" [alt]="getCardTitle(row)" />
+            </div>
+          }
+
+          <!-- Card content -->
+          <div class="ngxsmk-datatable__card-content">
+            <!-- Title -->
+            <div class="ngxsmk-datatable__card-title">{{ getCardTitle(row) }}</div>
+            
+            <!-- Subtitle -->
+            @if (getCardSubtitle(row)) {
+              <div class="ngxsmk-datatable__card-subtitle">{{ getCardSubtitle(row) }}</div>
+            }
+            
+            <!-- Description -->
+            @if (getCardDescription(row)) {
+              <div class="ngxsmk-datatable__card-description">{{ getCardDescription(row) }}</div>
+            }
+            
+            <!-- Badges -->
+            @if (getCardBadges(row).length > 0) {
+              <div class="ngxsmk-datatable__card-badges">
+                @for (badge of getCardBadges(row); track badge.label) {
+                  <span class="ngxsmk-datatable__card-badge">{{ badge.value }}</span>
+                }
+              </div>
+            }
+            
+            <!-- Meta fields -->
+            <div class="ngxsmk-datatable__card-meta">
+              @for (field of getCardMetaFields(row); track field.label) {
+                <div class="ngxsmk-datatable__card-meta-item">
+                  <span class="ngxsmk-datatable__card-meta-label">{{ field.label }}:</span>
+                  <span class="ngxsmk-datatable__card-meta-value">{{ field.value }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Data table content (Desktop/Tablet) -->
+  @if (!loadingIndicator && rows.length > 0 && !isCardView) {
     <div class="ngxsmk-datatable__content">
       
       <!-- Header -->
@@ -63,7 +130,7 @@
           }
 
           <!-- Frozen left columns -->
-          @for (column of frozenLeftColumns; track column.id) {
+          @for (column of frozenLeftColumns; track column.id; let i = $index) {
             <div 
               class="ngxsmk-datatable__header-cell ngxsmk-datatable__header-cell--frozen-left"
               [class]="getHeaderClass(column)"
@@ -71,7 +138,14 @@
               [class.ngxsmk-datatable__header-cell--sortable]="column.sortable"
               [class.ngxsmk-datatable__header-cell--sorted]="isColumnSorted(column)"
               [class.ngxsmk-datatable__header-cell--resizing]="isResizingColumn(column)"
+              [class.ngxsmk-datatable__header-cell--dragging]="isDraggingColumn(column)"
+              [class.ngxsmk-datatable__header-cell--drag-over]="isDragOverColumn(column)"
+              [attr.draggable]="enableColumnReorder && !isResizingColumn(column)"
               (click)="onHeaderClick($event, column)"
+              (dragstart)="onColumnDragStart($event, column, i)"
+              (dragover)="onColumnDragOver($event, column, i)"
+              (drop)="onColumnDrop($event)"
+              (dragend)="onColumnDragEnd($event)"
             >
               <div class="ngxsmk-datatable__header-cell-content">
                 <span class="ngxsmk-datatable__header-cell-text">{{ column.name }}</span>
@@ -94,7 +168,7 @@
           }
 
           <!-- Scrollable columns -->
-          @for (column of scrollableColumns; track column.id) {
+          @for (column of scrollableColumns; track column.id; let i = $index) {
             <div 
               class="ngxsmk-datatable__header-cell"
               [class]="getHeaderClass(column)"
@@ -102,7 +176,14 @@
               [class.ngxsmk-datatable__header-cell--sortable]="column.sortable"
               [class.ngxsmk-datatable__header-cell--sorted]="isColumnSorted(column)"
               [class.ngxsmk-datatable__header-cell--resizing]="isResizingColumn(column)"
+              [class.ngxsmk-datatable__header-cell--dragging]="isDraggingColumn(column)"
+              [class.ngxsmk-datatable__header-cell--drag-over]="isDragOverColumn(column)"
+              [attr.draggable]="enableColumnReorder && !isResizingColumn(column)"
               (click)="onHeaderClick($event, column)"
+              (dragstart)="onColumnDragStart($event, column, frozenLeftColumns.length + i)"
+              (dragover)="onColumnDragOver($event, column, frozenLeftColumns.length + i)"
+              (drop)="onColumnDrop($event)"
+              (dragend)="onColumnDragEnd($event)"
             >
               <div class="ngxsmk-datatable__header-cell-content">
                 <span class="ngxsmk-datatable__header-cell-text">{{ column.name }}</span>
@@ -125,7 +206,7 @@
           }
 
           <!-- Frozen right columns -->
-          @for (column of frozenRightColumns; track column.id) {
+          @for (column of frozenRightColumns; track column.id; let i = $index) {
             <div 
               class="ngxsmk-datatable__header-cell ngxsmk-datatable__header-cell--frozen-right"
               [class]="getHeaderClass(column)"
@@ -133,7 +214,14 @@
               [class.ngxsmk-datatable__header-cell--sortable]="column.sortable"
               [class.ngxsmk-datatable__header-cell--sorted]="isColumnSorted(column)"
               [class.ngxsmk-datatable__header-cell--resizing]="isResizingColumn(column)"
+              [class.ngxsmk-datatable__header-cell--dragging]="isDraggingColumn(column)"
+              [class.ngxsmk-datatable__header-cell--drag-over]="isDragOverColumn(column)"
+              [attr.draggable]="enableColumnReorder && !isResizingColumn(column)"
               (click)="onHeaderClick($event, column)"
+              (dragstart)="onColumnDragStart($event, column, frozenLeftColumns.length + scrollableColumns.length + i)"
+              (dragover)="onColumnDragOver($event, column, frozenLeftColumns.length + scrollableColumns.length + i)"
+              (drop)="onColumnDrop($event)"
+              (dragend)="onColumnDragEnd($event)"
             >
               <div class="ngxsmk-datatable__header-cell-content">
                 <span class="ngxsmk-datatable__header-cell-text">{{ column.name }}</span>
@@ -239,12 +327,14 @@
 
             <!-- Frozen left cells -->
             @for (column of frozenLeftColumns; track column.id) {
-              <div 
-                class="ngxsmk-datatable__cell ngxsmk-datatable__cell--frozen-left"
-                [class]="getCellClass(row, column, row[column.prop || column.id], getActualRowIndex(i))"
-                [style.width.px]="columnWidths[column.id]"
-                (click)="onCellClick($event, row, column, row[column.prop || column.id])"
-              >
+            <div 
+              class="ngxsmk-datatable__cell ngxsmk-datatable__cell--frozen-left"
+              [class]="getCellClass(row, column, row[column.prop || column.id], getActualRowIndex(i))"
+              [class.ngxsmk-datatable__cell--multiline]="column.multiLine"
+              [style.width.px]="columnWidths[column.id]"
+              (click)="onCellClick($event, row, column, row[column.prop || column.id])"
+              (dblclick)="onCellDblClick($event, row, column, row[column.prop || column.id], getActualRowIndex(i))"
+            >
                 <div class="ngxsmk-datatable__cell-content">
                   @if (column.cellTemplate) {
                     <ng-container 
@@ -262,8 +352,10 @@
               <div 
                 class="ngxsmk-datatable__cell"
                 [class]="getCellClass(row, column, row[column.prop || column.id], getActualRowIndex(i))"
+                [class.ngxsmk-datatable__cell--multiline]="column.multiLine"
                 [style.width.px]="columnWidths[column.id]"
                 (click)="onCellClick($event, row, column, row[column.prop || column.id])"
+                (dblclick)="onCellDblClick($event, row, column, row[column.prop || column.id], getActualRowIndex(i))"
               >
                 <div class="ngxsmk-datatable__cell-content">
                   @if (column.cellTemplate) {
@@ -282,8 +374,10 @@
               <div 
                 class="ngxsmk-datatable__cell ngxsmk-datatable__cell--frozen-right"
                 [class]="getCellClass(row, column, row[column.prop || column.id], getActualRowIndex(i))"
+                [class.ngxsmk-datatable__cell--multiline]="column.multiLine"
                 [style.width.px]="columnWidths[column.id]"
                 (click)="onCellClick($event, row, column, row[column.prop || column.id])"
+                (dblclick)="onCellDblClick($event, row, column, row[column.prop || column.id], getActualRowIndex(i))"
               >
                 <div class="ngxsmk-datatable__cell-content">
                   @if (column.cellTemplate) {

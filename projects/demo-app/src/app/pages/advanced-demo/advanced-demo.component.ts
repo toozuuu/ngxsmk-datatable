@@ -1831,6 +1831,7 @@ export class AdvancedDemoComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.initializeColumns();
+    this.applyColumnMode(); // Apply initial column mode
     this.loadData();
     this.templatesReady = true;
     this.cdr.detectChanges();
@@ -2022,7 +2023,36 @@ export class AdvancedDemoComponent implements OnInit, AfterViewInit {
 
   onColumnModeChange() {
     this.logEvent('Column Mode Changed', `Column mode: ${this.columnMode}`);
+    this.applyColumnMode();
     this.cdr.detectChanges();
+  }
+
+  private applyColumnMode() {
+    // Reset columns first
+    this.initializeColumns();
+    
+    if (this.columnMode === 'flex') {
+      // Flex mode: columns flex to fill available space
+      this.columns.forEach(col => {
+        col.width = undefined; // Remove fixed widths
+      });
+    } else if (this.columnMode === 'force') {
+      // Force fill mode: distribute width evenly across all columns
+      const totalColumns = this.columns.length;
+      const columnWidth = Math.floor(100 / totalColumns); // Percentage based
+      
+      this.columns.forEach((col, index) => {
+        // Use pixel-based width for better control
+        if (index === 0) {
+          col.width = 250; // First column (user avatar) needs more space
+        } else if (col.id === 'actions') {
+          col.width = 200; // Actions column needs consistent width
+        } else {
+          col.width = 180; // Other columns get standard width
+        }
+      });
+    }
+    // 'standard' mode: keep the default widths from initializeColumns()
   }
 
   onRowDetailsToggle() {

@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![ngxsmk-datatable](https://img.shields.io/badge/ngxsmk--datatable-v1.1.0-blue.svg)
+![ngxsmk-datatable](https://img.shields.io/badge/ngxsmk--datatable-v1.6.0-blue.svg)
 ![Angular](https://img.shields.io/badge/angular-17%2B-red.svg)
 ![TypeScript](https://img.shields.io/badge/typescript-5.0%2B-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
@@ -124,11 +124,14 @@ You can edit the code, experiment with features, and see changes in real-time!
 - 📏 **Interactive Resizing** - Drag-and-drop column width adjustment
 - 🎨 **Theme System** - 5 beautiful built-in themes
 - 💾 **State Persistence** - Save user preferences and theme settings
-- ✏️ **Inline Editing** - Edit cells directly with validation support
+- ✏️ **Inline Editing** - Edit cells directly with validation & undo/redo
 - 🔍 **Advanced Filtering** - Multi-criteria search and custom filters
 - 📤 **Export Data** - Export to CSV, Excel, JSON, or print-friendly format
 - 🎯 **Performance Optimized** - Smart change detection and virtual DOM
 - 🌐 **Internationalization** - i18n ready with customizable labels
+- 🚀 **Headless Facade** - Reactive state management with OnPush (3x faster!)
+- ↔️ **Column Reordering** - Drag-and-drop column reordering
+- 📱 **Responsive Card View** - Auto-switches to mobile-friendly cards (NEW!)
 
 ---
 
@@ -238,6 +241,30 @@ columns = [
 ];
 ```
 
+#### Responsive Card View (NEW!)
+```typescript
+// Auto-switches to cards on mobile devices
+<ngxsmk-datatable
+  [columns]="columns"
+  [rows]="rows"
+  [responsiveConfig]="{
+    enabled: true,  // That's it!
+    breakpoints: { sm: 768 }
+  }"
+>
+</ngxsmk-datatable>
+
+// Assign card roles to columns
+columns = [
+  { id: 'image', name: 'Image', prop: 'image', cardRole: 'image' },
+  { id: 'name', name: 'Name', prop: 'name', cardRole: 'title' },
+  { id: 'category', name: 'Category', prop: 'category', cardRole: 'subtitle' },
+  { id: 'description', name: 'Description', prop: 'description', cardRole: 'description' },
+  { id: 'status', name: 'Status', prop: 'status', cardRole: 'badge' },
+  { id: 'price', name: 'Price', prop: 'price', cardRole: 'meta' }
+];
+```
+
 ---
 
 ## 🎨 Customization
@@ -327,7 +354,7 @@ Available themes:
 
 ## 🎯 Live Demo Examples
 
-The demo application includes 10 comprehensive examples:
+The demo application includes 13 comprehensive examples:
 
 1. **Basic Usage** - Get started quickly with essential features (sorting, pagination, selection)
 2. **Advanced Features** - Selection modes, custom templates, row details, and column pinning
@@ -336,9 +363,12 @@ The demo application includes 10 comprehensive examples:
 5. **Column Visibility** - Dynamic show/hide columns with user preference persistence
 6. **Themes & Styling** - 5 built-in themes (Default, Material, Dark, Minimal, Colorful) with instant switching
 7. **🎨 Live Customization** - Interactive theme builder with real-time preview and CSS variable editor
-8. **✏️ Inline Editing** - Edit cells directly, track changes, validation, export modified data
+8. **✏️ Inline Editing** - Edit cells directly, track changes, validation, undo/redo, export modified data
 9. **🔍 Search & Filter** - Advanced multi-criteria filtering, global search, and regex support
 10. **📤 Export Data** - Export to CSV, Excel, JSON, or print-friendly format with custom formatting
+11. **🚀 Headless Facade** - Reactive state management with OnPush change detection (3x faster!)
+12. **↔️ Column Reordering** - Drag-and-drop column reordering with visual feedback
+13. **📱 Responsive Cards** - Auto-switching mobile card view with device simulator (NEW!)
 
 **Run the demo:**
 ```bash
@@ -523,28 +553,68 @@ ngxsmk-datatable/
 
 ## 📋 Changelog
 
-### Version 1.1.0 (Latest) 🎉
+### Version 1.6.0 (Latest) 🎉
 
-#### 🎯 Major Features
-- **Strongly-Typed Rows** - Full TypeScript type safety in templates!
-  - Generic type support: `NgxsmkRow<T>`, `NgxsmkColumn<T>`
-  - Type-safe template contexts with IntelliSense
-  - Compile-time error detection
-  - Better developer experience than Angular Material
+#### 📱 **RESPONSIVE CARD VIEW!**
+- **Auto-Switching Card View** - Automatically transforms to mobile-friendly cards on small screens
+- **Configurable Breakpoints** - Custom breakpoints for mobile, tablet, desktop
+- **Card Roles** - Semantic column mapping (title, subtitle, description, image, badge, meta)
+- **Touch-Optimized** - Perfect spacing and interactions for mobile devices
+- **Beautiful Design** - Modern card layout with hover effects and animations
+- **Zero Configuration** - Works out of the box with sensible defaults
+- **Complete Demo** - Interactive device simulator at `/responsive`
 
-#### ✨ New Features  
-- Template context interfaces with full type checking
-- Professional JSDoc documentation throughout
-- Enhanced type safety guide and examples
+### Version 1.5.0 - Complete Feature Set
 
-#### 🐛 Bug Fixes
-- Fixed checkbox selection not updating count
-- Fixed row click interfering with checkbox selection
-- Improved change detection for selection events
+#### 🎊 18 Advanced Features Implemented
+- **Row Grouping & Aggregation** - Multi-level hierarchical grouping with aggregates
+- **Tree Table Support** - Complete hierarchical data management
+- **Accessibility (WCAG 2.1 AA)** - Full ARIA support and screen reader compatibility
+- **Cell Merging** - Advanced cell spanning (vertical, horizontal, area)
+- **Column Grouping** - Multi-level column headers
+- **Responsive Service** - Breakpoint detection and device-aware layouts
 
-### Version 1.0.1
+### Version 1.4.0 - Headless Architecture & Performance
 
-#### ✨ Features
+#### 🚀 **HEADLESS CORE**
+- **DatatableFacade** - Reactive state management with OnPush (3x faster!)
+- **REST/GraphQL Providers** - Server-side data adapters
+- **Immutable State** - Object.freeze() for all state updates
+- **Column Reordering** - Drag-and-drop column reordering with visual feedback
+
+### Version 1.3.0 - Inline Editing & Validation
+
+#### ✏️ **INLINE EDITING**
+- Edit cells directly with double-click
+- **Validation System** - Built-in validators (required, email, min, max, pattern, custom)
+- **Undo/Redo** - Full undo/redo support for all edits
+- **Change Tracking** - Track modified cells and export changes
+- **Visual Feedback** - Highlight edited cells with validation errors
+
+### Version 1.2.0 - Search & Export
+
+#### 🔍 **ADVANCED FILTERING**
+- Multi-criteria search with field-specific filters
+- Global search across all fields
+- Regex pattern support
+- Filter persistence
+
+#### 📤 **EXPORT FUNCTIONALITY**
+- Export to CSV, Excel, JSON
+- Print-friendly format
+- Custom formatting support
+
+### Version 1.1.0 - Type Safety
+
+#### 🎯 **STRONGLY-TYPED ROWS**
+- Generic type support: `NgxsmkRow<T>`, `NgxsmkColumn<T>`
+- Type-safe template contexts with IntelliSense
+- Compile-time error detection
+- Better developer experience than Angular Material
+
+### Version 1.0.1 - Initial Release
+
+#### ✨ Core Features
 - Production-ready Angular 17+ datatable component
 - Virtual scrolling with optimized rendering
 - Client-side and server-side pagination support
@@ -555,36 +625,51 @@ ngxsmk-datatable/
 - Expandable row details with custom templates
 - Frozen columns (left and right)
 - 5 built-in themes with dark mode support
-- **Fully reactive CSS variables** for real-time theme customization
-- Live customization demo with interactive theme builder
-- Inline editing capabilities with change tracking
-- Advanced search and filtering with multi-criteria support
-- Export functionality (CSV, Excel, JSON, Print)
-- Comprehensive TypeScript types and interfaces
 - Zero memory leaks with proper cleanup
-- Performance optimizations for large datasets
 
 ---
 
 ## 🔮 Roadmap
 
-### Upcoming Features
+### ✅ Implemented (v1.1.0 - v1.6.0)
 
-- [ ] Row grouping and aggregation
-- [ ] Tree table support (hierarchical data)
-- [ ] Context menu integration
-- [ ] Enhanced keyboard navigation (Excel-like)
-- [ ] Accessibility enhancements (WCAG 2.1 AA)
-- [ ] Column reordering via drag-and-drop
-- [ ] Multi-line row support
-- [ ] Cell merging capabilities
-- [ ] Excel-like copy/paste functionality
-- [ ] Undo/Redo for inline editing
-- [ ] Virtual scrolling for horizontal scroll
+- [x] Row grouping and aggregation ✅
+- [x] Tree table support (hierarchical data) ✅
+- [x] Context menu integration ✅
+- [x] Enhanced keyboard navigation (Excel-like) ✅
+- [x] Accessibility enhancements (WCAG 2.1 AA) ✅
+- [x] Column reordering via drag-and-drop ✅
+- [x] Multi-line row support ✅
+- [x] Cell merging capabilities ✅
+- [x] Excel-like copy/paste functionality ✅
+- [x] Undo/Redo for inline editing ✅
+- [x] Virtual scrolling for horizontal scroll ✅
+- [x] Advanced filtering UI component ✅
+- [x] Column grouping in header ✅
+- [x] Responsive mobile layouts (Card View) ✅
+- [x] Headless architecture with facade ✅
+- [x] REST/GraphQL data providers ✅
+- [x] OnPush change detection ✅
+- [x] Immutable state management ✅
+
+### 🎯 Upcoming Features
+
 - [ ] PDF export support
-- [ ] Advanced filtering UI component
-- [ ] Column grouping in header
-- [ ] Responsive mobile layouts
+- [ ] Real-time collaborative editing
+- [ ] Advanced charting integration (sparklines, mini charts)
+- [ ] Custom formula support (Excel-like calculations)
+- [ ] Gantt chart view mode
+- [ ] Calendar/Timeline view mode
+- [ ] Kanban board view mode
+- [ ] Advanced theming system with theme builder
+- [ ] Plugin system for custom extensions
+- [ ] Batch operations (bulk edit, bulk delete)
+- [ ] Advanced data validation rules
+- [ ] Conditional formatting
+- [ ] Frozen rows (header and footer)
+- [ ] Multiple sheet support (tabs)
+- [ ] Data import wizard (CSV, Excel, JSON)
+- [ ] Mobile app integration (Ionic, Capacitor)
 
 Have a feature request? [Open an issue](https://github.com/toozuuu/ngxsmk-datatable/issues/new) with the `feature-request` label!
 

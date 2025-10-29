@@ -55,7 +55,7 @@ import { CommonModule } from '@angular/common';
         <aside class="sidebar">
           <div class="sidebar-header">
             <h3>Demos</h3>
-            <span class="badge">10 Examples</span>
+            <span class="badge">13 Examples</span>
           </div>
           
           <nav class="sidebar-nav">
@@ -134,8 +134,8 @@ import { CommonModule } from '@angular/common';
                 <i class="fas fa-edit"></i>
               </div>
               <div class="nav-content">
-                <span class="nav-title">Inline Editing</span>
-                <span class="nav-desc">Edit cells directly</span>
+                <span class="nav-title">⚡ Inline Editing NEW!</span>
+                <span class="nav-desc">Validation & Undo/Redo</span>
               </div>
             </a>
             
@@ -156,6 +156,36 @@ import { CommonModule } from '@angular/common';
               <div class="nav-content">
                 <span class="nav-title">Export Data</span>
                 <span class="nav-desc">CSV, Excel, JSON, Print</span>
+              </div>
+            </a>
+            
+            <a routerLink="/facade" routerLinkActive="active" class="nav-link">
+              <div class="nav-icon">
+                <i class="fas fa-rocket"></i>
+              </div>
+              <div class="nav-content">
+                <span class="nav-title">🚀 Facade (NEW!)</span>
+                <span class="nav-desc">Headless + OnPush</span>
+              </div>
+            </a>
+            
+            <a routerLink="/column-reorder" routerLinkActive="active" class="nav-link">
+              <div class="nav-icon">
+                <i class="fas fa-arrows-alt-h"></i>
+              </div>
+              <div class="nav-content">
+                <span class="nav-title">↔️ Column Reorder (NEW!)</span>
+                <span class="nav-desc">Drag & Drop</span>
+              </div>
+            </a>
+            
+            <a routerLink="/responsive" routerLinkActive="active" class="nav-link">
+              <div class="nav-icon">
+                <i class="fas fa-mobile-alt"></i>
+              </div>
+              <div class="nav-content">
+                <span class="nav-title">📱 Responsive Cards (NEW!)</span>
+                <span class="nav-desc">Auto mobile view</span>
               </div>
             </a>
           </nav>
@@ -224,13 +254,13 @@ import { CommonModule } from '@angular/common';
     }
 
     .app-title {
-      font-size: 1.8rem;
+      font-size: 1.5rem;
       font-weight: 700;
       margin: 0;
     }
 
     .app-subtitle {
-      font-size: 0.9rem;
+      font-size: 0.875rem;
       margin: 0;
       opacity: 0.9;
     }
@@ -307,7 +337,7 @@ import { CommonModule } from '@angular/common';
 
     .sidebar-header h3 {
       margin: 0;
-      font-size: 1.3rem;
+      font-size: 1.125rem;
       color: #1f2937;
     }
 
@@ -316,7 +346,7 @@ import { CommonModule } from '@angular/common';
       color: white;
       padding: 4px 10px;
       border-radius: 12px;
-      font-size: 0.75rem;
+      font-size: 0.6875rem;
       font-weight: 600;
     }
 
@@ -361,7 +391,7 @@ import { CommonModule } from '@angular/common';
       border-radius: 8px;
       background: #f3f4f6;
       color: #667eea;
-      font-size: 1.2rem;
+      font-size: 1.125rem;
       transition: all 0.2s;
       flex-shrink: 0;
     }
@@ -379,12 +409,12 @@ import { CommonModule } from '@angular/common';
 
     .nav-title {
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 0.875rem;
       line-height: 1.2;
     }
 
     .nav-desc {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       opacity: 0.8;
     }
 
@@ -396,7 +426,7 @@ import { CommonModule } from '@angular/common';
 
     .sidebar-features h4 {
       margin: 0 0 12px 0;
-      font-size: 1rem;
+      font-size: 0.9375rem;
       color: #1f2937;
     }
 
@@ -408,7 +438,7 @@ import { CommonModule } from '@angular/common';
 
     .sidebar-features li {
       padding: 6px 0;
-      font-size: 0.85rem;
+      font-size: 0.8125rem;
       color: #6b7280;
     }
 
@@ -436,11 +466,11 @@ import { CommonModule } from '@angular/common';
       }
       
       .app-title {
-        font-size: 1.4rem;
+        font-size: 1.25rem;
       }
       
       .app-subtitle {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
       }
       
       .sidebar {

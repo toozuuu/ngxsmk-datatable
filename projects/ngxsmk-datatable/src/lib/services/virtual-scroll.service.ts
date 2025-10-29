@@ -9,6 +9,15 @@ export interface VirtualScrollState {
   scrollTop: number;
 }
 
+export interface HorizontalVirtualScrollState {
+  startColumnIndex: number;
+  endColumnIndex: number;
+  visibleColumns: any[];
+  totalWidth: number;
+  scrollLeft: number;
+  leftOffset: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -107,5 +116,151 @@ export class VirtualScrollService {
     const bottomHeight = Math.max(0, (totalItems - endIndex - 1) * itemHeight);
     
     return { top: topHeight, bottom: bottomHeight };
+  }
+
+  // ============================================
+  // Horizontal Virtual Scrolling Methods
+  // ============================================
+
+  /**
+   * Calculate visible columns based on horizontal scroll position
+   */
+  calculateVisibleColumns(
+    columns: any[],
+    columnWidths: { [key: string]: number },
+    containerWidth: number,
+    scrollLeft: number,
+    bufferSize: number = 2
+  ): HorizontalVirtualScrollState {
+    if (!columns || columns.length === 0) {
+      return {
+        startColumnIndex: 0,
+        endColumnIndex: 0,
+        visibleColumns: [],
+        totalWidth: 0,
+        scrollLeft: 0,
+        leftOffset: 0
+      };
+    }
+
+    // Calculate cumulative widths
+    const cumulativeWidths: number[] = [];
+    let totalWidth = 0;
+    
+    for (let i = 0; i < columns.length; i++) {
+      const col = columns[i];
+      const width = columnWidths[col.id] || col.width || 150;
+      totalWidth += width;
+      cumulativeWidths.push(totalWidth);
+    }
+
+    // Find start column index
+    let startColumnIndex = 0;
+    for (let i = 0; i < cumulativeWidths.length; i++) {
+      if (cumulativeWidths[i] > scrollLeft) {
+        startColumnIndex = Math.max(0, i - bufferSize);
+        break;
+      }
+    }
+
+    // Find end column index
+    const visibleWidth = scrollLeft + containerWidth;
+    let endColumnIndex = columns.length - 1;
+    for (let i = startColumnIndex; i < cumulativeWidths.length; i++) {
+      if (cumulativeWidths[i] > visibleWidth) {
+        endColumnIndex = Math.min(columns.length - 1, i + bufferSize);
+        break;
+      }
+    }
+
+    // Calculate left offset for visible columns
+    const leftOffset = startColumnIndex > 0 ? cumulativeWidths[startColumnIndex - 1] : 0;
+
+    // Get visible columns
+    const visibleColumns = columns.slice(startColumnIndex, endColumnIndex + 1);
+
+    return {
+      startColumnIndex,
+      endColumnIndex,
+      visibleColumns,
+      totalWidth,
+      scrollLeft,
+      leftOffset
+    };
+  }
+
+  /**
+   * Scroll to a specific column
+   */
+  scrollToColumn(
+    columnIndex: number,
+    columnWidths: { [key: string]: number },
+    columns: any[],
+    containerWidth: number
+  ): number {
+    if (columnIndex < 0 || columnIndex >= columns.length) {
+      return 0;
+    }
+
+    let targetScrollLeft = 0;
+    for (let i = 0; i < columnIndex; i++) {
+      const col = columns[i];
+      const width = columnWidths[col.id] || col.width || 150;
+      targetScrollLeft += width;
+    }
+
+    return targetScrollLeft;
+  }
+
+  /**
+   * Get spacer widths for horizontal virtual scrolling
+   */
+  getHorizontalSpacerWidth(
+    startColumnIndex: number,
+    endColumnIndex: number,
+    columnWidths: { [key: string]: number },
+    columns: any[]
+  ): { left: number; right: number } {
+    let leftWidth = 0;
+    for (let i = 0; i < startColumnIndex; i++) {
+      const col = columns[i];
+      const width = columnWidths[col.id] || col.width || 150;
+      leftWidth += width;
+    }
+
+    let rightWidth = 0;
+    for (let i = endColumnIndex + 1; i < columns.length; i++) {
+      const col = columns[i];
+      const width = columnWidths[col.id] || col.width || 150;
+      rightWidth += width;
+    }
+
+    return { left: leftWidth, right: rightWidth };
+  }
+
+  /**
+   * Check if a column is currently visible in the viewport
+   */
+  isColumnVisible(
+    columnIndex: number,
+    startColumnIndex: number,
+    endColumnIndex: number
+  ): boolean {
+    return columnIndex >= startColumnIndex && columnIndex <= endColumnIndex;
+  }
+
+  /**
+   * Get total width of all columns
+   */
+  getTotalColumnsWidth(
+    columns: any[],
+    columnWidths: { [key: string]: number }
+  ): number {
+    let totalWidth = 0;
+    for (const col of columns) {
+      const width = columnWidths[col.id] || col.width || 150;
+      totalWidth += width;
+    }
+    return totalWidth;
   }
 }

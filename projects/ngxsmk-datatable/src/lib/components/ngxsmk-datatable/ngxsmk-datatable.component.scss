@@ -246,6 +246,16 @@ $dt-transition-normal: var(--ngxsmk-dt-transition-normal);
     background: $dt-bg-light;
     border-bottom: 1px solid $dt-border-medium;
     z-index: 2;
+    overflow-x: auto;
+    overflow-y: hidden;
+    
+    // Hide scrollbar but keep functionality
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    
+    &::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
+    }
 
     &-row {
       display: flex;
@@ -489,6 +499,16 @@ $dt-transition-normal: var(--ngxsmk-dt-transition-normal);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    
+    // Multi-line cell support
+    &--multiline {
+      white-space: normal;
+      word-wrap: break-word;
+      word-break: break-word;
+      align-items: flex-start;
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
 
     // Frozen columns
     &--frozen-left {
@@ -767,5 +787,309 @@ body.ngxsmk-resizing {
     &__row {
       min-height: 52px;
     }
+  }
+}
+
+// ============================================================================
+// Drag and Drop Styles
+// ============================================================================
+
+.ngxsmk-datatable {
+  &__header-cell {
+    &[draggable="true"] {
+      cursor: move;
+      cursor: grab;
+      
+      &:active {
+        cursor: grabbing;
+      }
+    }
+    
+    // Column being dragged
+    &--dragging {
+      opacity: 0.5;
+      background-color: var(--ngxsmk-dt-primary-lighter);
+      border: 2px dashed var(--ngxsmk-dt-primary-color);
+      position: relative;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(59, 130, 246, 0.1);
+        pointer-events: none;
+      }
+    }
+    
+    // Column being dragged over
+    &--drag-over {
+      background-color: var(--ngxsmk-dt-primary-light);
+      border-left: 3px solid var(--ngxsmk-dt-primary-color);
+      position: relative;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        left: -2px;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background-color: var(--ngxsmk-dt-primary-color);
+        animation: dragIndicatorPulse 1s ease-in-out infinite;
+      }
+    }
+    
+    // Disable drag when resizing
+    &--resizing {
+      cursor: col-resize !important;
+      
+      &[draggable="true"] {
+        pointer-events: none;
+      }
+    }
+  }
+}
+
+@keyframes dragIndicatorPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scaleY(0.9);
+  }
+}
+
+// ============================================================================
+// CARD VIEW (Responsive Mobile Layout)
+// ============================================================================
+.ngxsmk-datatable__card-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  padding: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px;
+  }
+}
+
+.ngxsmk-datatable__card {
+  background-color: $dt-bg-white;
+  border: 1px solid $dt-border-light;
+  border-radius: $dt-radius-md;
+  padding: 16px;
+  transition: all $dt-transition-normal;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: $dt-shadow-sm;
+  
+  &:hover {
+    border-color: $dt-border-medium;
+    box-shadow: $dt-shadow-md;
+    transform: translateY(-2px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  &--selected {
+    background-color: $dt-bg-selected;
+    border-color: $dt-primary-color;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+}
+
+.ngxsmk-datatable__card-checkbox {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: $dt-primary-color;
+    
+    &:focus {
+      outline: 2px solid $dt-primary-color;
+      outline-offset: 2px;
+    }
+  }
+}
+
+.ngxsmk-datatable__card-image {
+  width: 100%;
+  height: 160px;
+  border-radius: $dt-radius-sm;
+  overflow: hidden;
+  background-color: $dt-bg-light;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.ngxsmk-datatable__card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.ngxsmk-datatable__card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: $dt-text-primary;
+  line-height: 1.4;
+  margin: 0;
+  padding-right: 32px; // Space for checkbox
+  
+  // Truncate long titles
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.ngxsmk-datatable__card-subtitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: $dt-text-secondary;
+  line-height: 1.4;
+  margin: 0;
+  
+  // Truncate long subtitles
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ngxsmk-datatable__card-description {
+  font-size: 14px;
+  color: $dt-text-secondary;
+  line-height: 1.6;
+  margin: 0;
+  
+  // Limit to 3 lines
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.ngxsmk-datatable__card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.ngxsmk-datatable__card-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background-color: $dt-primary-light;
+  color: $dt-primary-color;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+  
+  &:first-child {
+    background-color: $dt-primary-color;
+    color: white;
+  }
+}
+
+.ngxsmk-datatable__card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid $dt-border-light;
+}
+
+.ngxsmk-datatable__card-meta-item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.ngxsmk-datatable__card-meta-label {
+  color: $dt-text-tertiary;
+  font-weight: 500;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.ngxsmk-datatable__card-meta-value {
+  color: $dt-text-primary;
+  font-weight: 400;
+  word-break: break-word;
+}
+
+// ============================================================================
+// RESPONSIVE UTILITIES
+// ============================================================================
+@media (max-width: 768px) {
+  .ngxsmk-datatable__card {
+    padding: 14px;
+  }
+  
+  .ngxsmk-datatable__card-title {
+    font-size: 16px;
+  }
+  
+  .ngxsmk-datatable__card-image {
+    height: 140px;
+  }
+  
+  .ngxsmk-datatable__card-meta-label {
+    min-width: 70px;
+    font-size: 12px;
+  }
+  
+  .ngxsmk-datatable__card-meta-value {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ngxsmk-datatable__card-view {
+    padding: 8px;
+    gap: 8px;
+  }
+  
+  .ngxsmk-datatable__card {
+    padding: 12px;
+  }
+  
+  .ngxsmk-datatable__card-image {
+    height: 120px;
   }
 }

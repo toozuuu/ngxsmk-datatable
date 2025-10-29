@@ -45,5 +45,17 @@ export const routes: Routes = [
   {
     path: 'export',
     loadComponent: () => import('./pages/export-demo/export-demo.component').then(m => m.ExportDemoComponent)
+  },
+  {
+    path: 'facade',
+    loadComponent: () => import('./pages/facade-demo/facade-demo.component').then(m => m.FacadeDemoComponent)
+  },
+  {
+    path: 'column-reorder',
+    loadComponent: () => import('./pages/column-reorder-demo/column-reorder-demo.component').then(m => m.ColumnReorderDemoComponent)
+  },
+  {
+    path: 'responsive',
+    loadComponent: () => import('./pages/responsive-demo/responsive-demo.component').then(m => m.ResponsiveDemoComponent)
   }
 ];

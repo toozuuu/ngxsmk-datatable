@@ -32,12 +32,15 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { NgxsmkPagerComponent } from '../ngxsmk-pager/ngxsmk-pager.component';
 import { ColumnResizeService } from '../../services/column-resize.service';
 import { SelectionService } from '../../services/selection.service';
+import { DatatableFacade } from '../../core/state/datatable.facade';
+import { DragDropService } from '../../services/drag-drop.service';
+import { ResponsiveService, ResponsiveState } from '../../services/responsive.service';
 
 @Component({
   selector: 'ngxsmk-datatable',
   standalone: true,
   imports: [CommonModule, FormsModule, SafeHtmlPipe, NgxsmkPagerComponent],
-  providers: [VirtualScrollService, ColumnResizeService, SelectionService],
+  providers: [VirtualScrollService, ColumnResizeService, SelectionService, DragDropService],
   templateUrl: './ngxsmk-datatable.component.html',
   styleUrls: ['./ngxsmk-datatable.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -78,6 +81,21 @@ import { SelectionService } from '../../services/selection.service';
  * ```
  */
 export class NgxsmkDatatableComponent<T = any> implements OnInit, OnChanges, OnDestroy, AfterViewInit {
+  /**
+   * Facade for headless state management (optional)
+   * When provided, the component will use the facade's observables instead of @Input properties.
+   * This enables OnPush change detection optimization and reactive data flow.
+   * 
+   * @example
+   * ```typescript
+   * facade = new DatatableFacade<User>({
+   *   trackRowsBy: (i, row) => row.id,
+   *   onPush: true
+   * });
+   * ```
+   */
+  @Input() facade?: DatatableFacade<T>;
+  
   /** Column definitions for the datatable */
   @Input() columns: NgxsmkColumn<T>[] = [];
   
@@ -167,6 +185,18 @@ export class NgxsmkDatatableComponent<T = any> implements OnInit, OnChanges, OnD
   /** Configuration for expandable row details */
   @Input() rowDetail: RowDetailView | null = null;
   
+  /** Enable column reordering via drag-and-drop */
+  @Input() enableColumnReorder = false;
+  
+  /** Responsive configuration for card view on mobile */
+  @Input() responsiveConfig?: {
+    enabled?: boolean;
+    breakpoints?: { xs?: number; sm?: number; md?: number; lg?: number; xl?: number };
+    displayModes?: { mobile?: 'table' | 'card' | 'list'; tablet?: 'table' | 'card'; desktop?: 'table' };
+    hiddenColumnsOnMobile?: string[];
+    hiddenColumnsOnTablet?: string[];
+  };
+  
   /** Rows to freeze at the top of the table */
   @Input() frozenRowsTop: NgxsmkRow<T>[] = [];
   
@@ -176,20 +206,23 @@ export class NgxsmkDatatableComponent<T = any> implements OnInit, OnChanges, OnD
   /** Emitted when a row or cell is activated (clicked) */
   @Output() activate = new EventEmitter<any>();
   
+  /** Emitted when a cell is double-clicked */
+  @Output() cellDblClick = new EventEmitter<{ event: Event; row: NgxsmkRow<T>; column: NgxsmkColumn<T>; value: any; rowIndex: number; cellElement: HTMLElement }>();
+  
   /** Emitted when row selection changes */
   @Output() select = new EventEmitter<SelectionEvent>();
   
   /** Emitted when column sorting changes */
   @Output() sort = new EventEmitter<SortEvent>();
   
+  /** Emitted when columns are reordered via drag-and-drop */
+  @Output() columnReorder = new EventEmitter<{ column: NgxsmkColumn<T>; oldIndex: number; newIndex: number }>();
+  
   /** Emitted when page changes */
   @Output() page = new EventEmitter<PageEvent>();
   
   /** Emitted when a column is resized */
   @Output() columnResize = new EventEmitter<any>();
-  
-  /** Emitted when columns are reordered */
-  @Output() columnReorder = new EventEmitter<any>();
   
   /** Emitted when row detail is expanded or collapsed */
   @Output() rowDetailToggle = new EventEmitter<any>();
@@ -293,11 +326,19 @@ export class NgxsmkDatatableComponent<T = any> implements OnInit, OnChanges, OnD
   /** Total number of items across all pages */
   totalItems = 0;
 
+  /** Responsive state */
+  responsiveState: ResponsiveState | null = null;
+  
+  /** Should display in card view */
+  isCardView = false;
+
   constructor(
     private cdr: ChangeDetectorRef,
     private virtualScrollService: VirtualScrollService,
     private columnResizeService: ColumnResizeService,
-    private selectionService: SelectionService
+    private selectionService: SelectionService,
+    private dragDropService: DragDropService,
+    private responsiveService: ResponsiveService
   ) {
     this.selectionModel = this.selectionService.createSelectionModel();
   }
@@ -306,11 +347,109 @@ export class NgxsmkDatatableComponent<T = any> implements OnInit, OnChanges, OnD
     this.initializePagination();
     this.initializeComponent();
     this.setupEventListeners();
+    this.setupFacadeSubscriptions();
+    this.setupResponsiveMode();
+  }
+
+  /**
+   * Setup subscriptions to facade observables (when facade is provided)
+   */
+  private setupFacadeSubscriptions(): void {
+    if (!this.facade) {
+      return;
+    }
+
+    // Subscribe to rows changes
+    this.facade.rows$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(rows => {
+        this.rows = [...rows] as any;
+        this.processRows();
+        this.cdr.markForCheck(); // Trigger OnPush change detection
+      });
+
+    // Subscribe to columns changes
+    this.facade.columns$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(columns => {
+        this.columns = [...columns] as any;
+        this.processColumns();
+        this.cdr.markForCheck();
+      });
+
+    // Subscribe to selection changes
+    this.facade.selection$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(selection => {
+        // Sync facade selection back to component selection model
+        this.selectionModel.clear();
+        const selectedRows = this.rows.filter((row: any) => selection.includes(row.id));
+        selectedRows.forEach(row => this.selectionModel.select(row));
+        this.cdr.markForCheck();
+      });
+
+    // Subscribe to loading state
+    this.facade.loading$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(loading => {
+        // Handle loading state (show spinner, etc.)
+        this.cdr.markForCheck();
+      });
+
+    // Subscribe to error state
+    this.facade.error$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(error => {
+        if (error) {
+          console.error('Datatable error:', error);
+        }
+        this.cdr.markForCheck();
+      });
+  }
+
+  /**
+   * Setup responsive mode subscriptions
+   */
+  private setupResponsiveMode(): void {
+    if (!this.responsiveConfig?.enabled) {
+      return;
+    }
+
+    // Set custom breakpoints if provided
+    if (this.responsiveConfig.breakpoints) {
+      this.responsiveService.setBreakpoints(this.responsiveConfig.breakpoints);
+    }
+
+    // Subscribe to responsive state changes
+    this.responsiveService.responsiveState$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(state => {
+        this.responsiveState = state;
+        this.isCardView = this.responsiveService.shouldUseCardView(this.responsiveConfig);
+        this.cdr.markForCheck();
+      });
+
+    // Initialize current state
+    this.responsiveState = this.responsiveService.getState();
+    this.isCardView = this.responsiveService.shouldUseCardView(this.responsiveConfig);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     let needsUpdate = false;
 
+    // Sync changes to facade if provided
+    if (this.facade) {
+      if (changes['rows'] && !changes['rows'].isFirstChange()) {
+        this.facade.setRows(this.rows as any);
+      }
+      if (changes['columns'] && !changes['columns'].isFirstChange()) {
+        this.facade.setColumns(this.columns as any);
+      }
+      // Facade subscriptions will handle the updates
+      return;
+    }
+
+    // Traditional input handling (backwards compatible)
     if (changes['rows']) {
       this.processRows();
       needsUpdate = true;
@@ -533,6 +672,12 @@ export class NgxsmkDatatableComponent<T = any> implements OnInit, OnChanges, OnD
     if (this.bodyElement?.nativeElement) {
       this.bodyElement.nativeElement.addEventListener('scroll', (event: Event) => {
         const target = event.target as HTMLElement;
+        
+        // Sync header horizontal scroll with body scroll
+        if (this.headerElement?.nativeElement) {
+          this.headerElement.nativeElement.scrollLeft = target.scrollLeft;
+        }
+        
         this.scrollSubject.next({
           scrollTop: target.scrollTop,
           scrollLeft: target.scrollLeft
@@ -577,6 +722,18 @@ export class NgxsmkDatatableComponent<T = any> implements OnInit, OnChanges, OnD
     if (this.selectionType === 'cell') {
       this.handleCellSelection(event, row, column, value);
     }
+  }
+
+  onCellDblClick(event: Event, row: NgxsmkRow<T>, column: NgxsmkColumn<T>, value: any, rowIndex: number): void {
+    const cellElement = event.target as HTMLElement;
+    this.cellDblClick.emit({
+      event,
+      row,
+      column,
+      value,
+      rowIndex,
+      cellElement: cellElement.closest('.ngxsmk-datatable__cell') as HTMLElement || cellElement
+    });
   }
 
   /**
@@ -688,6 +845,11 @@ export class NgxsmkDatatableComponent<T = any> implements OnInit, OnChanges, OnD
       this.selectionModel.select(row);
     } else if (this.selectionType === 'multi' || this.selectionType === 'multiClick' || this.selectionType === 'checkbox') {
       this.selectionModel.toggle(row);
+    }
+
+    // Sync selection with facade if provided
+    if (this.facade && row['id']) {
+      this.facade.toggleRowSelection(row['id']);
     }
 
     this.select.emit({
@@ -821,6 +983,64 @@ export class NgxsmkDatatableComponent<T = any> implements OnInit, OnChanges, OnD
   }
 
   /**
+   * Get card title field (first column with cardRole='title' or first column)
+   */
+  getCardTitle(row: NgxsmkRow<T>): any {
+    const titleCol = this.columns.find(col => col.cardRole === 'title') || this.columns[0];
+    return titleCol ? row[titleCol.prop || titleCol.id] : '';
+  }
+
+  /**
+   * Get card subtitle field
+   */
+  getCardSubtitle(row: NgxsmkRow<T>): any {
+    const subtitleCol = this.columns.find(col => col.cardRole === 'subtitle');
+    return subtitleCol ? row[subtitleCol.prop || subtitleCol.id] : null;
+  }
+
+  /**
+   * Get card description field
+   */
+  getCardDescription(row: NgxsmkRow<T>): any {
+    const descCol = this.columns.find(col => col.cardRole === 'description');
+    return descCol ? row[descCol.prop || descCol.id] : null;
+  }
+
+  /**
+   * Get card image URL
+   */
+  getCardImage(row: NgxsmkRow<T>): any {
+    const imageCol = this.columns.find(col => col.cardRole === 'image');
+    return imageCol ? row[imageCol.prop || imageCol.id] : null;
+  }
+
+  /**
+   * Get card badge fields
+   */
+  getCardBadges(row: NgxsmkRow<T>): Array<{ label: string; value: any; column: NgxsmkColumn<T> }> {
+    return this.columns
+      .filter(col => col.cardRole === 'badge')
+      .map(col => ({
+        label: col.name,
+        value: row[col.prop || col.id],
+        column: col
+      }));
+  }
+
+  /**
+   * Get card meta fields (all visible fields not assigned a cardRole)
+   */
+  getCardMetaFields(row: NgxsmkRow<T>): Array<{ label: string; value: any; column: NgxsmkColumn<T> }> {
+    return this.columns
+      .filter(col => !col.hideInCardView && (!col.cardRole || col.cardRole === 'meta'))
+      .map(col => ({
+        label: col.name,
+        value: row[col.prop || col.id],
+        column: col
+      }));
+  }
+
+  /**
    * Track by function for virtual scrolling that ensures proper DOM updates
    * @param index - The index in the visible rows array
    * @param row - The row data
@@ -924,6 +1144,103 @@ export class NgxsmkDatatableComponent<T = any> implements OnInit, OnChanges, OnD
     return this.resizingColumn?.id === column.id;
   }
 
+  // ============================================
+  // Drag and Drop Methods
+  // ============================================
+
+  private draggedColumn: NgxsmkColumn<T> | null = null;
+  private draggedColumnIndex: number = -1;
+  private dragOverColumnIndex: number = -1;
+
+  /**
+   * Start dragging a column
+   */
+  onColumnDragStart(event: DragEvent, column: NgxsmkColumn<T>, index: number): void {
+    if (!this.enableColumnReorder || this.resizingColumn) {
+      event.preventDefault();
+      return;
+    }
+
+    this.draggedColumn = column;
+    this.draggedColumnIndex = index;
+    this.dragDropService.startDragColumn(column, index, event);
+  }
+
+  /**
+   * Handle drag over column
+   */
+  onColumnDragOver(event: DragEvent, column: NgxsmkColumn<T>, index: number): void {
+    if (!this.enableColumnReorder || !this.draggedColumn) {
+      return;
+    }
+
+    event.preventDefault();
+    this.dragOverColumnIndex = index;
+    this.dragDropService.dragOver(column, index, event);
+  }
+
+  /**
+   * Handle drop event
+   */
+  onColumnDrop(event: DragEvent): void {
+    if (!this.enableColumnReorder || !this.draggedColumn) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const fromIndex = this.draggedColumnIndex;
+    const toIndex = this.dragOverColumnIndex;
+
+    if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
+      // Reorder columns
+      const newColumns = [...this.columns];
+      const [movedColumn] = newColumns.splice(fromIndex, 1);
+      newColumns.splice(toIndex, 0, movedColumn);
+
+      this.columns = newColumns;
+      this.processColumns();
+
+      // Emit reorder event
+      this.columnReorder.emit({
+        column: movedColumn,
+        oldIndex: fromIndex,
+        newIndex: toIndex
+      });
+
+      // Trigger change detection
+      this.cdr.markForCheck();
+    }
+
+    this.onColumnDragEnd(event);
+  }
+
+  /**
+   * Handle drag end
+   */
+  onColumnDragEnd(event: DragEvent): void {
+    this.draggedColumn = null;
+    this.draggedColumnIndex = -1;
+    this.dragOverColumnIndex = -1;
+    this.dragDropService.endDrag();
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Check if column is being dragged
+   */
+  isDraggingColumn(column: NgxsmkColumn<T>): boolean {
+    return this.draggedColumn?.id === column.id;
+  }
+
+  /**
+   * Check if column is drag over target
+   */
+  isDragOverColumn(column: NgxsmkColumn<T>): boolean {
+    const index = this.columns.findIndex(c => c.id === column.id);
+    return index === this.dragOverColumnIndex && index !== this.draggedColumnIndex;
+  }
+
   /**
    * Handles refresh button click
    */
@@ -1014,12 +1331,24 @@ export class NgxsmkDatatableComponent<T = any> implements OnInit, OnChanges, OnD
   selectAll(): void {
     if (this.selectionModel.isAllSelected(this.rows)) {
       this.selectionModel.deselectAll();
+      
+      // Sync with facade if provided
+      if (this.facade) {
+        this.facade.clearSelection();
+      }
+      
       this.select.emit({
         selected: [],
         event: new Event('deselectAll')
       });
     } else {
       this.selectionModel.selectAll(this.rows);
+      
+      // Sync with facade if provided
+      if (this.facade) {
+        this.facade.selectAll();
+      }
+      
       this.select.emit({
         selected: this.getSelectedRows(),
         event: new Event('selectAll')
@@ -1032,6 +1361,12 @@ export class NgxsmkDatatableComponent<T = any> implements OnInit, OnChanges, OnD
    */
   deselectAll(): void {
     this.selectionModel.clear();
+    
+    // Sync with facade if provided
+    if (this.facade) {
+      this.facade.clearSelection();
+    }
+    
     this.select.emit({
       selected: [],
       event: new Event('deselectAll')
