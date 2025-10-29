@@ -409,6 +409,50 @@ Closes #[issue number]
 - You'll be added to the contributors list
 - Thank you! 🎉
 
+## 🤖 CI/CD Automated Workflows
+
+This project uses GitHub Actions for continuous integration and deployment. When you submit a PR or push to main, automated workflows will run:
+
+### What Gets Automatically Checked
+
+1. **Build Validation** - Library and demo app must build successfully
+2. **Tests** - All unit tests must pass
+3. **Linting** - Code must pass linter checks
+4. **Bundle Size** - Size is reported in PR comments
+5. **Security** - CodeQL scans for vulnerabilities
+
+### Workflows That Run
+
+- **CI** - Runs on every push and PR (builds, tests, lints)
+- **PR Validation** - Additional checks for pull requests
+- **CodeQL** - Security analysis
+- **Demo Deploy** - Automatically deploys demo app to GitHub Pages (main branch only)
+- **NPM Publish** - Publishes to npm on releases (maintainers only)
+
+### Viewing Workflow Results
+
+1. Go to the **Actions** tab in GitHub
+2. Click on your workflow run
+3. Review the logs for any failures
+4. Fix issues and push again
+
+### Local Pre-flight Check
+
+Before pushing, run these commands to catch issues locally:
+
+```bash
+# Full pre-flight check
+npm run lint && \
+npm run build:lib:prod && \
+npm run build:demo:prod && \
+npm run test:lib -- --watch=false
+
+# Quick check
+npm run lint && npm run build:lib
+```
+
+See [Workflows Documentation](.github/workflows/README.md) for detailed CI/CD information.
+
 ## 🧪 Testing
 
 ### Running Tests
