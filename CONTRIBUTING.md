@@ -409,6 +409,24 @@ Closes #[issue number]
 - You'll be added to the contributors list
 - Thank you! 🎉
 
+## 🤖 Automated NPM Publishing
+
+This project uses GitHub Actions to automate npm publishing.
+
+### How It Works
+
+When a GitHub Release is created, the package is automatically built and published to npm.
+
+### For Maintainers
+
+To publish a new version:
+1. Update version in package.json files
+2. Update CHANGELOG.md
+3. Create a GitHub Release with matching tag
+4. Workflow automatically publishes to npm
+
+See [Publishing Setup Guide](.github/NPM-PUBLISHING-SETUP.md) for details.
+
 ## 🧪 Testing
 
 ### Running Tests

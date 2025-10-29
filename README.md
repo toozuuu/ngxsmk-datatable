@@ -6,8 +6,6 @@
 ![Angular](https://img.shields.io/badge/angular-17%2B-red.svg)
 ![TypeScript](https://img.shields.io/badge/typescript-5.0%2B-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
-[![npm version](https://img.shields.io/npm/v/ngxsmk-datatable)](https://www.npmjs.com/package/ngxsmk-datatable)
-[![npm downloads](https://img.shields.io/npm/dm/ngxsmk-datatable)](https://www.npmjs.com/package/ngxsmk-datatable)
 
 **The Ultimate Angular DataTable Component**
 
